@@ -1,0 +1,45 @@
+        @prefix sf: <http://www.opengis.net/ont/sf#> .
+        @prefix geo: <http://www.opengis.net/ont/geosparql#> .
+
+        <igsn_uri> a sam:Specimen, prov:Entity;
+            dc:identifier [ #SKOS
+                a igsn:AlternateIdentifier;
+                igsn:identifierType <http://pid.geoscience.gov.au/def/voc/igsn-codelists/IGSN>; #skos:Concept;
+                prov:value "IGSN"^^xsd:string;
+            ];
+            dc:identifier [ #OWL
+                a <http://pid.geoscience.gov.au/def/voc/igsn-codelists/IGSN>;
+                prov:value "IGSN"^^xsd:string;
+            ];
+            geo:hasGeometry [
+                a sf:Point; # or Line
+                geo:asGML "<gml:Point srsDimension="3" srsName="http://www.opengis.net/def/crs/EPSG/0/4326"><gml:pos>49.40 -123.26</gml:pos></gml:Point>"^^geosp:gmlLiteral
+                geo:asWKT "<http://www.opengis.net/def/crs/EPSG/0/8311> POINTZ(144.2409874717 -18.1739861699)"^^geosp:wktLiteral
+            ];
+            sam:samplingElevation [
+                a sam:Elevation;
+                sam:elevation 34.6;
+                sam:verticalDatum <http://www.opengis.net/def/crs/EPSG/0/xxxx>;
+            ];
+            sam:currentLocation "some note"^^xsd:string;
+            obs:featureOfInterest <parent_uri>;
+            sam:materialClass <http://vocabulary.odm2.org/medium/rock/>;
+            sam:samplingMethod skos:Concept; (methodType) http://pid.geoscience.gov.au/def/voc/igsn-codelists/Drill
+            #sam:specimenType skos:Concept;
+            sam:samplingTime ""^^xsd:datetime;
+            dct:accessRights skos:Concept #http://pid.geoscience.gov.au/def/voc/igsn-codelists/Private
+
+        .
+
+        <parent_uri> a geo:Feature;
+            #xxx:gaFeatureType skos:Concept; # we limit this to our voc (parent feature type from Entity Types: BOREHOLE, SURVEY, PIPELINE -- these should be in a vocab)
+            #igsn:featureType (http://52.63.163.95/ga/sissvoc/ga-igsn-code-lists/resource?uri=http://pid.geoscience.gov.au/def/voc/igsn-codelists/featureType)
+            geo:hasGeometry [
+                a sf:Point; # or anything (Line, Polygon, combo)
+                geo:asGML "<gml:Point srsDimension="3" srsName="http://www.opengis.net/def/crs/EPSG/0/4326"><gml:pos>49.40 -123.26</gml:pos></gml:Point>"^^geosp:gmlLiteral
+                geo:asWKT "<http://www.opengis.net/def/crs/EPSG/0/8311> POINTZ(144.2409874717 -18.1739861699)"^^geosp:wktLiteral
+            ]
+            sam:samplingElevation [
+                sam:elevation 34.6;
+                sam:verticalDatum <http://www.opengis.net/def/crs/EPSG/0/xxxx>;
+            ]
