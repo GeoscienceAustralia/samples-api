@@ -1,5 +1,6 @@
 from lxml import etree
 from rdflib import Graph, URIRef, RDF, XSD, Namespace, Literal, BNode
+from datetime import datetime
 
 
 class Sample:
@@ -133,7 +134,40 @@ class Sample:
     '''
 
     def __init__(self):
-        pass
+        self.igsn = None
+        self.sampleid = None
+        self.sample_type = None
+        self.method_type = None
+        self.material_type = None
+        self.long_min = None
+        self.long_max = None
+        self.lat_min = None
+        self.lat_max = None
+        self.gtype = None
+        self.srid = None
+        self.x = None
+        self.y = None
+        self.z = None
+        self.elem_info = None
+        self.ordinates = None
+        self.state = None
+        self.country = None
+        self.depth_top = None
+        self.depth_base = None
+        self.strath = None
+        self.age = None
+        self.remark = None
+        self.lith = None
+        self.entity_type = None
+        self.date_aquired = None
+        self.entity_id = None
+        self.hole_long_min = None
+        self.hole_long_max = None
+        self.hole_lat_min = None
+        self.hole_lat_max = None
+        self.date_load = None
+        self.sample_no = None
+        self.entity_no = None
 
     def populate_from_oracle_api(self):
         """
@@ -141,7 +175,9 @@ class Sample:
         :return: None
         """
         # call API
-        # request.get
+        # r = request.get(...)
+        # xml = r.content # check the mimetype
+        # call populate_from_xml_file(StringIO(r.content))
         pass
 
     def populate_from_xml_file(self, xml_file):
@@ -203,11 +239,12 @@ class Sample:
             elif elem.tag == "SAMPLEID":
                 self.sampleid = elem.text
             elif elem.tag == "SAMPLE_TYPE_NEW":
-                self.sample_type = Sample.TERM_LOOKUP['sample_type'].get(elem.text),
+                self.sample_type = Sample.TERM_LOOKUP['sample_type'].get(elem.text)
             elif elem.tag == "SAMPLING_METHOD":
-                self.method_type = Sample.TERM_LOOKUP['method_type'].get(elem.text),
+                self.method_type = Sample.TERM_LOOKUP['method_type'].get(elem.text)
             elif elem.tag == "MATERIAL_CLASS":
-                self.material_type = Sample.TERM_LOOKUP['material_type'].get(elem.text),
+                if elem.text:
+                    self.material_type = Sample.TERM_LOOKUP['material_type'].get(elem.text)
             elif elem.tag == "SAMPLE_MIN_LONGITUDE":
                 self.long_min = elem.text
             elif elem.tag == "SAMPLE_MAX_LONGITUDE":
@@ -231,9 +268,9 @@ class Sample:
             elif elem.tag == "SDO_ORDINATES":
                 self.ordinates = elem.text
             elif elem.tag == "STATEID":
-                self.state = Sample.TERM_LOOKUP['state'].get(elem.text),
+                self.state = Sample.TERM_LOOKUP['state'].get(elem.text)
             elif elem.tag == "COUNTRY":
-                self.country = Sample.TERM_LOOKUP['country'].get(elem.text),
+                self.country = Sample.TERM_LOOKUP['country'].get(elem.text)
             elif elem.tag == "TOP_DEPTH":
                 self.depth_top = elem.text
             elif elem.tag == "BASE_DEPTH":
@@ -243,11 +280,13 @@ class Sample:
             elif elem.tag == "AGE":
                 self.age = elem.text
             elif elem.tag == "REMARK":
-                self.remark = elem.text
+                if elem.text:
+                    self.remark = elem.text
             elif elem.tag == "LITHNAME":
                 self.lith = elem.text
             elif elem.tag == "ACQUIREDATE":
-                self.date_aquire = elem.text
+                if elem.text:
+                    self.date_aquired = datetime.strptime(elem.text, '%d-%b-%y')
             elif elem.tag == "ENTITY_TYPE":
                 self.entity_type = elem.text
             elif elem.tag == "ENTITYID":
@@ -269,7 +308,7 @@ class Sample:
 
         return True
 
-    def export_as_rdf(self, model_view='default', format='turtle'):
+    def export_as_rdf(self, model_view='default', rdf_format='turtle'):
         """
         Exports this instance in RDF, according to a given model from the list of supported models,
         in a given rdflib RDF format
@@ -281,38 +320,22 @@ class Sample:
         :return: RDF string
         """
 
+        # things that are applicable to all model views
         g = Graph()
-        # declare namespaces
-        PROV = Namespace('http://www.w3.org/ns/prov#')
-        DCT = Namespace('http://purl.org/dc/elements/1.1/')
+        # DC = Namespace('http://purl.org/dc/elements/1.1/')
+        DCT = Namespace('http://purl.org/dc/terms/')
         SAM = Namespace('http://def.seegrid.csiro.au/ontology/om/sam-lite#')
         GEOSP = Namespace('http://www.opengis.net/ont/geosparql#')
-        SF = Namespace('http://www.opengis.net/ont/sf#')
-        IGSN = Namespace('http://pig.geoscience.gov.au/def/igsn')
 
-        # TODO: match the triples generator code to the example
-        # make the sample URI
+        # URI for this sample
         base_uri = 'http://pid.geoscience.gov.au/sample/'
         this_sample = URIRef(base_uri + self.igsn)
 
-        # make the triples
-        g.add((this_sample, RDF.type, SAM.Specimen))
+        # define GA as an Agent
+        ga = URIRef('http://pid.geoscience.gov.au/org/ga')
+        g.add((ga, RDF.type, DCT.Agent))
 
-        # location = BNode()
-        # g.add((this_sample, SAM.currentLocation, location))
-        # location = GA Services building
-        elevation = BNode()
-        g.add((elevation, RDF.type, SAM.Elevation))
-        g.add((this_sample, SAM.samplingElevation, elevation))
-        g.add((elevation, SAM.elevation, Literal(self.z, datatype=XSD.float)))
-        g.add((elevation, SAM.verticalDatum, Literal("GDA94", datatype=XSD.string)))
-
-        g.add((this_sample, RDF.type, GEOSP.Feature))
-        g.add((this_sample, RDF.type, PROV.Entity))
-        g.add((this_sample, DCT.identifier, Literal(self.igsn)))
-        point = BNode()
-        g.add((this_sample, GEOSP.hasGeometry, point))
-        g.add((point, RDF.type, SF.Point))
+        # sample location
         if self.z is not None:
             # wkt = "SRID=" + self.srid + ";POINTZ(" + self.x + " " + self.y + " " + self.z + ")"
             wkt = "<http://www.opengis.net/def/crs/EPSG/0/" + self.srid + "> POINTZ(" + self.x + " " + self.y + " " + self.z + ")"
@@ -326,65 +349,109 @@ class Sample:
                     '<gml:pos>' + self.x + ' ' + self.y + '</gml:pos>'\
                   '</gml:Point>'
 
-        g.add((point, GEOSP.asWKT, Literal(wkt, datatype=GEOSP.wktLiteral)))
-        g.add((point, GEOSP.asGML, Literal(gml, datatype=GEOSP.gmlLiteral)))
+        wkt = Literal(wkt, datatype=GEOSP.wktLiteral)
+        gml = Literal(wkt, datatype=GEOSP.gmlLiteral)
 
-        #g.add((this_sample, RDFS.label, Literal('Sample', datatype=XSD.string)))
+        # select model view
+        if model_view == 'default' or model_view == 'igsn' or model_view is None:
+            # default model is the IGSN model
+            '''
+            @prefix sf: <http://www.opengis.net/ont/sf#> .
+            @prefix geo: <http://www.opengis.net/ont/geosparql#> .
 
-        # TODO: implement a lookup table for each of the items in the GA DB that must be vocab terms in the IGSN vocab
-        # TODO: implement a fake vocab for sampling feature type BOREHOLE, SURVEY, PIPELINE)
-        #http://def.seegrid.csiro.au/ontology/om/sam-lite#SamplingPoint
-        #http://def.seegrid.csiro.au/ontology/om/sam-lite#Location
-        #http://def.seegrid.csiro.au/ontology/om/sam-lite#materialClass
-        #http://def.seegrid.csiro.au/ontology/om/sam-lite#samplingMethod
-        #http://def.seegrid.csiro.au/ontology/om/sam-lite#samplingTime
-        #http://def.seegrid.csiro.au/ontology/om/sam-lite#SpatialSamplingFeature hostedProcedure ObservationProcess
-        #http://def.seegrid.csiro.au/isotc211/iso19156/2011/sampling#specimenType
+            <igsn_uri> a sam:Specimen, prov:Entity;
+                dc:identifier [ #SKOS
+                    a igsn:AlternateIdentifier;
+                    igsn:identifierType <http://pid.geoscience.gov.au/def/voc/igsn-codelists/IGSN>; #skos:Concept;
+                    prov:value "IGSN"^^xsd:string;
+                ];
+                dc:identifier [ #OWL
+                    a <http://pid.geoscience.gov.au/def/voc/igsn-codelists/IGSN>;
+                    prov:value "IGSN"^^xsd:string;
+                ];
+                geo:hasGeometry [
+                    a sf:Point; # or Line
+                    geo:asGML "<gml:Point srsDimension="3" srsName="http://www.opengis.net/def/crs/EPSG/0/4326"><gml:pos>49.40 -123.26</gml:pos></gml:Point>"^^geosp:gmlLiteral
+                    geo:asWKT "<http://www.opengis.net/def/crs/EPSG/0/8311> POINTZ(144.2409874717 -18.1739861699)"^^geosp:wktLiteral
+                ];
+                sam:samplingElevation [
+                    a sam:Elevation;
+                    sam:elevation 34.6;
+                    sam:verticalDatum <http://www.opengis.net/def/crs/EPSG/0/xxxx>;
+                ];
+                sam:currentLocation "some note"^^xsd:string;
+                obs:featureOfInterest <parent_uri>;
+                sam:materialClass <http://vocabulary.odm2.org/medium/rock/>;
+                sam:samplingMethod skos:Concept; (methodType) http://pid.geoscience.gov.au/def/voc/igsn-codelists/Drill
+                #sam:specimenType skos:Concept;
+                sam:samplingTime ""^^xsd:datetime;
+                dct:accessRights skos:Concept #http://pid.geoscience.gov.au/def/voc/igsn-codelists/Private
 
-        #sam:Specimen sam:currentLocation sam:Location
-        #geosp:Geomtry geosp.asWKT ...
-        #http://def.seegrid.csiro.au/isotc211/iso19156/2011/sampling#Specimen
+            .
 
-        # prefix gm: http://def.seegrid.csiro.au/isotc211/iso19107/2003/geometry#
-        #gm:Object
-        #   gm:Primitive
-        #      gm:Point
+            <parent_uri> a geo:Feature;
+                #xxx:gaFeatureType skos:Concept; # we limit this to our voc (parent feature type from Entity Types: BOREHOLE, SURVEY, PIPELINE -- these should be in a vocab)
+                #igsn:featureType (http://52.63.163.95/ga/sissvoc/ga-igsn-code-lists/resource?uri=http://pid.geoscience.gov.au/def/voc/igsn-codelists/featureType)
+                geo:hasGeometry [
+                    a sf:Point; # or anything (Line, Polygon, combo)
+                    geo:asGML "<gml:Point srsDimension="3" srsName="http://www.opengis.net/def/crs/EPSG/0/4326"><gml:pos>49.40 -123.26</gml:pos></gml:Point>"^^geosp:gmlLiteral
+                    geo:asWKT "<http://www.opengis.net/def/crs/EPSG/0/8311> POINTZ(144.2409874717 -18.1739861699)"^^geosp:wktLiteral
+                ]
+                sam:samplingElevation [
+                    sam:elevation 34.6;
+                    sam:verticalDatum <http://www.opengis.net/def/crs/EPSG/0/xxxx>;
+                ]
+            '''
 
-        #geo:lat
-        #geo:long
+            # IGSN model required namespaces
+            PROV = Namespace('http://www.w3.org/ns/prov#')
+            SF = Namespace('http://www.opengis.net/ont/sf#')
+            ORG = Namespace('http://www.w3.org/ns/org#')
+            IGSN = Namespace('http://pig.geoscience.gov.au/def/igsn')
 
+            g.add((this_sample, RDF.type, SAM.Specimen))
 
-        #this_sample gm:position gm:Position
-        #gm:Position gm:coordinates ?
-        #gm:Position gm:srs 8311
+            # define GA as an Org, remove the DCT.Agent defn
+            g.add((ga, RDF.type, ORG.Org))
+            g.remove((ga, RDF.type, DCT.Agent))
 
-        #http://ijsdir.jrc.ec.europa.eu/index.php/ijsdir/article/view/351/359
+            # location = BNode()
+            # g.add((this_sample, SAM.currentLocation, location))
+            # location = GA Services building
+            elevation = BNode()
+            g.add((elevation, RDF.type, SAM.Elevation))
+            g.add((this_sample, SAM.samplingElevation, elevation))
+            g.add((elevation, SAM.elevation, Literal(self.z, datatype=XSD.float)))
+            g.add((elevation, SAM.verticalDatum, Literal("GDA94", datatype=XSD.string)))
 
-        #
-        #   try thsi sample via Stirling's API: AU239
-        #
+            g.add((this_sample, RDF.type, GEOSP.Feature))
+            g.add((this_sample, RDF.type, PROV.Entity))
+            g.add((this_sample, DCT.identifier, Literal(self.igsn)))
+            point = BNode()
+            g.add((this_sample, GEOSP.hasGeometry, point))
+            g.add((point, RDF.type, SF.Point))
+            g.add((point, GEOSP.asGML, Literal(gml, datatype=GEOSP.gmlLiteral)))
 
+        elif model_view == 'dc':
+            # this is the cut-down IGSN --> Dublin core mapping describe at http://igsn.github.io/oai/
+            g.add((this_sample, RDF.type, DCT.PhysicalResource))
+            g.add((this_sample, DCT.coverage, wkt))
+            # g.add((this_sample, DCT.creator, Literal('Unknown', datatype=XSD.string)))
+            if self.date_aquired is not None:
+                g.add((this_sample, DCT.date, Literal(self.date_aquired.isoformat(), datatype=XSD.date)))
+            if self.remark is not None:
+                g.add((this_sample, DCT.description, self.remark))
+            if self.material_type is not None:
+                g.add((this_sample, DCT.format, URIRef(self.material_type)))
+            g.add((this_sample, DCT.identifier, Literal('igsn:' + self.igsn, datatype=XSD.string)))
+            g.add((this_sample, DCT.publisher, ga))
+            # g.add((this_sample, DCT.relation, ga)) -- no value yet in GA DB
+            # g.add((this_sample, DCT.subject, ga)) -- how is this different to type?
+            # g.add((this_sample, DCT.title, ga)) -- no value at GA
+            if self.sample_type is not None:
+                g.add((this_sample, DCT.type, URIRef(self.sample_type)))
 
-        #
-        # WKT example from Kolas2013
-        # "<http://www.opengis.net/def/crs/EPSG/0/8311> Point(-83.38 33.95)"^^geo:wktLiteral
-        #
-        '''
-        @prefix owl: <http://www.w3.org/2002/07/owl#> .
-        @prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
-        @prefix geo: <http://www.opengis.net/ont/geosparql#> .
-        @prefix ex: <http://www.example.org/POI#> .
-        @prefix sf: <http://www.opengis.net/ont/sf#> .
-
-        ex:WashingtonMonument a ex:Monument;
-        rdfs:label "Washington Monument";
-        geo:hasGeometry [
-            a sf:Point;
-            geo:asWKT "POINT(-77.03524 38.889468)"^^geo:wktLiteral.
-        ]
-        '''
-
-        return g.serialize(format='nt')
+        return g.serialize(format=rdf_format)
 
     def export_as_igsn_xml(self):
         """
@@ -394,10 +461,8 @@ class Sample:
         :return: XML string
         """
 
-
-
 if __name__ == '__main__':
     s = Sample()
     s.populate_from_xml_file('test/sample_eg1.xml')
-    #print s.export_as_rdf()
+    print s.export_as_rdf('dc')
 
