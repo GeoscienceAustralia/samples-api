@@ -331,9 +331,8 @@ class Sample:
         base_uri = 'http://pid.geoscience.gov.au/sample/'
         this_sample = URIRef(base_uri + self.igsn)
 
-        # define GA as an Agent
+        # define GA
         ga = URIRef('http://pid.geoscience.gov.au/org/ga')
-        g.add((ga, RDF.type, DCT.Agent))
 
         # sample location
         if self.z is not None:
@@ -444,6 +443,8 @@ class Sample:
             if self.material_type is not None:
                 g.add((this_sample, DCT.format, URIRef(self.material_type)))
             g.add((this_sample, DCT.identifier, Literal('igsn:' + self.igsn, datatype=XSD.string)))
+            # define GA as a dct:Agent
+            g.add((ga, RDF.type, DCT.Agent))
             g.add((this_sample, DCT.publisher, ga))
             # g.add((this_sample, DCT.relation, ga)) -- no value yet in GA DB
             # g.add((this_sample, DCT.subject, ga)) -- how is this different to type?
