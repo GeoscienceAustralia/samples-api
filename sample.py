@@ -117,7 +117,7 @@ class Sample:
             'WA':   'http://www.geonames.org/2058645/'
         },
         'country': {
-            'AUS': 'http://www.geonames.org/2077456/australia.html'
+            'AUS': 'http://www.geonames.org/2077456/'
         },
         'lith': {
             'one': 'ONE',
@@ -461,6 +461,7 @@ class Sample:
 
         :return: XML string
         """
+        pass
 
 if __name__ == '__main__':
     s = Sample()
