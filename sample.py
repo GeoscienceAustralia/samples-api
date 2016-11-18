@@ -124,8 +124,8 @@ class Sample:
             'two': 'TWO',
         },
         'entity_type': {
-            'BOTEHOLE': 'borehole',
-            'two': 'TWO',
+            'BOREHOLE': 'http://vocabulary.odm2.org/samplingfeaturetype/borehole/',
+            'FIELD SITE': 'http://vocabulary.odm2.org/samplingfeaturetype/site/',
         }
     }
 
