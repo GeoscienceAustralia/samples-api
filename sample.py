@@ -29,6 +29,10 @@ class Sample:
         http://pid.geoscience.gov.au/def/voc/igsn-codelists/sridType
     """
     TERM_LOOKUP = {
+        'access': {
+            'Public': 'http://pid.geoscience.gov.au/def/voc/igsn-codelists/Public',
+            'Private': 'http://pid.geoscience.gov.au/def/voc/igsn-codelists/Private'
+        },
         'sample_type': {
             'automated':            'http://vocabulary.odm2.org/specimentype/automated/',
             'core':                 'http://vocabulary.odm2.org/specimentype/core/',
@@ -130,6 +134,43 @@ class Sample:
         }
     }
 
+    '''
+    Entity Types not yet in a vocab
+
+    ACREAGE RELEASE
+    COUNTRY
+    DRILLHOLE
+    EMITTER
+    ESSCI
+    ESTUARY
+    EXPLORATION PERMIT
+    FACIES
+    FIELD SITE
+    MAPSHEET
+    MARSEGMENT
+    MINERAL DEPOSIT
+    MINERAL PROJECT
+    MINERALISED ZONE
+    OBSERVATORY
+    PIPELINE
+    PLACE NAME
+    POLITICAL REGION
+    PORT
+    POWER STATION
+    PRODUCTION LICENCE
+    PROJECT
+    PROVINCE
+    RESOURCE PROCESSING PLANT
+    RESOURCE PROJECT
+    RETENTION LEASE
+    SECTION
+    SEISMICLINE
+    STATE
+    SURVEY
+    WELL
+    WILDCAT LOCATION
+    '''
+
     def __init__(self):
         self.igsn = None
         self.sampleid = None
@@ -157,14 +198,15 @@ class Sample:
         self.lith = None
         self.entity_type = None
         self.date_aquired = None
-        self.entity_id = None
+        self.entity_uri = None
+        self.entity_name = None
+        self.entity_type = None
         self.hole_long_min = None
         self.hole_long_max = None
         self.hole_lat_min = None
         self.hole_lat_max = None
         self.date_load = None
         self.sample_no = None
-        self.entity_no = None
 
     def populate_from_oracle_api(self):
         """
@@ -284,10 +326,12 @@ class Sample:
             elif elem.tag == "ACQUIREDATE":
                 if elem.text:
                     self.date_aquired = datetime.strptime(elem.text, '%d-%b-%y')
+            elif elem.tag == "ENO":
+                self.entity_uri = 'http://pid.geoscience.gov.au/site/' + elem.text
+            elif elem.tag == "ENTITYID":
+                self.entity_name = elem.text
             elif elem.tag == "ENTITY_TYPE":
                 self.entity_type = elem.text
-            elif elem.tag == "ENTITYID":
-                self.entity_id = elem.text
             elif elem.tag == "HOLE_MIN_LONGITUDE":
                 self.hole_long_min = elem.text
             elif elem.tag == "HOLE_MAX_LONGITUDE":
@@ -300,8 +344,6 @@ class Sample:
                 self.date_load = elem.text
             elif elem.tag == "SAMPLENO":
                 self.sample_no = elem.text
-            elif elem.tag == "ENO":
-                self.entity_no = elem.text
 
         return True
 
@@ -323,6 +365,8 @@ class Sample:
         DCT = Namespace('http://purl.org/dc/terms/')
         SAM = Namespace('http://def.seegrid.csiro.au/ontology/om/sam-lite#')
         GEOSP = Namespace('http://www.opengis.net/ont/geosparql#')
+        OM = Namespace('http://def.seegrid.csiro.au/ontology/om/om-lite#')
+        AUROLE = Namespace('http://communications.data.gov.au/def/role/')
 
         # URI for this sample
         base_uri = 'http://pid.geoscience.gov.au/sample/'
@@ -382,7 +426,6 @@ class Sample:
                 #sam:specimenType skos:Concept;
                 sam:samplingTime ""^^xsd:datetime;
                 dct:accessRights skos:Concept #http://pid.geoscience.gov.au/def/voc/igsn-codelists/Private
-
             .
 
             <parent_uri> a geo:Feature;
@@ -402,31 +445,110 @@ class Sample:
             # IGSN model required namespaces
             PROV = Namespace('http://www.w3.org/ns/prov#')
             SF = Namespace('http://www.opengis.net/ont/sf#')
-            ORG = Namespace('http://www.w3.org/ns/org#')
             IGSN = Namespace('http://pig.geoscience.gov.au/def/igsn')
 
             g.add((this_sample, RDF.type, SAM.Specimen))
+            g.add((this_sample, RDF.type, PROV.Entity))
 
-            # define GA as an Org, remove the DCT.Agent defn
-            g.add((ga, RDF.type, ORG.Org))
-            g.remove((ga, RDF.type, DCT.Agent))
+            # IGSN AlternateIdentifier
+            '''
+            dc:identifier [
+                a igsn:AlternateIdentifier;
+                igsn:identifierType <http://pid.geoscience.gov.au/def/voc/igsn-codelists/IGSN>; #skos:Concept;
+                prov:value "IGSN"^^xsd:string;
+            ];
+            '''
+            alternate_identifier = BNode()
+            g.add((this_sample, DCT.identifier, alternate_identifier))
+            g.add((alternate_identifier, RDF.type, IGSN.AlternateIdentifier))
+            g.add((alternate_identifier, IGSN.identifierType, URIRef('http://pid.geoscience.gov.au/def/voc/igsn-codelists/IGSN')))
+            g.add((alternate_identifier, PROV.value, Literal(self.igsn, datatype=XSD.string)))
 
-            # location = BNode()
-            # g.add((this_sample, SAM.currentLocation, location))
-            # location = GA Services building
+            '''
+            geo:hasGeometry [
+                a sf:Point; # or Line
+                geo:asGML "<gml:Point srsDimension="3" srsName="http://www.opengis.net/def/crs/EPSG/0/4326"><gml:pos>49.40 -123.26</gml:pos></gml:Point>"^^geosp:gmlLiteral
+                geo:asWKT "<http://www.opengis.net/def/crs/EPSG/0/8311> POINTZ(144.2409874717 -18.1739861699)"^^geosp:wktLiteral
+            ];
+            '''
+            geometry = BNode()
+            g.add((this_sample, GEOSP.hasGeometry, geometry))
+            g.add((geometry, RDF.type, SF.Point))
+            g.add((geometry, GEOSP.asGML, gml))
+            g.add((geometry, GEOSP.asWKT, wkt))
+
+            '''
+            sam:samplingElevation [
+                a sam:Elevation;
+                sam:elevation 34.6;
+                sam:verticalDatum <http://www.opengis.net/def/crs/EPSG/0/xxxx>;
+            ];
+            '''
             elevation = BNode()
-            g.add((elevation, RDF.type, SAM.Elevation))
             g.add((this_sample, SAM.samplingElevation, elevation))
+            g.add((elevation, RDF.type, SAM.Elevation))
             g.add((elevation, SAM.elevation, Literal(self.z, datatype=XSD.float)))
             g.add((elevation, SAM.verticalDatum, Literal("GDA94", datatype=XSD.string)))
 
-            g.add((this_sample, RDF.type, GEOSP.Feature))
-            g.add((this_sample, RDF.type, PROV.Entity))
-            g.add((this_sample, DCT.identifier, Literal(self.igsn)))
-            point = BNode()
-            g.add((this_sample, GEOSP.hasGeometry, point))
-            g.add((point, RDF.type, SF.Point))
-            g.add((point, GEOSP.asGML, Literal(gml, datatype=GEOSP.gmlLiteral)))
+            '''
+            sam:currentLocation "some note"^^xsd:string;
+            sam:materialClass <http://vocabulary.odm2.org/medium/rock/>;
+            sam:samplingMethod skos:Concept; (methodType) http://pid.geoscience.gov.au/def/voc/igsn-codelists/Drill
+            #sam:specimenType skos:Concept;
+            sam:samplingTime ""^^xsd:datetime;
+            dct:accessRights skos:Concept #http://pid.geoscience.gov.au/def/voc/igsn-codelists/Private
+            obs:featureOfInterest <parent_uri>;
+            '''
+            g.add((this_sample, SAM.currentLocation, Literal('GA Services building', datatype=XSD.string)))
+            if self.material_type is not None:
+                g.add((this_sample, SAM.materialClass, URIRef(self.material_type)))
+            if self.method_type is not None:
+                g.add((this_sample, SAM.samplingMethod, URIRef(self.method_type)))
+            if self.date_aquired is not None:
+                g.add((this_sample, SAM.samplingTime, Literal(self.date_aquired, datatype=datetime)))
+            # TODO: represent Public/Private (and other?) access methods in DB
+            g.add((this_sample, DCT.accessRights, URIRef(Sample.TERM_LOOKUP['access']['Public'])))
+            # TODO: make a register of Entities
+            this_parent = URIRef(self.entity_uri)
+            g.add((this_sample, OM.featureOfInterest, this_parent))
+
+            '''
+            <parent_uri> a geo:Feature;
+                #xxx:gaFeatureType skos:Concept; # we limit this to our voc (parent feature type from Entity Types: BOREHOLE, SURVEY, PIPELINE -- these should be in a vocab)
+                #igsn:featureType (http://52.63.163.95/ga/sissvoc/ga-igsn-code-lists/resource?uri=http://pid.geoscience.gov.au/def/voc/igsn-codelists/featureType)
+                geo:hasGeometry [
+                    a sf:Point; # or anything (Line, Polygon, combo)
+                    geo:asGML "<gml:Point srsDimension="3" srsName="http://www.opengis.net/def/crs/EPSG/0/4326"><gml:pos>49.40 -123.26</gml:pos></gml:Point>"^^geosp:gmlLiteral
+                    geo:asWKT "<http://www.opengis.net/def/crs/EPSG/0/8311> POINTZ(144.2409874717 -18.1739861699)"^^geosp:wktLiteral
+                ]
+                sam:samplingElevation [
+                    sam:elevation 34.6;
+                    sam:verticalDatum <http://www.opengis.net/def/crs/EPSG/0/xxxx>;
+                ]
+            '''
+            fake_entity_type_uri = 'http://pid.geoscience.gov.au/def/voc/sites/' + self.entity_type.lower()
+            g.add((this_parent, IGSN.featureType, URIRef(fake_entity_type_uri)))  # TODO: sort out the parent type, both the predicate used and the value (need a vocab)
+
+            parent_geometry = BNode()
+            g.add((this_parent, GEOSP.hasGeometry, parent_geometry))
+            g.add((parent_geometry, RDF.type, SF.Point))  # TODO: extend this for other geometry types
+            g.add((parent_geometry, GEOSP.asGML, gml))
+            g.add((parent_geometry, GEOSP.asWKT, wkt))
+
+            parent_elevation = BNode()
+            g.add((this_parent, SAM.samplingElevation, parent_elevation))
+            g.add((parent_elevation, RDF.type, SAM.Elevation))
+            g.add((parent_elevation, SAM.elevation, Literal(self.z, datatype=XSD.float)))
+            g.add((parent_elevation, SAM.verticalDatum, Literal("GDA94", datatype=XSD.string)))
+
+            # TODO: make a publisher Agent at least
+            # define GA as an PROV Org
+            g.add((ga, RDF.type, PROV.Org))
+            qualified_attribution = BNode()
+            g.add((qualified_attribution, RDF.type, PROV.Attribution))
+            g.add((qualified_attribution, PROV.agent, ga))
+            g.add((qualified_attribution, PROV.hadRole, AUROLE.Publisher))
+            g.add((this_sample, PROV.qualifiedAttribution, qualified_attribution))
 
         elif model_view == 'dc':
             # this is the cut-down IGSN --> Dublin core mapping describe at http://igsn.github.io/oai/
@@ -476,10 +598,118 @@ class Sample:
 
         :return: XML string
         """
+
+
+        '''
+        SESAR XML example from: https://app.geosamples.org/webservices/display.php?igsn=LCZ7700AK
+
+        <?xml version="1.0" encoding="UTF-8"?>
+        <results>
+            <qrcode_img_src>app.geosamples.org/barcode/image.php?igsn=LCZ7700AK&amp;sample_id=CDR4_100mesh</qrcode_img_src>
+            <user_code>LCZ</user_code>
+            <igsn>LCZ7700AK</igsn>
+            <name>CDR4_100mesh</name>
+            <sample_type>Individual Sample</sample_type>
+            <parent_igsn>LCZ771200</parent_igsn>
+            <publish_date>2015-07-01</publish_date>
+            <material>Rock</material>
+            <classification>Metamorphic</classification>
+            <field_name>hornfels grade metavolcaniclastic</field_name>
+            <description>ground with a mortar and pestle to pass through a 100 mesh (150um) sieve</description>
+            <collection_method>Manual&amp;gt;Hammer</collection_method>
+            <geological_unit>Fajardo Formation</geological_unit>
+            <purpose>weathering study</purpose>
+            <latitude>18.28657</latitude>
+            <longitude>-65.77803</longitude>
+            <country>Puerto Rico</country>
+            <cruise_field_prgrm>Luquillo Critical Zone Observatory (CZO)</cruise_field_prgrm>
+            <collector>Joe Orlando</collector>
+            <collection_start_date>2011-01-13</collection_start_date>
+            <collection_date_precision>day</collection_date_precision>
+            <current_archive>Department of Geosciences, Penn State Unv</current_archive>
+            <current_archive_contact>Susan L. Brantley</current_archive_contact>
+            <parents>
+                <parent>LCZ771200 CDR4</parent>
+            </parents>
+            <siblings>
+                <sibling>LCZ7700AJ CDR4_sawcut</sibling>
+                <sibling>LCZ7700AL CDR4_TS_30um</sibling>
+                <sibling>LCZ7700AM CDR4_TS_150um</sibling>
+            </siblings>
+        </results>
+
+        Example XML from
+        http://www.iedadata.org/services/sesar_examplexml
+
+    <samples>
+        <sample>
+            <sample_type>Dredge</sample_type>
+            <igsn>R05333444</igsn>
+            <user_code>R05</user_code>
+            <name>Primary name of sample</name>
+            <sample_other_name>Another name by which the sample is known</sample_other_name>
+            <parent_igsn>R05000001</parent_igsn>
+            <parent_sample_type>Core</parent_sample_type>
+            <parent_name>Rebeccas Original Core</parent_name>
+            <is_private>1</is_private>
+            <publish_date>05/22/2011</publish_date>
+            <material>Rock</material>
+            <classification>Igneous>Plutonic>Exotic</classification>
+            <field_name>Name of field, ie. Basalt</field_name>
+            <description>description of sample</description>
+            <age_min>10.02</age_min>
+            <age_max>10.02</age_max>
+            <age_unit>Million Years (Ma)</age_unit>
+            <geological_age>10.02</geological_age>
+            <geological_unit></geological_unit>
+            <collection_method></collection_method>
+            <collection_method_descr></collection_method_descr>
+            <size>10.02</size>
+            <size_unit>cm</size_unit>
+            <sample_comment></sample_comment>
+            <latitude>10.02</latitude>
+            <longitude>10.02</longitude>
+            <latitude_end>10.02</latitude_end>
+            <longitude_end>10.02</longitude_end>
+            <elevation>10.02</elevation>
+            <elevation_end>10.02</elevation_end>
+            <primary_location_type>Ocean Ridge</primary_location_type>
+            <primary_location_name>East Pacific Rise</primary_location_name>
+            <location_description>ridge axis</location_description>
+            <locality>21 North study area</locality>
+            <locality_description></locality_description>
+            <country>Name of country</country>
+            <province>Name of province</province>
+            <county>Name of county</county>
+            <city>Name of city</city>
+            <cruise_field_prgrm>Name of cruise field program ie HLY0805</cruise_field_prgrm>
+            <platform_type>Icebreaker</platform_type>
+            <platform_name>Name of platform ie USCGC Healy</platform_name>
+            <platform_descr>Platform Description ie US Coast Guard Cutter</platform_descr>
+            <collector>Collector / Chief Scientist name</collector>
+            <collector_detail>Details of Collector</collector_detail>
+            <collection_start_date></collection_start_date>
+            <collection_start_time></collection_start_time>
+            <collection_end_date></collection_end_date>
+            <collection_end_time></collection_end_time>
+            <collection_date_precision></collection_date_precision>
+            <current_archive></current_archive>
+            <current_archive_contact></current_archive_contact>
+            <original_archive></original_archive>
+            <original_archive_contact></original_archive_contact>
+            <depth_min>10.2</depth_min>
+            <depth_max>10.2</depth_max>
+            <depth_scale>cm</depth_scale>
+            <other_names>Another name by which this sample may be known</other_names>
+            <other_names>Yet another name by which this sample may be known</other_names>
+            <other_names>And yet another name by which this sample may be known</other_names>
+        </sample>
+    </samples>
+        '''
         pass
 
 if __name__ == '__main__':
     s = Sample()
     s.populate_from_xml_file('test/sample_eg1.xml')
-    print s.export_as_rdf('dc')
+    print s.export_as_rdf()
 
