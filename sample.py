@@ -1,6 +1,7 @@
 from lxml import etree
 from rdflib import Graph, URIRef, RDF, XSD, Namespace, Literal, BNode
 from datetime import datetime
+from StringIO import StringIO
 
 
 class Sample:
@@ -129,10 +130,6 @@ class Sample:
         }
     }
 
-    '''
-
-    '''
-
     def __init__(self):
         self.igsn = None
         self.sampleid = None
@@ -172,6 +169,7 @@ class Sample:
     def populate_from_oracle_api(self):
         """
         Populates this instance with data from the Oracle Samples table API
+
         :return: None
         """
         # call API
@@ -184,11 +182,10 @@ class Sample:
         """
         Populates this instance with data from an XML file.
 
-        This is mainly a testing function.
-
         :param xml_file:
         :return: None
         """
+        # iterate through the elements in the XML element tree and handle each
         for event, elem in etree.iterparse(xml_file):
             '''
             <ROWSET>
@@ -320,7 +317,7 @@ class Sample:
         :return: RDF string
         """
 
-        # things that are applicable to all model views
+        # things that are applicable to all model views; the graph and some namespaces
         g = Graph()
         # DC = Namespace('http://purl.org/dc/elements/1.1/')
         DCT = Namespace('http://purl.org/dc/terms/')
@@ -334,7 +331,7 @@ class Sample:
         # define GA
         ga = URIRef('http://pid.geoscience.gov.au/org/ga')
 
-        # sample location
+        # sample location in GML & WKT, formulation from GeoSPARQL
         if self.z is not None:
             # wkt = "SRID=" + self.srid + ";POINTZ(" + self.x + " " + self.y + " " + self.z + ")"
             wkt = "<http://www.opengis.net/def/crs/EPSG/0/" + self.srid + "> POINTZ(" + self.x + " " + self.y + " " + self.z + ")"
@@ -453,6 +450,24 @@ class Sample:
                 g.add((this_sample, DCT.type, URIRef(self.sample_type)))
 
         return g.serialize(format=rdf_format)
+
+    def is_xml_export_valid(self, xml_string):
+        """
+        Validate and export of this Sample instance in XML using the XSD files from the dev branch
+        of the IGSN repo: https://github.com/IGSN/metadata/tree/dev/description. The actual XSD
+        files used are in the xml-validation dir, commit be2f0f8d7ef78407c386d3c8a0aba7c31397aa29
+
+        :param xml_string:
+        :return: boolean
+        """
+        # load the schema
+        xsd_doc = etree.parse(StringIO('xml-validation/resource.xsd'))
+        xsd = etree.XMLSchema(xsd_doc)
+
+        # load the XML doc
+        xml = etree.parse(StringIO(xml_string))
+
+        return xsd.validate(xml)
 
     def export_as_igsn_xml(self):
         """
