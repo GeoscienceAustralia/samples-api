@@ -5,6 +5,11 @@
 
     {% if view == 'alternates' %}
         <h2>Alternates view</h2>
-        {{ alternates_html|safe }}
+    {% elif view == 'igsn' %}
+        <h2>IGSN Ontology view</h2>
+    {% elif view == 'dc' %}
+        <h2>Dublin Core view</h2>
     {% endif %}
+    {{ placed_html|safe }}
+
 {% endblock %}

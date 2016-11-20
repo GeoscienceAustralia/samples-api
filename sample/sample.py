@@ -4,6 +4,7 @@ from datetime import datetime
 from StringIO import StringIO
 
 
+
 class Sample:
     """
     Sample class
@@ -356,6 +357,41 @@ class Sample:
 
         return True
 
+    def generate_sample_wkt(self):
+        if self.z is not None:
+            # wkt = "SRID=" + self.srid + ";POINTZ(" + self.x + " " + self.y + " " + self.z + ")"
+            wkt = "<http://www.opengis.net/def/crs/EPSG/0/" + self.srid + "> POINTZ(" + self.x + " " + self.y + " " + self.z + ")"
+        else:
+            # wkt = "SRID=" + self.srid + ";POINT(" + self.x + " " + self.y + ")"
+            wkt = "<http://www.opengis.net/def/crs/EPSG/0/" + self.srid + "> POINT(" + self.x + " " + self.y + ")"
+
+        return wkt
+
+    def generate_sample_gml(self):
+        if self.z is not None:
+            gml = '<gml:Point srsDimension="3" srsName="http://www.opengis.net/def/crs/EPSG/0/' + self.srid + '">'\
+                    '<gml:pos>' + self.x + ' ' + self.y + ' ' + self.z + '</gml:pos>'\
+                  '</gml:Point>'
+        else:
+            gml = '<gml:Point srsDimension="2" srsName="http://www.opengis.net/def/crs/EPSG/0/' + self.srid + '">'\
+                    '<gml:pos>' + self.x + ' ' + self.y + '</gml:pos>'\
+                  '</gml:Point>'
+
+        return gml
+
+    def generate_parent_wkt(self):
+        # TODO: add support for geometries other than Point
+        wkt = "<http://www.opengis.net/def/crs/EPSG/0/" + self.srid + "> POINT(" + self.hole_long_min + " " + self.hole_lat_min + ")"
+
+        return wkt
+
+    def generate_parent_gml(self):
+        # TODO: add support for geometries other than Point
+        gml = '<gml:Point srsDimension="2" srsName="http://www.opengis.net/def/crs/EPSG/0/' + self.srid + '">' \
+              ' <gml:pos>' + self.hole_long_min + ' ' + self.hole_lat_min + '</gml:pos>' \
+              '</gml:Point>'
+        return gml
+
     def export_as_rdf(self, model_view='default', rdf_mime='text/turtle'):
         """
         Exports this instance in RDF, according to a given model from the list of supported models,
@@ -390,21 +426,8 @@ class Sample:
         ga = URIRef('http://pid.geoscience.gov.au/org/ga')
 
         # sample location in GML & WKT, formulation from GeoSPARQL
-        if self.z is not None:
-            # wkt = "SRID=" + self.srid + ";POINTZ(" + self.x + " " + self.y + " " + self.z + ")"
-            wkt = "<http://www.opengis.net/def/crs/EPSG/0/" + self.srid + "> POINTZ(" + self.x + " " + self.y + " " + self.z + ")"
-            gml = '<gml:Point srsDimension="3" srsName="http://www.opengis.net/def/crs/EPSG/0/' + self.srid + '">'\
-                    '<gml:pos>' + self.x + ' ' + self.y + ' ' + self.z + '</gml:pos>'\
-                  '</gml:Point>'
-        else:
-            # wkt = "SRID=" + self.srid + ";POINT(" + self.x + " " + self.y + ")"
-            wkt = "<http://www.opengis.net/def/crs/EPSG/0/" + self.srid + "> POINT(" + self.x + " " + self.y + ")"
-            gml = '<gml:Point srsDimension="2" srsName="http://www.opengis.net/def/crs/EPSG/0/' + self.srid + '">'\
-                    '<gml:pos>' + self.x + ' ' + self.y + '</gml:pos>'\
-                  '</gml:Point>'
-
-        wkt = Literal(wkt, datatype=GEOSP.wktLiteral)
-        gml = Literal(wkt, datatype=GEOSP.gmlLiteral)
+        wkt = Literal(self.generate_sample_wkt(), datatype=GEOSP.wktLiteral)
+        gml = Literal(self.generate_sample_gml(), datatype=GEOSP.gmlLiteral)
 
         # select model view
         if model_view == 'default' or model_view == 'igsn' or model_view is None:
@@ -506,8 +529,8 @@ class Sample:
             parent_geometry = BNode()
             g.add((this_parent, GEOSP.hasGeometry, parent_geometry))
             g.add((parent_geometry, RDF.type, SF.Point))  # TODO: extend this for other geometry types
-            g.add((parent_geometry, GEOSP.asGML, gml))
-            g.add((parent_geometry, GEOSP.asWKT, wkt))
+            g.add((parent_geometry, GEOSP.asWKT, Literal(self.generate_parent_wkt(), datatype=GEOSP.wktLiteral)))
+            g.add((parent_geometry, GEOSP.asGML, Literal(self.generate_parent_gml(), datatype=GEOSP.wktLiteral)))
 
             parent_elevation = BNode()
             g.add((this_parent, SAM.samplingElevation, parent_elevation))
@@ -515,8 +538,7 @@ class Sample:
             g.add((parent_elevation, SAM.elevation, Literal(self.z, datatype=XSD.float)))
             g.add((parent_elevation, SAM.verticalDatum, Literal("GDA94", datatype=XSD.string)))
 
-            # TODO: make a publisher Agent at least
-            # define GA as an PROV Org
+            # define GA as an PROV Org with an ISO19115 role of Publisher
             g.add((ga, RDF.type, PROV.Org))
             qualified_attribution = BNode()
             g.add((qualified_attribution, RDF.type, PROV.Attribution))
@@ -681,6 +703,50 @@ class Sample:
     </samples>
         '''
         pass
+
+    def export_as_html(self, model_view='default'):
+        """
+        Exports this instance in HTML, according to a given model from the list of supported models.
+
+        :param model_view: string of one of the model view names available for Sample objects ['igsn', 'dc', '',
+            'default']
+        :return: HTML string
+        """
+        html =  '<style>' + \
+                '   table.data {' +\
+                '       border-collapse: collapse;' + \
+                '       border: solid 2px black;' + \
+                '   }' + \
+                '   table.data tr, table.data th {' + \
+                '       border: solid 1px black;' + \
+                '       padding: 5px;' + \
+                '   }' + \
+                '</style>'
+
+        html += '<table class="data">'
+        html += '   <tr><th>Property</th><th>Value</th></tr>'
+        if model_view == 'default' or model_view == 'igsn' or model_view is None:
+            # TODO: complete the properties in this view
+            html += '   <tr><th>IGSN</th><td>' + self.igsn + '</td></tr>'
+            html += '   <tr><th>Sample ID</th><td>' + self.sampleid + '</td></tr>'
+            if self.sample_type is not None:
+                html += '   <tr><th>Sample Type</th><td>' + self.sample_type + '</td></tr>'
+
+        elif model_view == 'dc':
+            html += '   <tr><th>IGSN</th><td>' + self.igsn + '</td></tr>'
+            html += '   <tr><th>Coverage</th><td>' + self.generate_sample_wkt() + '</td></tr>'
+            if self.date_aquired is not None:
+                html += '   <tr><th>Date</th><td>' + self.date_aquired.isoformat() + '</td></tr>'
+            if self.remark is not None:
+                html += '   <tr><th>Description</th><td>' + self.remark + '</td></tr>'
+            if self.material_type is not None:
+                html += '   <tr><th>Format</th><td>' + self.material_type + '</td></tr>'
+            if self.sample_type is not None:
+                html += '   <tr><th>Type</th><td>' + self.sample_type + '</td></tr>'
+
+        html += '</table>'
+
+        return html
 
 if __name__ == '__main__':
     s = Sample()

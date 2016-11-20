@@ -12,8 +12,8 @@ def index():
     )
 
 
-@routes.route('/sample')
-def sample():
+@routes.route('/sample/<string:igsn>')
+def sample(igsn):
     """
     A single Sample
 
@@ -48,14 +48,14 @@ def sample():
 
     # validate format
     if request.args.get('_format') is not None:
-        if request.args.get('_format') not in VIEWS_FORMATS[view]:
+        if request.args.get('_format').replace(' ', '+') not in VIEWS_FORMATS[view]:
             return Response(
                 'You have selected a format that does not exist for the view of Samples you selected. ' +
                 'Please choose one of ' + ', '.join(VIEWS_FORMATS[view]) + '.',
                 status=400,
                 mimetype='text/plain')
         else:
-            format = request.args.get('_format')
+            format = request.args.get('_format').replace(' ', '+')
     else:
         format = 'text/html'
 
@@ -66,11 +66,35 @@ def sample():
             view=view,
             alternates_html=render_template('view_alternates.html', views_formats=VIEWS_FORMATS)
         )
-    elif view == 'igsn':
-        pass
-    elif view == 'dc':
-        pass
+    elif view in ['igsn', 'dc']:
+        # for all these views we will need to populate a sample
+        from sample import sample
+        s = sample.Sample()
+        s.populate_from_xml_file('test/sample_eg2.xml')
 
+        if format in ['text/turtle', 'application/rdf+xml', 'application/rdf+json']:
+            file_extension = {
+                'text/turtle': '.ttl',
+                'application/rdf+xml': '.rdf',
+                'application/rdf+json': '.json'
+            }
+            return Response(
+                s.export_as_rdf(
+                    model_view=view,
+                    rdf_mime=format),
+                status=200,
+                mimetype=format,
+                headers={'Content-Disposition': 'attachment; filename=' + igsn + file_extension[format]}
+            )
+        elif format == 'application/xml':
+            # TODO: implement IGSN XML format
+            pass
+        else:  # format == 'text/html'
+            return render_template(
+                'sample.html',
+                view=view,
+                placed_html=s.export_as_html(model_view=view)
+            )
 
 
 @routes.route('/sample/')
