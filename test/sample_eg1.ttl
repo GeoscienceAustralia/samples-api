@@ -1,0 +1,46 @@
+# A first version of the IGSN-O expression of sample_eg1.xml
+
+@prefix geosp: <http://www.opengis.net/ont/geosparql#> .
+@prefix dct: <http://purl.org/dc/terms/> .
+@prefix sam: <http://def.seegrid.csiro.au/ontology/om/sam-lite#> .
+@prefix igsn: <http://pid.geoscience.gov.au/def/ont/igsn#> .
+@prefix prov: <http://www.w3.org/ns/prov#> .
+@prefix om: <http://def.seegrid.csiro.au/ontology/om/om-lite#> .
+@prefix oml: <http://def.seegrid.csiro.au/ontology/om/om-lite#> .
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix xml: <http://www.w3.org/XML/1998/namespace> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+
+<http://pid.geoscience.gov.au/sample/AU2648696> a sam:Specimen, prov:Entity ;
+    om:featureOfInterest <http://pid.geoscience.gov.au/site/15846> ;
+    sam:currentLocation "GA Services building"^^xsd:string ;
+    sam:samplingElevation [
+			a sam:Elevation ;
+            sam:elevation "219.453"^^xsd:float ;
+            sam:verticalDatum "GDA94"^^xsd:string ] ;
+    dct:accessRights <http://pid.geoscience.gov.au/def/voc/igsn-codelists/Public> ;
+    dct:identifier [
+			a igsn:AlternateIdentifier ;
+            igsn:identifierType <http://pid.geoscience.gov.au/def/voc/igsn-codelists/IGSN> ;
+            prov:value "AU2648696"^^xsd:string ] ;
+    geosp:hasGeometry [
+			a <http://www.opengis.net/ont/sf#Point> ;
+            geosp:asGML "<http://www.opengis.net/def/crs/EPSG/0/8311> POINTZ(143.43508333 -26.94486389 219.453)"^^geosp:gmlLiteral ;
+            geosp:asWKT "<http://www.opengis.net/def/crs/EPSG/0/8311> POINTZ(143.43508333 -26.94486389 219.453)"^^geosp:wktLiteral ] ;
+    prov:qualifiedAttribution [
+			a prov:Attribution ;
+            prov:agent <http://pid.geoscience.gov.au/org/ga> ;
+            prov:hadRole <http://communications.data.gov.au/def/role/Publisher> ] .
+
+<http://pid.geoscience.gov.au/org/ga> a prov:Org .
+
+<http://pid.geoscience.gov.au/site/15846> sam:samplingElevation [
+			a sam:Elevation ;
+            sam:elevation "219.453"^^xsd:float ;
+            sam:verticalDatum "GDA94"^^xsd:string ] ;
+    igsn:featureType <http://pid.geoscience.gov.au/def/voc/sites/Borehole> ;
+    geosp:hasGeometry [
+			a <http://www.opengis.net/ont/sf#Point> ;
+            geosp:asGML "<http://www.opengis.net/def/crs/EPSG/0/8311> POINTZ(143.43508333 -26.94486389 219.453)"^^geosp:gmlLiteral ;
+            geosp:asWKT "<http://www.opengis.net/def/crs/EPSG/0/8311> POINTZ(143.43508333 -26.94486389 219.453)"^^geosp:wktLiteral ] .

@@ -5,3 +5,6 @@ HOST = '0.0.0.0'
 PORT = 8080
 THREADED = False
 DEBUG = True
+
+BASE_URI = 'http://localhost/'
+WEB_SUBFOLDER = ''

@@ -134,6 +134,15 @@ class Sample:
         }
     }
 
+    # Associates an RDF mimetype to an rdflib RDF format
+    RDF_MIMETYPES = {
+        'text/turtle': 'turtle',
+        'text/ntriples': 'nt',
+        'text/nt': 'nt',
+        'text/n3': 'nt',
+        'application/rdf+xml': 'xml',
+        'application/rdf+json': 'json-ld'
+    }
     '''
     Entity Types not yet in a vocab
 
@@ -347,7 +356,7 @@ class Sample:
 
         return True
 
-    def export_as_rdf(self, model_view='default', rdf_format='turtle'):
+    def export_as_rdf(self, model_view='default', rdf_mime='text/turtle'):
         """
         Exports this instance in RDF, according to a given model from the list of supported models,
         in a given rdflib RDF format
@@ -363,10 +372,15 @@ class Sample:
         g = Graph()
         # DC = Namespace('http://purl.org/dc/elements/1.1/')
         DCT = Namespace('http://purl.org/dc/terms/')
+        g.bind('dct', DCT)
         SAM = Namespace('http://def.seegrid.csiro.au/ontology/om/sam-lite#')
+        g.bind('sam', SAM)
         GEOSP = Namespace('http://www.opengis.net/ont/geosparql#')
+        g.bind('geosp', GEOSP)
         OM = Namespace('http://def.seegrid.csiro.au/ontology/om/om-lite#')
+        g.bind('om', OM)
         AUROLE = Namespace('http://communications.data.gov.au/def/role/')
+        g.bind('aurole', AUROLE)
 
         # URI for this sample
         base_uri = 'http://pid.geoscience.gov.au/sample/'
@@ -395,62 +409,22 @@ class Sample:
         # select model view
         if model_view == 'default' or model_view == 'igsn' or model_view is None:
             # default model is the IGSN model
-            '''
-            @prefix sf: <http://www.opengis.net/ont/sf#> .
-            @prefix geo: <http://www.opengis.net/ont/geosparql#> .
-
-            <igsn_uri> a sam:Specimen, prov:Entity;
-                dc:identifier [ #SKOS
-                    a igsn:AlternateIdentifier;
-                    igsn:identifierType <http://pid.geoscience.gov.au/def/voc/igsn-codelists/IGSN>; #skos:Concept;
-                    prov:value "IGSN"^^xsd:string;
-                ];
-                dc:identifier [ #OWL
-                    a <http://pid.geoscience.gov.au/def/voc/igsn-codelists/IGSN>;
-                    prov:value "IGSN"^^xsd:string;
-                ];
-                geo:hasGeometry [
-                    a sf:Point; # or Line
-                    geo:asGML "<gml:Point srsDimension="3" srsName="http://www.opengis.net/def/crs/EPSG/0/4326"><gml:pos>49.40 -123.26</gml:pos></gml:Point>"^^geosp:gmlLiteral
-                    geo:asWKT "<http://www.opengis.net/def/crs/EPSG/0/8311> POINTZ(144.2409874717 -18.1739861699)"^^geosp:wktLiteral
-                ];
-                sam:samplingElevation [
-                    a sam:Elevation;
-                    sam:elevation 34.6;
-                    sam:verticalDatum <http://www.opengis.net/def/crs/EPSG/0/xxxx>;
-                ];
-                sam:currentLocation "some note"^^xsd:string;
-                obs:featureOfInterest <parent_uri>;
-                sam:materialClass <http://vocabulary.odm2.org/medium/rock/>;
-                sam:samplingMethod skos:Concept; (methodType) http://pid.geoscience.gov.au/def/voc/igsn-codelists/Drill
-                #sam:specimenType skos:Concept;
-                sam:samplingTime ""^^xsd:datetime;
-                dct:accessRights skos:Concept #http://pid.geoscience.gov.au/def/voc/igsn-codelists/Private
-            .
-
-            <parent_uri> a geo:Feature;
-                #xxx:gaFeatureType skos:Concept; # we limit this to our voc (parent feature type from Entity Types: BOREHOLE, SURVEY, PIPELINE -- these should be in a vocab)
-                #igsn:featureType (http://52.63.163.95/ga/sissvoc/ga-igsn-code-lists/resource?uri=http://pid.geoscience.gov.au/def/voc/igsn-codelists/featureType)
-                geo:hasGeometry [
-                    a sf:Point; # or anything (Line, Polygon, combo)
-                    geo:asGML "<gml:Point srsDimension="3" srsName="http://www.opengis.net/def/crs/EPSG/0/4326"><gml:pos>49.40 -123.26</gml:pos></gml:Point>"^^geosp:gmlLiteral
-                    geo:asWKT "<http://www.opengis.net/def/crs/EPSG/0/8311> POINTZ(144.2409874717 -18.1739861699)"^^geosp:wktLiteral
-                ]
-                sam:samplingElevation [
-                    sam:elevation 34.6;
-                    sam:verticalDatum <http://www.opengis.net/def/crs/EPSG/0/xxxx>;
-                ]
-            '''
 
             # IGSN model required namespaces
             PROV = Namespace('http://www.w3.org/ns/prov#')
+            g.bind('prov', PROV)
             SF = Namespace('http://www.opengis.net/ont/sf#')
-            IGSN = Namespace('http://pig.geoscience.gov.au/def/igsn')
+            g.bind('sf', SF)
+            IGSN = Namespace('http://pid.geoscience.gov.au/def/ont/igsn#')
+            g.bind('igsn', IGSN)
 
+            # classing the sample
             g.add((this_sample, RDF.type, SAM.Specimen))
             g.add((this_sample, RDF.type, PROV.Entity))
 
-            # IGSN AlternateIdentifier
+            # linking the sample and the RDF document
+            #g.add((this_sample, FOAF.isPrimaryTopicOf, PROV.Entity))
+
             '''
             dc:identifier [
                 a igsn:AlternateIdentifier;
@@ -506,7 +480,7 @@ class Sample:
                 g.add((this_sample, SAM.samplingMethod, URIRef(self.method_type)))
             if self.date_aquired is not None:
                 g.add((this_sample, SAM.samplingTime, Literal(self.date_aquired, datatype=datetime)))
-            # TODO: represent Public/Private (and other?) access methods in DB
+            # TODO: represent Public/Private (and other?) access methods in DB, add to terms in vocab?
             g.add((this_sample, DCT.accessRights, URIRef(Sample.TERM_LOOKUP['access']['Public'])))
             # TODO: make a register of Entities
             this_parent = URIRef(self.entity_uri)
@@ -526,7 +500,7 @@ class Sample:
                     sam:verticalDatum <http://www.opengis.net/def/crs/EPSG/0/xxxx>;
                 ]
             '''
-            fake_entity_type_uri = 'http://pid.geoscience.gov.au/def/voc/sites/' + self.entity_type.lower()
+            fake_entity_type_uri = 'http://pid.geoscience.gov.au/def/voc/sites/' + self.entity_type.title()
             g.add((this_parent, IGSN.featureType, URIRef(fake_entity_type_uri)))  # TODO: sort out the parent type, both the predicate used and the value (need a vocab)
 
             parent_geometry = BNode()
@@ -571,7 +545,7 @@ class Sample:
             if self.sample_type is not None:
                 g.add((this_sample, DCT.type, URIRef(self.sample_type)))
 
-        return g.serialize(format=rdf_format)
+        return g.serialize(format=Sample.RDF_MIMETYPES[rdf_mime])
 
     def is_xml_export_valid(self, xml_string):
         """
@@ -711,5 +685,5 @@ class Sample:
 if __name__ == '__main__':
     s = Sample()
     s.populate_from_xml_file('test/sample_eg1.xml')
-    print s.export_as_rdf()
+    print s.export_as_rdf(rdf_mime='application/rdf+xml')
 

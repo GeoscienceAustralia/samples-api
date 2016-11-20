@@ -12,6 +12,21 @@ def index():
     )
 
 
+@routes.route('/sample')
+def sample():
+    return render_template(
+        'sample.html'
+    )
+
+
+@routes.route('/sample/')
+def samples():
+    return render_template(
+        'samples.html'
+    )
+
+
 @routes.route('/test')
 def test():
     return Response('test page', status=200, mimetype='text/plain')
+
