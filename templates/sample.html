@@ -2,4 +2,9 @@
 
 {% block content %}
     <h1>Samples</h1>
+
+    {% if view == 'alternates' %}
+        <h2>Alternates view</h2>
+        {{ alternates_html|safe }}
+    {% endif %}
 {% endblock %}
