@@ -123,7 +123,28 @@ class Sample:
             'WA':   'http://www.geonames.org/2058645/'
         },
         'country': {
-            'AUS': 'http://www.geonames.org/2077456/'
+            'AUS': 'http://www.geonames.org/2077456/',
+            'PNG': 'http://www.geonames.org/2088628/',
+            'ATA': 'http://www.geonames.org/6697173/',
+            'SLB': 'http://www.geonames.org/2103350/',
+            'FRA': 'http://www.geonames.org/3017382/',
+            'TMP': 'http://www.geonames.org/1966436/',
+            'BRA': 'http://www.geonames.org/3469034/',
+            'INW': 'http://www.geonames.org/',
+            'GBR': 'http://www.geonames.org/2635167/',
+            'ZAF': 'http://www.geonames.org/953987/',
+            'USA': 'http://www.geonames.org/6252001/',
+            'NCL': 'http://www.geonames.org/2139685/',
+            'GRL': 'http://www.geonames.org/3425505/',
+            'NOR': 'http://www.geonames.org/3144096/',
+            'ZWE': 'http://www.geonames.org/878675/',
+            'ITA': 'http://www.geonames.org/3175395/',
+            'CZE': 'http://www.geonames.org/3077311/',
+            'NZL': 'http://www.geonames.org/2186224/',
+            'INL': 'http://www.geonames.org/',
+            'LKA': 'http://www.geonames.org/1227603/',
+            'IND': 'http://www.geonames.org/1269750/'
+
         },
         'lith': {
             'one': 'ONE',
