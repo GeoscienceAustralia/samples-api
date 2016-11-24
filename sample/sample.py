@@ -2,6 +2,7 @@ from lxml import etree
 from rdflib import Graph, URIRef, RDF, XSD, Namespace, Literal, BNode
 from datetime import datetime
 from StringIO import StringIO
+from lxml.builder import ElementMaker
 import pandas as pd
 import os
 
@@ -1077,6 +1078,7 @@ class Sample:
             if self.method_type is not None:
                 g.add((this_sample, SAM.samplingMethod, URIRef(self.method_type)))
             if self.date_aquired is not None:
+                g.add((this_sample, SAM.samplingTime, Literal(self.date_aquired.isoformat(), datatype=XSD.datetime)))
                 g.add((this_sample, SAM.samplingTime, Literal(self.date_aquired, datatype=datetime)))
             # TODO: represent Public/Private (and other?) access methods in DB, add to terms in vocab?
             g.add((this_sample, DCT.accessRights, URIRef(Sample.TERM_LOOKUP['access']['Public'])))
@@ -1154,8 +1156,9 @@ class Sample:
         :param xml_string:
         :return: boolean
         """
+        # online validator: https://www.corefiling.com/opensource/schemaValidate.html
         # load the schema
-        xsd_doc = etree.parse(StringIO('xml-validation/resource.xsd'))
+        xsd_doc = etree.parse('../xml-validation/igsn-csiro-v2.0-all.xsd')
         xsd = etree.XMLSchema(xsd_doc)
 
         # load the XML doc
@@ -1170,7 +1173,7 @@ class Sample:
 
         :return: XML string
         """
-
+        # SESAR
         '''
         SESAR XML example from: https://app.geosamples.org/webservices/display.php?igsn=LCZ7700AK
 
@@ -1277,7 +1280,109 @@ class Sample:
         </sample>
     </samples>
         '''
-        pass
+        # CSIRO
+        '''
+        <?xml version="1.0" encoding="UTF-8"?>
+        <igsn:samples
+                xsi:schemaLocation="http://igsn.org/schema/kernel-v.1.0 ../xml-validation/igsn-csiro-v2.0.xsd"
+                xmlns:igsn="http://igsn.org/schema/kernel-v.1.0"
+                xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+            <!-- from https://github.com/kitchenprinzessin3880/csiro-igsn-schema/blob/master/example-capricon.xml -->
+            <!--igsn:subNamespace>CAP</igsn:subNamespace -->
+            <igsn:sample>
+                <igsn:sampleNumber identifierType="igsn">CSCAP0001</igsn:sampleNumber>
+                <igsn:sampleName>Cap0001-JHP8</igsn:sampleName>
+                <igsn:isPublic>1</igsn:isPublic>
+                <igsn:landingPage><![CDATA[https://capdf.csiro.au/gs-hydrogeochem/public/ows?service=WFS&version=1.0.0&request=GetFeature&typeName=public:hydrogeochem&cql_filter=sid%3D243]]></igsn:landingPage>
+                <igsn:sampleTypes>
+                    <igsn:sampleType>http://vocabulary.odm2.org/specimentype/precipitationBulk</igsn:sampleType>
+                </igsn:sampleTypes>
+                <igsn:materialTypes>
+                    <igsn:materialType>http://vocabulary.odm2.org/medium/snow</igsn:materialType>
+                </igsn:materialTypes>
+                <igsn:samplingLocation/>
+                <igsn:samplingTime/>
+                <igsn:sampleCuration>
+                    <igsn:curation> <!-- nick -->
+                        <igsn:curator>Mineral Resources Flagship,CSIRO</igsn:curator>
+                        <igsn:curationLocation>Some location</igsn:curationLocation>
+                    </igsn:curation> <!-- nick -->
+                </igsn:sampleCuration>
+                <igsn:classification>rock</igsn:classification>
+                <igsn:comments>This is a fake comment</igsn:comments>
+                <igsn:otherNames>
+                    <igsn:otherName>FakeOtherName</igsn:otherName>
+                </igsn:otherNames>
+                <igsn:purpose>Fake purpose</igsn:purpose>
+                <igsn:samplingFeatures>
+                    <igsn:samplingFeature>
+                        <igsn:samplingFeatureName>mountain X</igsn:samplingFeatureName>
+                    </igsn:samplingFeature>
+                </igsn:samplingFeatures>
+                <igsn:sampleCollectors>
+                    <igsn:collector>Nick Car</igsn:collector>
+                </igsn:sampleCollectors>
+                <igsn:samplingMethod>bucket</igsn:samplingMethod>
+                <igsn:samplingCampaign>Campaign X</igsn:samplingCampaign>
+                <igsn:relatedResources>
+                    <igsn:relatedResourceIdentifier>abcd1234</igsn:relatedResourceIdentifier>
+                </igsn:relatedResources>
+                <igsn:logElement event="submitted" timeStamp="2015-09-10T18:20:30" />
+            </igsn:sample>
+        </igsn:samples>
+        '''
+
+        E = ElementMaker(namespace="http://igsn.org/schema/kernel-v.1.0",
+                         nsmap={'igsn': "http://igsn.org/schema/kernel-v.1.0"})
+
+        doc = E.samples(
+                E.sample(
+                E.sampleNumber(str(self.igsn), identifierType='igsn'),
+                E.sampleName(""),
+                # TODO: fix acess rights
+                E.isPublic('0'),
+                E.landingPage('http://eg.com'),
+                E.sampleTypes(
+                    E.sampleType(str(self.sample_type))
+                ),
+                E.materialTypes(
+                    E.materialType(str(self.material_type))
+                ),
+                E.samplingLocation('AUS'),
+                E.samplingTime(str(self.date_aquired)),
+                E.sampleCuration('x'),
+                E.curation('x'),
+                E.curator('x'),
+                E.curationLocation('GA shed'),
+                E.classification('x'),
+                E.comments('x'),
+                E.otherNames(
+                    E.otherName('x')
+                ),
+                E.purpose('x'),
+                E.samplingFeatures(
+                    E.samplingFeature(
+                        E.samplingFeatureName(str(self.entity_name))
+                    )
+                ),
+                E.sampleCollectors(
+                    E.sampleCollector('x')
+                ),
+                E.samplingMethod(str(self.method_type)),
+                E.samplingCampaign('x'),
+                E.relatedResources(
+                    E.relatedResource(
+                        E.relatedResourceIdentifier(
+                            E.relatedIdentifierType('url'),
+                            E.relationType('IsCitedBy')
+                        )
+                    )
+                ),
+                E.logEvent(event='submitted', timeStamp='2015-09-10T18:20:30')
+            )
+        )
+        xml = etree.tostring(doc, pretty_print=True, xml_declaration=True, encoding='UTF-8')
+        print xml
 
     def export_as_html(self, model_view='default'):
         """
@@ -1326,6 +1431,9 @@ class Sample:
 
 if __name__ == '__main__':
     s = Sample()
-    s.populate_from_xml_file('test/sample_eg1.xml')
+    s.populate_from_xml_file('../test/sample_eg2.xml')
     print s.export_as_rdf(rdf_mime='application/rdf+xml')
+
+    #print s.is_xml_export_valid(open('../test/sample_eg3_IGSN_schema.xml').read())
+    #print s.export_as_igsn_xml()
 
