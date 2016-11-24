@@ -4,7 +4,7 @@ from datetime import datetime
 from StringIO import StringIO
 import pandas as pd
 import os
-
+import requests
 
 class Sample:
     """
@@ -792,19 +792,37 @@ class Sample:
         self.date_load = None
         self.sample_no = None
 
-    def populate_from_oracle_api(self):
+    def populate_from_oracle_api(self,IGSN):
         """
         Populates this instance with data from the Oracle Samples table API
 
         :return: None
         """
+
+        os.environ['NO_PROXY'] = 'ga.gov.au'
+        target_url = 'http://biotite.ga.gov.au:7777/wwwstaff_distd/a.igsn_api.get_igsnSample?pIGSN=' + IGSN
         # call API
-        # r = request.get(...)
-        # xml = r.content # check the mimetype
-        # call populate_from_xml_file(StringIO(r.content))
+        r = requests.get(target_url)
+        if self.validate_xml(r.content):
+            self.populate_from_xml_file(StringIO(r.content))
+            return True
+        else:
+            return False
+
+    def validate_xml(self,xml):
+
+        parser = etree.XMLParser(dtd_validation=False)
+
+        try:
+            root = etree.fromstring(xml, parser)
+            return True
+        except Exception:
+            print 'not valid xml'
+            return False
+
         pass
 
-    def populate_from_xml_file(self, xml_file):
+    def populate_from_xml_file(self, xml):
         """
         Populates this instance with data from an XML file.
 
@@ -812,7 +830,7 @@ class Sample:
         :return: None
         """
         # iterate through the elements in the XML element tree and handle each
-        for event, elem in etree.iterparse(xml_file):
+        for event, elem in etree.iterparse(xml):
             '''
             <ROWSET>
              <ROW>
@@ -906,7 +924,7 @@ class Sample:
                 if elem.text:
                     self.remark = elem.text
             elif elem.tag == "LITHNAME":
-                self.lith = elem.text
+                self.lith = Sample.TERM_LOOKUP['lith'].get(elem.text)
             elif elem.tag == "ACQUIREDATE":
                 if elem.text:
                     self.date_aquired = datetime.strptime(elem.text, '%d-%b-%y')
