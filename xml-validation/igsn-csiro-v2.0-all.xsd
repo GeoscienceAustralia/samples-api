@@ -1,0 +1,606 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- edited with XMLSpy v2012 rel. 2 (x64) (http://www.altova.com) by Terry Rankine (CSIRO) -->
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xlink="http://www.w3.org/1999/xlink/namespace" xmlns:igsn="http://igsn.org/schema/kernel-v.1.0" targetNamespace="http://igsn.org/schema/kernel-v.1.0" elementFormDefault="qualified" version="2.0">
+	<xs:element name="samples">
+		<xs:annotation>
+			<xs:documentation>A collection of samples.</xs:documentation>
+		</xs:annotation>
+		<xs:complexType>
+			<xs:sequence>
+				<!--xs:element name="subNamespace" minOccurs="1" maxOccurs="1">
+					<xs:annotation>
+						<xs:documentation>The subnamespace of the data center registering the samples</xs:documentation>
+					</xs:annotation>
+				</xs:element -->
+				<xs:element name="sample" minOccurs="1" maxOccurs="unbounded">
+					<xs:annotation>
+						<xs:documentation>An individual sample</xs:documentation>
+					</xs:annotation>
+					<xs:complexType>
+						<xs:all>
+							<xs:element name="sampleNumber">
+								<xs:annotation>
+									<xs:documentation>(Required)The first two characters must be [A-Z] and represents the namespace of an allocating agent, e.g, CS. The rest can be a combination of characters, numbers and dash (-) and dot(.). See IGSN syntax at http://dokuwiki.gfz-potsdam.de/datawiki/doku.php?id=igsn:syntax</xs:documentation>
+								</xs:annotation>
+								<xs:complexType>
+									<xs:simpleContent>
+										<xs:extension base="igsn:igsnSyntax">
+											<xs:attribute name="identifierType" type="igsn:identifierType" use="required"/>
+										</xs:extension>
+									</xs:simpleContent>
+								</xs:complexType>
+							</xs:element>
+							<!-- sample number, e.g., igsn -->
+							<xs:element name="sampleName">
+								<xs:annotation>
+									<xs:documentation>Name of the sample.</xs:documentation>
+								</xs:annotation>
+								<xs:simpleType>
+									<xs:restriction base="xs:token">
+										<xs:minLength value="1"/>
+									</xs:restriction>
+								</xs:simpleType>
+							</xs:element>
+							<xs:element name="otherNames" minOccurs="0">
+								<xs:annotation>
+									<xs:documentation>An alias for the sample name. Use this element to include local name/identifier of the sample.</xs:documentation>
+								</xs:annotation>
+								<xs:complexType>
+									<xs:sequence>
+										<xs:element name="otherName" maxOccurs="unbounded">
+											<xs:simpleType>
+												<xs:restriction base="xs:token">
+													<xs:minLength value="1"/>
+												</xs:restriction>
+											</xs:simpleType>
+										</xs:element>
+									</xs:sequence>
+								</xs:complexType>
+							</xs:element>
+							<xs:element name="isPublic">
+								<xs:annotation>
+									<xs:documentation>The visibility of sample metadata. Use 1 for public and 0 for private samples.</xs:documentation>
+								</xs:annotation>
+								<xs:complexType>
+									<xs:simpleContent>
+										<xs:extension base="xs:boolean"/>
+									</xs:simpleContent>
+								</xs:complexType>
+							</xs:element>
+							<xs:element name="landingPage">
+								<xs:annotation>
+									<xs:documentation>The landing page of a sample.</xs:documentation>
+								</xs:annotation>
+								<xs:simpleType>
+									<xs:restriction base="xs:anyURI">
+										<xs:pattern value="https?://.+"/>
+									</xs:restriction>
+								</xs:simpleType>
+							</xs:element>
+							<xs:element name="sampleTypes" nillable="true">
+								<xs:annotation>
+									<xs:documentation>The basic form of a sample. See controlled list "include/igsn-sampleType.xsd". If the value of a sampleType is not available, declare the xsi:nil and nilReason attributes, e.g.,  xsi:nil="true" nilReason=""</xs:documentation>
+								</xs:annotation>
+								<xs:complexType>
+									<xs:sequence>
+										<xs:element name="sampleType" type="igsn:sampleType" maxOccurs="unbounded"/>
+									</xs:sequence>
+									<xs:attributeGroup ref="igsn:nullValue"/>
+								</xs:complexType>
+							</xs:element>
+							<xs:element name="materialTypes" nillable="true">
+								<xs:annotation>
+									<xs:documentation>The materials that compose a sample. See controlled list "include/igsn-materialType.xsd"</xs:documentation>
+								</xs:annotation>
+								<xs:complexType>
+									<xs:sequence>
+										<xs:element name="materialType" type="igsn:materialType" maxOccurs="unbounded"/>
+									</xs:sequence>
+									<xs:attributeGroup ref="igsn:nullValue"/>
+								</xs:complexType>
+							</xs:element>
+							<xs:element name="classification" minOccurs="0">
+								<xs:annotation>
+									<xs:documentation>Classification concepts, e.g. Rock>Igneous.Use the classifictionIdentifier attibute to indicate the URL of the concept or related vocabulary service.</xs:documentation>
+								</xs:annotation>
+								<xs:complexType>
+									<xs:simpleContent>
+										<xs:extension base="xs:token">
+											<xs:attribute name="classificationIdentifier" type="xs:anyURI"/>
+										</xs:extension>
+									</xs:simpleContent>
+								</xs:complexType>
+							</xs:element>
+							<xs:element name="purpose" minOccurs="0">
+								<xs:annotation>
+									<xs:documentation>The purpose for collecting the sample.</xs:documentation>
+								</xs:annotation>
+								<xs:simpleType>
+									<xs:restriction base="xs:token">
+										<xs:minLength value="1"/>
+									</xs:restriction>
+								</xs:simpleType>
+							</xs:element>
+							<xs:element name="samplingLocation" nillable="true">
+								<xs:annotation>
+									<xs:documentation>The location where the sample is collected. This may apply to geo (latlon,localxy, bounding box(bbox)) and non-geo(locality) location information.Example of latitude and longitude: 51.150719,-0.973177. Example of localxy (UTM Easting and UTM Northing) is : 641753.82,5668538.64. The srs attribute can be used to indicate the UTMZone (e.g., 30U) or SRID. If the location value is not available, declare the xsi:nil and nilReason attributes.</xs:documentation>
+								</xs:annotation>
+								<xs:complexType>
+									<xs:group ref="igsn:locationGroup">
+										<xs:annotation>
+											<xs:documentation></xs:documentation>
+										</xs:annotation>
+									</xs:group>
+									<xs:attributeGroup ref="igsn:nullValue"/>
+								</xs:complexType>
+							</xs:element>
+							<xs:element name="samplingTime" nillable="true">
+								<xs:annotation>
+									<xs:documentation>The temporal information of sample collection. </xs:documentation>
+								</xs:annotation>
+								<xs:complexType>
+									<xs:group ref="igsn:timeGroup"/>
+									<xs:attributeGroup ref="igsn:nullValue"/>
+								</xs:complexType>
+							</xs:element>
+							<xs:element name="samplingFeatures" minOccurs="0">
+								<xs:annotation>
+									<xs:documentation>The host from which a sample is collected/produced, e.g., observation well. See controlled list - "include/igsn-samplingFeature-v1.1.xsd". Note that this is not ultimate feature (sampledFeature),but rather referring to the proximate feature of a sample.</xs:documentation>
+								</xs:annotation>
+								<xs:complexType>
+									<xs:sequence>
+										<xs:element name="samplingFeature" maxOccurs="unbounded">
+											<xs:complexType>
+												<xs:sequence>
+													<xs:element name="samplingFeatureName">
+														<xs:complexType>
+															<xs:simpleContent>
+																<xs:extension base="xs:string">
+																	<xs:attribute name="samplingFeatureType" type="igsn:samplingFeature"/>
+																</xs:extension>
+															</xs:simpleContent>
+														</xs:complexType>
+													</xs:element>
+													<xs:element name="samplingFeatureLocation" minOccurs="0">
+														<xs:complexType>
+															<xs:group ref="igsn:locationGroup">
+																<xs:annotation>
+																	<xs:documentation>The location of a samplingfeature. This may apply to geo (latlon,localxy, bounding box(bbox)) and non-geo(locality) location information. Example of latitude and longitude: 51.150719,-0.973177. Example of localxy (UTM Easting and UTM Northing) is : 641753.82,5668538.64. The srsName attribute can be used to indicate the UTMZone (e.g., 30U) or SRID.
+			</xs:documentation>
+																</xs:annotation>
+															</xs:group>
+														</xs:complexType>
+													</xs:element>
+													<xs:element name="sampledFeatures" minOccurs="0">
+														<xs:complexType>
+															<xs:sequence>
+																<xs:element name="sampledFeature" maxOccurs="unbounded">
+																	<xs:complexType>
+																		<xs:simpleContent>
+																			<xs:extension base="xs:token">
+																				<xs:attribute name="sampledFeatureType" type="xs:anyURI"/>
+																			</xs:extension>
+																		</xs:simpleContent>
+																	</xs:complexType>
+																</xs:element>
+															</xs:sequence>
+														</xs:complexType>
+													</xs:element>
+												</xs:sequence>
+											</xs:complexType>
+										</xs:element>
+									</xs:sequence>
+								</xs:complexType>
+							</xs:element>
+							<xs:element name="sampleCollectors" nillable="true">
+								<xs:annotation>
+									<xs:documentation>Contact information of the person who collected the sample.This also applies to the principal investigator in a project responsible for sample collection.</xs:documentation>
+								</xs:annotation>
+								<xs:complexType>
+									<xs:sequence>
+										<xs:element name="collector" maxOccurs="unbounded">
+											<!--xs:complexType>
+												<xs:simpleContent>
+													<xs:extension base="igsn:StringOrNillValues">
+														<xs:attribute name="collectorIdentifier" type="xs:anyURI" use="optional"/>
+													</xs:extension>
+												</xs:simpleContent>
+											</xs:complexType -->
+											<xs:complexType>
+												<xs:simpleContent>
+													<xs:extension base="xs:token">
+														<xs:attribute name="collectorIdentifier" type="xs:anyURI" use="optional"/>
+													</xs:extension>
+												</xs:simpleContent>
+											</xs:complexType>
+										</xs:element>
+									</xs:sequence>
+									<xs:attributeGroup ref="igsn:nullValue"/>
+								</xs:complexType>
+							</xs:element>
+							<xs:element name="samplingMethod" nillable="true">
+								<xs:annotation>
+									<xs:documentation>Method/equipment used to collect the sample, e.g., Dredging, Manual Observation. </xs:documentation>
+								</xs:annotation>
+								<xs:complexType>
+									<xs:simpleContent>
+										<xs:extension base="xs:token">
+											<xs:attributeGroup ref="igsn:nullValue"/>
+										</xs:extension>
+									</xs:simpleContent>
+								</xs:complexType>
+							</xs:element>
+							<xs:element name="samplingCampaign" minOccurs="0">
+								<xs:annotation>
+									<xs:documentation>The field program/related projects.  e.g., cruise or expedition.</xs:documentation>
+								</xs:annotation>
+								<xs:simpleType>
+									<xs:restriction base="xs:token">
+										<xs:minLength value="1"/>
+									</xs:restriction>
+								</xs:simpleType>
+							</xs:element>
+							<xs:element name="sampleCuration" nillable="false">
+								<xs:annotation>
+									<xs:documentation>Sample archival information. The curator information must be specified. This can be present or future curator.</xs:documentation>
+								</xs:annotation>
+								<xs:complexType>
+									<xs:sequence>
+										<xs:element name="curation" maxOccurs="unbounded">
+											<xs:complexType>
+												<xs:sequence>
+													<xs:element name="curator" type="xs:token"/>
+													<xs:element name="curationTime" minOccurs="0">
+														<xs:annotation>
+															<xs:documentation>The temporal information of sample curation</xs:documentation>
+														</xs:annotation>
+														<xs:complexType>
+															<xs:group ref="igsn:timeGroup"/>
+														</xs:complexType>
+													</xs:element>
+													<xs:element name="curationLocation" type="xs:token" minOccurs="0"/>
+												</xs:sequence>
+											</xs:complexType>
+										</xs:element>
+									</xs:sequence>
+								</xs:complexType>
+							</xs:element>
+							<xs:element name="relatedResources" minOccurs="0" maxOccurs="1">
+								<xs:annotation>
+									<xs:documentation>This element is used to link the sample metadata other related samples and documents (e.g., project reports, publications, etc.)</xs:documentation>
+								</xs:annotation>
+								<xs:complexType>
+									<xs:sequence>
+										<xs:element name="relatedResourceIdentifier" minOccurs="1" maxOccurs="unbounded">
+											<xs:complexType>
+												<xs:simpleContent>
+													<xs:extension base="xs:token">
+														<xs:attribute name="relatedIdentifierType" type="igsn:relatedIdentifierType"/>
+														<xs:attribute name="relationType" type="igsn:relationType"/>
+													</xs:extension>
+												</xs:simpleContent>
+											</xs:complexType>
+										</xs:element>
+									</xs:sequence>
+								</xs:complexType>
+							</xs:element>
+							<xs:element name="comments" minOccurs="0">
+								<xs:annotation>
+									<xs:documentation>Any free text describing the sample. This also can be used to include additional metadata which cannot be specified with this standard schema.</xs:documentation>
+								</xs:annotation>
+								<xs:simpleType>
+									<xs:restriction base="xs:token">
+										<xs:minLength value="1"/>
+									</xs:restriction>
+								</xs:simpleType>
+							</xs:element>
+							<xs:element name="logElement" nillable="false" minOccurs="1" maxOccurs="1">
+								<xs:annotation>
+									<xs:documentation>The type of status of the physical sample and IGSN registration</xs:documentation>
+								</xs:annotation>
+								<xs:complexType>
+									<xs:simpleContent>
+										<xs:extension base="xs:token">
+											<xs:attribute name="event" type="igsn:eventType" use="required"/>
+											<xs:attribute name="timeStamp" type="igsn:W3CDTFdate" use="required"/>
+										</xs:extension>
+									</xs:simpleContent>
+								</xs:complexType>
+							</xs:element>
+						</xs:all>
+					</xs:complexType>
+				</xs:element>
+			</xs:sequence>
+		</xs:complexType>
+	</xs:element>
+	<xs:group name="timeGroup">
+		<xs:annotation>
+			<xs:documentation>Represents time instant or time period (start,end).</xs:documentation>
+		</xs:annotation>
+		<xs:all>
+			<xs:element name="timeInstant" type="igsn:W3CDTFdate" minOccurs="0" maxOccurs="1"/>
+			<xs:element name="timePeriod" minOccurs="0" maxOccurs="1">
+				<xs:complexType>
+					<xs:sequence>
+						<xs:element name="start" type="igsn:W3CDTFdate" minOccurs="0"/>
+						<xs:element name="end" type="igsn:W3CDTFdate" minOccurs="0"/>
+					</xs:sequence>
+				</xs:complexType>
+			</xs:element>
+		</xs:all>
+	</xs:group>
+	<xs:group name="locationGroup">
+		<xs:annotation>
+			<xs:documentation>This may apply to a named place (locality) or geometric (coordinate-based) location, e.g., WKT representation. The srs attribute indicates a Spatial Reference System Identifier (SRID)/EPSG, e.g., EPSG:4326
+			</xs:documentation>
+		</xs:annotation>
+		<xs:all>
+			<xs:element name="locality" type="xs:token" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>Named place or address</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="wkt" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>Well Known Text (wkt) representation of entity. </xs:documentation>
+				</xs:annotation>
+				<xs:complexType>
+					<xs:simpleContent>
+						<xs:extension base="xs:string">
+							<xs:attribute name="srs" type="xs:token" use="required">
+								<xs:annotation>
+									<xs:documentation>Use EPSG code, e.g., "EPSG:XXX", where "XXX" is the EPSG code for the referenced coordinate system; "none" shall be provided if the coordinate system is unreferenced.</xs:documentation>
+								</xs:annotation>
+							</xs:attribute>
+							<xs:attribute name="spatialType" type="igsn:spatialType" use="required"/>
+						</xs:extension>
+					</xs:simpleContent>
+				</xs:complexType>
+			</xs:element>
+			<xs:element name="elevation" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>Height of an entity above datum.</xs:documentation>
+				</xs:annotation>
+				<xs:complexType>
+					<xs:simpleContent>
+						<xs:extension base="xs:string">
+							<xs:attribute name="datum" type="xs:token" use="optional">
+								<xs:annotation>
+									<xs:documentation>a vertical datums specify the origin for elevations assocated with a feature, e.g., MSL, NAVD88, NGVD29, or Unknown</xs:documentation>
+								</xs:annotation>
+							</xs:attribute>
+							<xs:attribute name="units" type="xs:token" use="optional"/>
+						</xs:extension>
+					</xs:simpleContent>
+				</xs:complexType>
+			</xs:element>
+		</xs:all>
+	</xs:group>
+	<xs:attributeGroup name="nullValue">
+		<xs:attribute name="nilReason" type="igsn:NilReasonType" use="optional"/>
+	</xs:attributeGroup>
+	<xs:simpleType name="igsnSyntax">
+		<xs:annotation>
+			<xs:documentation>IGSN syntax data type</xs:documentation>
+		</xs:annotation>
+		<xs:restriction base="xs:token">
+			<xs:pattern value="([A-Z]{2}[A-Za-z0-9\-.]+)"/>
+		</xs:restriction>
+	</xs:simpleType>
+	<!--- xs:simpleType name="trueOrFalse">
+		<xs:restriction base="xs:boolean">
+			<xs:pattern value="0"/>
+			<xs:pattern value="1"/>
+		</xs:restriction>
+	</xs:simpleType -->
+	<!--xs:simpleType name="StringOrNillValues">
+		<xs:union memberTypes="xs:anyURI igsn:NilReasonType"/>
+	</xs:simpleType -->
+
+	<xs:simpleType name="nameIdentifier">
+		<xs:annotation>
+			<xs:documentation>The name or URL of the name identifier scheme.</xs:documentation>
+		</xs:annotation>
+		<xs:restriction base="xs:string">
+			<xs:enumeration value="orcid"/>
+			<xs:enumeration value="isni"/>
+			<xs:enumeration value="viaf"/>
+			<xs:enumeration value="researcherID"/>
+		</xs:restriction>
+	</xs:simpleType>
+	<xs:simpleType name="identifierType">
+		<xs:annotation>
+			<xs:documentation>The type of identifier. Currently only IGSN is allowed</xs:documentation>
+		</xs:annotation>
+		<xs:restriction base="xs:string">
+			<xs:enumeration value="igsn"/>
+		</xs:restriction>
+	</xs:simpleType>
+	<xs:simpleType name="relatedIdentifierType">
+		<xs:annotation>
+			<xs:documentation>The type of related identifier.</xs:documentation>
+		</xs:annotation>
+		<xs:restriction base="xs:string">
+			<xs:enumeration value="doi"/>
+			<xs:enumeration value="handle"/>
+			<xs:enumeration value="lsid"/>
+			<xs:enumeration value="url"/>
+			<xs:enumeration value="urn"/>
+		</xs:restriction>
+	</xs:simpleType>
+	<xs:simpleType name="relationType">
+		<xs:annotation>
+			<xs:documentation>Description of the relationship of the resource being registered (A) and the related resource (B).</xs:documentation>
+		</xs:annotation>
+		<xs:restriction base="xs:string">
+			<xs:enumeration value="IsCitedBy"/>
+			<xs:enumeration value="IsPartOf"/>
+			<xs:enumeration value="HasPart"/>
+			<xs:enumeration value="IsReferencedBy"/>
+			<xs:enumeration value="References"/>
+			<xs:enumeration value="IsDocumentedBy"/>
+			<xs:enumeration value="Documents"/>
+			<xs:enumeration value="IsCompiledBy"/>
+			<xs:enumeration value="Compiles"/>
+			<xs:enumeration value="IsVariantFormOf"/>
+			<xs:enumeration value="IsOriginalFormOf"/>
+			<!--indicates that B includes A in a citation-->
+			<!--indicates A is a portion of B-->
+			<!--indicates A includes the part B-->
+			<!--indicates A is used as a source of information by B-->
+			<!--indicates B is used as a source of information for A-->
+			<!--indicates B is documentation about/explaining A-->
+			<!--indicates A is documentation about/explaining B-->
+			<!--indicates B is used to compile or create A, e.g. Collection B-->
+			<!--indicates B is the result of a compile or creation event using A, e.g. Collection B -->
+			<!--indicates B is a variant or different form of A, e.g. calculated or calibrated form or different packaging-->
+			<!--indicates B is the original form of A-->
+		</xs:restriction>
+	</xs:simpleType>
+	<xs:simpleType name="eventType">
+		<xs:annotation>
+			<xs:documentation>The type of status of the physical object and object registration. Version 0.3</xs:documentation>
+		</xs:annotation>
+		<xs:restriction base="xs:string">
+			<xs:enumeration value="submitted"/>
+			<xs:enumeration value="updated"/>
+			<xs:enumeration value="deprecated"/>
+			<xs:enumeration value="destroyed"/>
+			<!-- Date of the initial registration. -->
+			<!--xs:enumeration value="registered"/-->
+			<!-- The object is registered. -->
+			<!-- Date of the last metadata update. -->
+			<!-- The object description is deprecated. The entry is no longer relevant, e.g. due to duplicate registration. -->
+			<!-- The object is destroyed. -->
+		</xs:restriction>
+	</xs:simpleType>
+	<xs:simpleType name="dateTimeWithoutMinutes">
+		<xs:annotation>
+			<xs:documentation>1997-07-16T19:20</xs:documentation>
+		</xs:annotation>
+		<xs:restriction base="xs:string">
+			<xs:pattern value="\d{4}-\d\d-\d\dT\d\d:\d\d"/>
+		</xs:restriction>
+	</xs:simpleType>
+	<xs:simpleType name="dateTimeWithoutMinutesPlusTimeZone">
+		<xs:annotation>
+			<xs:documentation>1997-07-16T19:20+01:00</xs:documentation>
+		</xs:annotation>
+		<xs:restriction base="xs:string">
+			<xs:pattern value="\d{4}-\d\d-\d\dT\d\d:\d\d\+\d\d:\d\d"/>
+		</xs:restriction>
+	</xs:simpleType>
+	<xs:simpleType name="W3CDTFdate">
+		<xs:annotation>
+			<xs:documentation>Definition of W3CDTF compliant date. see: http://www.w3.org/TR/NOTE-datetime</xs:documentation>
+		</xs:annotation>
+		<xs:union memberTypes="xs:gYear xs:gYearMonth xs:date xs:dateTime igsn:dateTimeWithoutMinutes igsn:dateTimeWithoutMinutesPlusTimeZone"/>
+	</xs:simpleType>
+	<xs:simpleType name="sampleType">
+		<xs:annotation>
+			<xs:documentation>Describe the basic form of the sample registered.Source vocabulary:http://vocabulary.odm2.org/specimentype/ </xs:documentation>
+		</xs:annotation>
+		<xs:restriction base="xs:anyURI">
+			<xs:enumeration value="http://vocabulary.odm2.org/specimentype/automated"/>
+			<xs:enumeration value="http://vocabulary.odm2.org/specimentype/core"/>
+			<xs:enumeration value="http://vocabulary.odm2.org/specimentype/coreHalfRound"/>
+			<xs:enumeration value="http://vocabulary.odm2.org/specimentype/corePiece"/>
+			<xs:enumeration value="http://vocabulary.odm2.org/specimentype/coreQuarterRound"/>
+			<xs:enumeration value="http://vocabulary.odm2.org/specimentype/coreSection"/>
+			<xs:enumeration value="http://vocabulary.odm2.org/specimentype/coreSectionHalf"/>
+			<xs:enumeration value="http://vocabulary.odm2.org/specimentype/coreSub-Piece"/>
+			<xs:enumeration value="http://vocabulary.odm2.org/specimentype/coreWholeRound"/>
+			<xs:enumeration value="http://vocabulary.odm2.org/specimentype/cuttings"/>
+			<xs:enumeration value="http://vocabulary.odm2.org/specimentype/dredge"/>
+			<xs:enumeration value="http://vocabulary.odm2.org/specimentype/foliageDigestion"/>
+			<xs:enumeration value="http://vocabulary.odm2.org/specimentype/foliageLeaching"/>
+			<xs:enumeration value="http://vocabulary.odm2.org/specimentype/forestFloorDigestion"/>
+			<xs:enumeration value="http://vocabulary.odm2.org/specimentype/individualSample"/>
+			<xs:enumeration value="http://vocabulary.odm2.org/specimentype/litterFallDigestion"/>
+			<xs:enumeration value="http://vocabulary.odm2.org/specimentype/other"/>
+			<xs:enumeration value="http://vocabulary.odm2.org/specimentype/petriDishDryDeposition"/>
+			<xs:enumeration value="http://vocabulary.odm2.org/specimentype/precipitationBulk"/>
+			<xs:enumeration value="http://vocabulary.odm2.org/specimentype/rockPowder"/>
+			<xs:enumeration value="http://vocabulary.odm2.org/specimentype/standardReferenceSpecimen"/>
+			<xs:enumeration value="http://vocabulary.odm2.org/specimentype/terrestrialSection"/>
+			<xs:enumeration value="http://vocabulary.odm2.org/specimentype/theSpecimenTypeIsUnknown"/>
+			<xs:enumeration value="http://vocabulary.odm2.org/specimentype/thinSection"/>
+			<xs:enumeration value="http://vocabulary.odm2.org/specimentype/orientedCore"/>
+			<xs:enumeration value="http://vocabulary.odm2.org/specimentype/grab"/>
+		</xs:restriction>
+	</xs:simpleType>
+	<xs:simpleType name="samplingFeature">
+		<xs:annotation>
+			<xs:documentation>A vocabulary for describing the type of Sampling Feature. SamplingFeatures of type Site and Well will be the most common, but many different types of varying levels of complexity can be used. Source vocabularies: http://vocabulary.odm2.org/samplingfeaturetype/</xs:documentation>
+		</xs:annotation>
+		<xs:restriction base="xs:anyURI">
+			<xs:enumeration value="http://vocabulary.odm2.org/samplingfeaturetype/borehole/"/>
+			<xs:enumeration value="http://vocabulary.odm2.org/samplingfeaturetype/crossSection/"/>
+			<xs:enumeration value="http://vocabulary.odm2.org/samplingfeaturetype/CTD/"/>
+			<xs:enumeration value="http://vocabulary.odm2.org/samplingfeaturetype/scene/"/>
+			<xs:enumeration value="http://vocabulary.odm2.org/samplingfeaturetype/quadrat/"/>
+			<xs:enumeration value="http://vocabulary.odm2.org/samplingfeaturetype/soilPitSection/"/>
+			<xs:enumeration value="http://vocabulary.odm2.org/samplingfeaturetype/observationWell/"/>
+			<xs:enumeration value="http://vocabulary.odm2.org/samplingfeaturetype/fieldArea/"/>
+			<xs:enumeration value="http://vocabulary.odm2.org/samplingfeaturetype/excavation/"/>
+		</xs:restriction>
+	</xs:simpleType>
+	<xs:simpleType name="materialType">
+		<xs:annotation>
+			<xs:documentation>Categorize the materials that composes a sample.Source vocabulary:http://vocabulary.odm2.org/medium/ </xs:documentation>
+		</xs:annotation>
+		<xs:restriction base="xs:anyURI">
+			<xs:enumeration value="http://vocabulary.odm2.org/medium/air"/>
+			<xs:enumeration value="http://vocabulary.odm2.org/medium/gas"/>
+			<xs:enumeration value="http://vocabulary.odm2.org/medium/ice"/>
+			<xs:enumeration value="http://vocabulary.odm2.org/medium/liquidAqueous"/>
+			<xs:enumeration value="http://vocabulary.odm2.org/medium/liquidOrganic"/>
+			<xs:enumeration value="http://vocabulary.odm2.org/medium/mineral"/>
+			<xs:enumeration value="http://vocabulary.odm2.org/medium/notApplicable"/>
+			<xs:enumeration value="http://vocabulary.odm2.org/medium/organism"/>
+			<xs:enumeration value="http://vocabulary.odm2.org/medium/other"/>
+			<xs:enumeration value="http://vocabulary.odm2.org/medium/particulate"/>
+			<xs:enumeration value="http://vocabulary.odm2.org/medium/rock"/>
+			<xs:enumeration value="http://vocabulary.odm2.org/medium/sediment"/>
+			<xs:enumeration value="http://vocabulary.odm2.org/medium/snow"/>
+			<xs:enumeration value="http://vocabulary.odm2.org/medium/soil"/>
+			<xs:enumeration value="http://vocabulary.odm2.org/medium/tissue"/>
+			<xs:enumeration value="http://vocabulary.odm2.org/medium/unknown"/>
+		</xs:restriction>
+	</xs:simpleType>
+	<xs:simpleType name="spatialType">
+		<xs:restriction base="xs:string">
+			<xs:enumeration value="Point"/>
+			<xs:enumeration value="Linestring"/>
+			<xs:enumeration value="MultiPoint"/>
+			<xs:enumeration value="Polygon"/>
+			<xs:enumeration value="Geometry"/>
+			<xs:enumeration value="Geometry Collection"/>
+			<xs:enumeration value="Curve"/>
+			<xs:enumeration value="Line"/>
+			<xs:enumeration value="LinearRing"/>
+			<xs:enumeration value="MultiCurve"/>
+			<xs:enumeration value="MultiLineString"/>
+			<xs:enumeration value="Surface"/>
+			<xs:enumeration value="MultiSurface"/>
+			<xs:enumeration value="MultiPolygon"/>
+		</xs:restriction>
+	</xs:simpleType>
+	<xs:simpleType name="NilReasonType">
+		<xs:annotation>
+			<xs:documentation>gml:NilReasonType defines a content model that allows recording of an explanation for a void value or other exception.gml:NilReasonType is a union of the following enumerated values:
+-	inapplicable there is no value
+-	missing the correct value is not readily available to the sender of this data. Furthermore, a correct value may not exist
+-	template the value will be available later
+-	unknown the correct value is not known to, and not computable by, the sender of this data. However, a correct value probably exists
+-	withheld the value is not divulged</xs:documentation>
+		</xs:annotation>
+		<xs:restriction base="xs:anyURI">
+			<xs:enumeration value="http://www.opengis.net/def/nil/OGC/0/missing"/>
+			<xs:enumeration value="http://www.opengis.net/def/nil/OGC/0/inapplicable"/>
+			<xs:enumeration value="http://www.opengis.net/def/nil/OGC/0/template"/>
+			<xs:enumeration value="http://www.opengis.net/def/nil/OGC/0/unknown"/>
+			<xs:enumeration value="http://www.opengis.net/def/nil/OGC/0/withheld"/>
+		</xs:restriction>
+	</xs:simpleType>
+</xs:schema>
