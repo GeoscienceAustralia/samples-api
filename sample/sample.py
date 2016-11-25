@@ -3,7 +3,6 @@ from rdflib import Graph, URIRef, RDF, XSD, Namespace, Literal, BNode
 from datetime import datetime
 from StringIO import StringIO
 from lxml.builder import ElementMaker
-import pandas as pd
 import os
 import requests
 
@@ -38,32 +37,32 @@ class Sample:
             'Private': 'http://pid.geoscience.gov.au/def/voc/igsn-codelists/Private'
         },
         'sample_type': {
-            'automated': 'http://vocabulary.odm2.org/specimentype/automated/',
-            'core': 'http://vocabulary.odm2.org/specimentype/core/',
-            'coreHalfRound': 'http://vocabulary.odm2.org/specimentype/coreHalfRound/',
-            'corePiece': 'http://vocabulary.odm2.org/specimentype/corePiece/',
-            'coreQuarterRound': 'http://vocabulary.odm2.org/specimentype/coreQuarterRound/',
-            'coreSection': 'http://vocabulary.odm2.org/specimentype/coreSection/',
-            'coreSectionHalf': 'http://vocabulary.odm2.org/specimentype/coreSectionHalf/',
-            'coreSub-Piece': 'http://vocabulary.odm2.org/specimentype/coreSub-Piece/',
-            'coreWholeRound': 'http://vocabulary.odm2.org/specimentype/coreWholeRound/',
-            'cuttings': 'http://vocabulary.odm2.org/specimentype/cuttings/',
-            'dredge': 'http://vocabulary.odm2.org/specimentype/dredge/',
-            'foliageDigestion': 'http://vocabulary.odm2.org/specimentype/foliageDigestion/',
-            'foliageLeaching': 'http://vocabulary.odm2.org/specimentype/foliageLeaching/',
-            'forestFloorDigestion': 'http://vocabulary.odm2.org/specimentype/forestFloorDigestion/',
-            'grab': 'http://vocabulary.odm2.org/specimentype/grab/',
-            'individualSample': 'http://vocabulary.odm2.org/specimentype/individualSample/',
-            'litterFallDigestion': 'http://vocabulary.odm2.org/specimentype/litterFallDigestion/',
-            'orientedCore': 'http://vocabulary.odm2.org/specimentype/orientedCore/',
-            'other': 'http://vocabulary.odm2.org/specimentype/other/',
-            'petriDishDryDeposition': 'http://vocabulary.odm2.org/specimentype/petriDishDryDeposition/',
-            'precipitationBulk': 'http://vocabulary.odm2.org/specimentype/precipitationBulk/',
-            'rockPowder': 'http://vocabulary.odm2.org/specimentype/rockPowder/',
-            'standardReferenceSpecimen': 'http://vocabulary.odm2.org/specimentype/standardReferenceSpecimen/',
-            'terrestrialSection': 'http://vocabulary.odm2.org/specimentype/terrestrialSection/',
-            'thinSection': 'http://vocabulary.odm2.org/specimentype/thinSection/',
-            'unknown': 'http://vocabulary.odm2.org/specimentype/unknown/'
+            'automated': 'http://vocabulary.odm2.org/specimentype/automated',
+            'core': 'http://vocabulary.odm2.org/specimentype/core',
+            'coreHalfRound': 'http://vocabulary.odm2.org/specimentype/coreHalfRound',
+            'corePiece': 'http://vocabulary.odm2.org/specimentype/corePiece',
+            'coreQuarterRound': 'http://vocabulary.odm2.org/specimentype/coreQuarterRound',
+            'coreSection': 'http://vocabulary.odm2.org/specimentype/coreSection',
+            'coreSectionHalf': 'http://vocabulary.odm2.org/specimentype/coreSectionHalf',
+            'coreSub-Piece': 'http://vocabulary.odm2.org/specimentype/coreSub-Piece',
+            'coreWholeRound': 'http://vocabulary.odm2.org/specimentype/coreWholeRound',
+            'cuttings': 'http://vocabulary.odm2.org/specimentype/cuttings',
+            'dredge': 'http://vocabulary.odm2.org/specimentype/dredge',
+            'foliageDigestion': 'http://vocabulary.odm2.org/specimentype/foliageDigestion',
+            'foliageLeaching': 'http://vocabulary.odm2.org/specimentype/foliageLeaching',
+            'forestFloorDigestion': 'http://vocabulary.odm2.org/specimentype/forestFloorDigestion',
+            'grab': 'http://vocabulary.odm2.org/specimentype/grab',
+            'individualSample': 'http://vocabulary.odm2.org/specimentype/individualSample',
+            'litterFallDigestion': 'http://vocabulary.odm2.org/specimentype/litterFallDigestion',
+            'orientedCore': 'http://vocabulary.odm2.org/specimentype/orientedCore',
+            'other': 'http://vocabulary.odm2.org/specimentype/other',
+            'petriDishDryDeposition': 'http://vocabulary.odm2.org/specimentype/petriDishDryDeposition',
+            'precipitationBulk': 'http://vocabulary.odm2.org/specimentype/precipitationBulk',
+            'rockPowder': 'http://vocabulary.odm2.org/specimentype/rockPowder',
+            'standardReferenceSpecimen': 'http://vocabulary.odm2.org/specimentype/standardReferenceSpecimen',
+            'terrestrialSection': 'http://vocabulary.odm2.org/specimentype/terrestrialSection',
+            'thinSection': 'http://vocabulary.odm2.org/specimentype/thinSection',
+            'unknown': 'http://vocabulary.odm2.org/specimentype/unknown'
         },
         'method_type': {
             'Auger': 'http://pid.geoscience.gov.au/def/voc/igsn-codelists/Auger',
@@ -92,61 +91,61 @@ class Sample:
             'Scallop': 'http://pid.geoscience.gov.au/def/voc/igsn-codelists/Scallop',
             'Scoop': 'http://pid.geoscience.gov.au/def/voc/igsn-codelists/Scoop',
             'SideSaddle': 'http://pid.geoscience.gov.au/def/voc/igsn-codelists/SideSaddle',
-            'Trap': 'http://pid.geoscience.gov.au/def/voc/igsn-codelists/Trap',
-            'Trawl': 'http://pid.geoscience.gov.au/def/voc/igsn-codelists/Trawl',
-            'TriggerWeight': 'http://pid.geoscience.gov.au/def/voc/igsn-codelists/TriggerWeight',
-            'UnknownMethod': 'http://pid.geoscience.gov.au/def/voc/igsn-codelists/UnknownMethod',
-            'Vibrating': 'http://pid.geoscience.gov.au/def/voc/igsn-codelists/Vibrating'
+            'trap': 'http://pid.geoscience.gov.au/def/voc/igsn-codelists/Trap',
+            'trawl': 'http://pid.geoscience.gov.au/def/voc/igsn-codelists/Trawl',
+            'triggerweight': 'http://pid.geoscience.gov.au/def/voc/igsn-codelists/TriggerWeight',
+            'unknownmethod': 'http://pid.geoscience.gov.au/def/voc/igsn-codelists/UnknownMethod',
+            'vibrating': 'http://pid.geoscience.gov.au/def/voc/igsn-codelists/Vibrating'
         },
         'material_type': {
-            'air': 'http://vocabulary.odm2.org/medium/air/',
-            'gas': 'http://vocabulary.odm2.org/medium/gas/',
-            'ice': 'http://vocabulary.odm2.org/medium/ice/',
-            'liquidAqueous': 'http://vocabulary.odm2.org/medium/liquidAqueous/',
-            'liquidOrganic': 'http://vocabulary.odm2.org/medium/liquidOrganic/',
-            'mineral': 'http://vocabulary.odm2.org/medium/mineral/',
-            'organism': 'http://vocabulary.odm2.org/medium/organism/',
-            'other': 'http://vocabulary.odm2.org/medium/other/',
-            'particulate': 'http://vocabulary.odm2.org/medium/particulate/',
-            'rock': 'http://vocabulary.odm2.org/medium/rock/',
-            'sediment': 'http://vocabulary.odm2.org/medium/sediment/',
-            'snow': 'http://vocabulary.odm2.org/medium/snow/',
-            'soil': 'http://vocabulary.odm2.org/medium/soil/',
-            'tissue': 'http://vocabulary.odm2.org/medium/tissue/',
-            'unknown': 'http://vocabulary.odm2.org/medium/unknown/'
+            'air': 'http://vocabulary.odm2.org/medium/air',
+            'gas': 'http://vocabulary.odm2.org/medium/gas',
+            'ice': 'http://vocabulary.odm2.org/medium/ice',
+            'liquidAqueous': 'http://vocabulary.odm2.org/medium/liquidAqueous',
+            'liquidOrganic': 'http://vocabulary.odm2.org/medium/liquidOrganic',
+            'mineral': 'http://vocabulary.odm2.org/medium/mineral',
+            'organism': 'http://vocabulary.odm2.org/medium/organism',
+            'other': 'http://vocabulary.odm2.org/medium/other',
+            'particulate': 'http://vocabulary.odm2.org/medium/particulate',
+            'rock': 'http://vocabulary.odm2.org/medium/rock',
+            'sediment': 'http://vocabulary.odm2.org/medium/sediment',
+            'snow': 'http://vocabulary.odm2.org/medium/snow',
+            'soil': 'http://vocabulary.odm2.org/medium/soil',
+            'tissue': 'http://vocabulary.odm2.org/medium/tissue',
+            'unknown': 'http://vocabulary.odm2.org/medium/unknown'
         },
         'state': {
-            'ACT': 'http://www.geonames.org/2177478/',
-            'NT': 'http://www.geonames.org/2064513/',
-            'NSW': 'http://sws.geonames.org/2155400/',
-            'QLD': 'http://www.geonames.org/2152274/',
-            'SA': 'http://www.geonames.org/2061327/',
-            'TAS': 'http://www.geonames.org/2147291/',
-            'VIC': 'http://www.geonames.org/2145234/',
-            'WA': 'http://www.geonames.org/2058645/'
+            'ACT': 'http://www.geonames.org/2177478',
+            'NT': 'http://www.geonames.org/2064513',
+            'NSW': 'http://sws.geonames.org/2155400',
+            'QLD': 'http://www.geonames.org/2152274',
+            'SA': 'http://www.geonames.org/2061327',
+            'TAS': 'http://www.geonames.org/2147291',
+            'VIC': 'http://www.geonames.org/2145234',
+            'WA': 'http://www.geonames.org/2058645'
         },
         'country': {
-            'AUS': 'http://www.geonames.org/2077456/',
-            'PNG': 'http://www.geonames.org/2088628/',
-            'ATA': 'http://www.geonames.org/6697173/',
-            'SLB': 'http://www.geonames.org/2103350/',
-            'FRA': 'http://www.geonames.org/3017382/',
-            'TMP': 'http://www.geonames.org/1966436/',
-            'BRA': 'http://www.geonames.org/3469034/',
-            'INW': 'http://www.geonames.org/',
-            'GBR': 'http://www.geonames.org/2635167/',
-            'ZAF': 'http://www.geonames.org/953987/',
-            'USA': 'http://www.geonames.org/6252001/',
-            'NCL': 'http://www.geonames.org/2139685/',
-            'GRL': 'http://www.geonames.org/3425505/',
-            'NOR': 'http://www.geonames.org/3144096/',
-            'ZWE': 'http://www.geonames.org/878675/',
-            'ITA': 'http://www.geonames.org/3175395/',
-            'CZE': 'http://www.geonames.org/3077311/',
-            'NZL': 'http://www.geonames.org/2186224/',
-            'INL': 'http://www.geonames.org/',
-            'LKA': 'http://www.geonames.org/1227603/',
-            'IND': 'http://www.geonames.org/1269750/'
+            'AUS': 'http://www.geonames.org/2077456',
+            'PNG': 'http://www.geonames.org/2088628',
+            'ATA': 'http://www.geonames.org/6697173',
+            'SLB': 'http://www.geonames.org/2103350',
+            'FRA': 'http://www.geonames.org/3017382',
+            'TMP': 'http://www.geonames.org/1966436',
+            'BRA': 'http://www.geonames.org/3469034',
+            'INW': 'http://pid.geoscience.gov.au/def/voc/igsn-codelists/INW',
+            'GBR': 'http://www.geonames.org/2635167',
+            'ZAF': 'http://www.geonames.org/953987',
+            'USA': 'http://www.geonames.org/6252001',
+            'NCL': 'http://www.geonames.org/2139685',
+            'GRL': 'http://www.geonames.org/3425505',
+            'NOR': 'http://www.geonames.org/3144096',
+            'ZWE': 'http://www.geonames.org/878675',
+            'ITA': 'http://www.geonames.org/3175395',
+            'CZE': 'http://www.geonames.org/3077311',
+            'NZL': 'http://www.geonames.org/2186224',
+            'INL': 'http://pid.geoscience.gov.au/def/voc/igsn-codelists/INL',
+            'LKA': 'http://www.geonames.org/1227603',
+            'IND': 'http://www.geonames.org/1269750'
 
         },
         # TODO: fix URI for 'unknown' in lith
@@ -353,7 +352,7 @@ class Sample:
            'gossan': 'http://resource.geosciml.org/classifier/cgi/lithology/residual_material',
            'lherzolite': 'http://resource.geosciml.org/classifier/cgi/lithology/peridotite',
            'lapilli tuff': 'http://resource.geosciml.org/classifier/cgi/lithology/ash_tuff_lapillistone_and_lapilli_tuff',
-           'unknown': 'http://resource.geosciml.org/classifier/cgi/lithology/unknown',
+           'unknown': 'http://www.opengis.net/def/nil/OGC/0/unknown',  # OGC nill type
            'pantellerite': 'http://resource.geosciml.org/classifier/cgi/lithology/rhyolite',
            'limestone': 'http://resource.geosciml.org/classifier/cgi/lithology/limestone',
            'micrite': 'http://resource.geosciml.org/classifier/cgi/lithology/limestone',
@@ -705,8 +704,10 @@ class Sample:
                 },
 
         'entity_type': {
-            'BOREHOLE': 'http://vocabulary.odm2.org/samplingfeaturetype/borehole/',
-            'FIELD SITE': 'http://vocabulary.odm2.org/samplingfeaturetype/site/',
+            'BOREHOLE': 'http://vocabulary.odm2.org/samplingfeaturetype/borehole',
+            'FIELD SITE': 'http://vocabulary.odm2.org/samplingfeaturetype/site',
+            'SURVEY': 'http://pid.geoscience.gov.au/def/voc/ga-entities/Survey',  # TODO: create a vocab for all Entity types
+            # TODO: find matches for other types in the DB
         }
     }
 
@@ -1372,7 +1373,7 @@ class Sample:
                 E.curation('x'),
                 E.curator('x'),
                 E.curationLocation('GA shed'),
-                E.classification('x'),
+                E.classification('http://www.opengis.net/def/nil/OGC/0/missing'),
                 E.comments('x'),
                 E.otherNames(
                     E.otherName('x')
@@ -1450,8 +1451,8 @@ class Sample:
 if __name__ == '__main__':
     s = Sample()
     s.populate_from_xml_file('../test/sample_eg2.xml')
-    print s.export_as_rdf(rdf_mime='application/rdf+xml')
+    #print s.export_as_rdf(rdf_mime='application/rdf+xml')
 
     #print s.is_xml_export_valid(open('../test/sample_eg3_IGSN_schema.xml').read())
-    #print s.export_as_igsn_xml()
+    print s.export_as_igsn_xml()
 
