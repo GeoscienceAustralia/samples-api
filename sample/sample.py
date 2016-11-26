@@ -35,6 +35,7 @@ class Sample:
 
     URI_MISSSING = 'http://www.opengis.net/def/nil/OGC/0/missing'
     URI_INAPPLICABLE = 'http://www.opengis.net/def/nil/OGC/0/inapplicable'
+    URI_GA = 'http://pid.geoscience.gov.au/org/ga'
     TERM_LOOKUP = {
         'access': {
             'Public': 'http://pid.geoscience.gov.au/def/voc/igsn-codelists/Public',
@@ -796,7 +797,7 @@ class Sample:
         self.date_load = Sample.URI_MISSSING
         self.sample_no = Sample.URI_MISSSING
 
-    def populate_from_oracle_api(self, IGSN):
+    def populate_from_oracle_api(self, igsn):
         """
         Populates this instance with data from the Oracle Samples table API
 
@@ -804,7 +805,7 @@ class Sample:
         """
 
         os.environ['NO_PROXY'] = 'ga.gov.au'
-        target_url = 'http://biotite.ga.gov.au:7777/wwwstaff_distd/a.igsn_api.get_igsnSample?pIGSN=' + IGSN
+        target_url = 'http://biotite.ga.gov.au:7777/wwwstaff_distd/a.igsn_api.get_igsnSample?pIGSN=' + igsn
         # call API
         r = requests.get(target_url)
         if self.validate_xml(r.content):
@@ -818,13 +819,11 @@ class Sample:
         parser = etree.XMLParser(dtd_validation=False)
 
         try:
-            root = etree.fromstring(xml, parser)
+            etree.fromstring(xml, parser)
             return True
         except Exception:
             print 'not valid xml'
             return False
-
-        pass
 
     def populate_from_xml_file(self, xml):
         """
@@ -1048,7 +1047,7 @@ class Sample:
         this_sample = URIRef(base_uri + self.igsn)
 
         # define GA
-        ga = URIRef('http://pid.geoscience.gov.au/org/ga')
+        ga = URIRef(Sample.URI_GA)
 
         # sample location in GML & WKT, formulation from GeoSPARQL
         wkt = Literal(self.generate_sample_wkt(), datatype=GEOSP.wktLiteral)
@@ -1351,7 +1350,7 @@ class Sample:
                     <igsn:materialType>http://vocabulary.odm2.org/medium/snow</igsn:materialType>
                 </igsn:materialTypes>
                 <igsn:samplingLocation/>
-                <igsn:samplingTime/>
+                <igsn:sampling_time/>
                 <igsn:sampleCuration>
                     <igsn:curation> <!-- nick -->
                         <igsn:curator>Mineral Resources Flagship,CSIRO</igsn:curator>
@@ -1382,14 +1381,13 @@ class Sample:
         </igsn:samples>
         '''
 
-        URI_GA = 'http://pid.geoscience.gov.au/org/ga'
         if isinstance(self.date_aquired, datetime):
-            samplingTime = self.date_aquired.isoformat()
+            sampling_time = self.date_aquired.isoformat()
         else:
-            samplingTime = Sample.URI_MISSSING
+            sampling_time = Sample.URI_MISSSING
 
         em = ElementMaker(namespace="http://igsn.org/schema/kernel-v.1.0",
-                         nsmap={'igsn': "http://igsn.org/schema/kernel-v.1.0"})
+                          nsmap={'igsn': "http://igsn.org/schema/kernel-v.1.0"})
 
         doc = em.samples(
             em.sample(
@@ -1404,15 +1402,15 @@ class Sample:
                     em.materialType(self.material_type)
                 ),
                 em.samplingLocation(self.generate_sample_wkt()),
-                em.samplingTime(samplingTime),
+                em.samplingTime(sampling_time),
                 em.sampleCuration(
                     em.curation(
-                        em.curator(URI_GA),
-                        em.curationLocation('Geoscience Australia, Jerrabomberra Avenue, Symonston, Australian Capital Territory')
+                        em.curator(Sample.URI_GA),
+                        em.curationLocation('Geoscience Australia, Jerrabomberra Ave, Symonston, ACT, Australia')
                     )
                 ),
                 # we are always missing the classification value in our DB so we can add this URI statically
-                em.classification(Sample.URI_MISSSING),
+                # em.classification(Sample.URI_MISSSING),
                 em.comments(self.remark),
                 # em.otherNames(
                 #     em.otherName()
@@ -1423,9 +1421,9 @@ class Sample:
                         em.samplingFeatureName(self.entity_name)
                     )
                 ),
-                em.sampleCollectors(
-                    em.sampleCollector(Sample.URI_MISSSING)
-                ),
+                # em.sampleCollectors(
+                #     em.sampleCollector(Sample.URI_MISSSING)
+                # ),
                 em.samplingMethod(self.method_type),
                 # em.samplingCampaign('x'),
                 # em.relatedResources(
@@ -1489,9 +1487,8 @@ class Sample:
 
 if __name__ == '__main__':
     s = Sample()
-    s.populate_from_xml_file('../test/sample_eg2.xml')
-    #print s.export_as_rdf(rdf_mime='text/turtle')
+    s.populate_from_xml_file('../test/sample_eg1.xml')
+    # print s.export_as_rdf(rdf_mime='text/turtle')
 
-    #print s.is_xml_export_valid(open('../test/sample_eg3_IGSN_schema.xml').read())
+    # print s.is_xml_export_valid(open('../test/sample_eg3_IGSN_schema.xml').read())
     print s.export_as_igsn_xml()
-
