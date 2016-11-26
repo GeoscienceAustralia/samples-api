@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<igsn:samples
+		xsi:schemaLocation="http://igsn.org/schema/kernel-v.1.0 ../xml-validation/igsn-csiro-v2.0.xsd"
+		xmlns:igsn="http://igsn.org/schema/kernel-v.1.0"
+		xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+  <igsn:sampleNumber>The dog and the hog</igsn:sampleNumber>
+  <igsn:sampleName>The dog and the hog</igsn:sampleName>
+  <igsn:isPublic>0</igsn:isPublic>
+  <igsn:landingPage>http://eg.com</igsn:landingPage>
+  <igsn:sampleTypes>
+    <igsn:sampleType>None</igsn:sampleType>
+  </igsn:sampleTypes>
+  <igsn:materialTypes>
+    <igsn:materialType>None</igsn:materialType>
+  </igsn:materialTypes>
+  <igsn:samplingLocation>AUS</igsn:samplingLocation>
+  <igsn:samplingTime>None</igsn:samplingTime>
+  <igsn:sampleCuration>x</igsn:sampleCuration>
+  <igsn:curation>x</igsn:curation>
+  <igsn:curator>x</igsn:curator>
+  <igsn:curationLocation>GA shed</igsn:curationLocation>
+  <igsn:classification>x</igsn:classification>
+  <igsn:comments>x</igsn:comments>
+  <igsn:otherNames>
+    <igsn:otherName>x</igsn:otherName>
+  </igsn:otherNames>
+  <igsn:purpose>x</igsn:purpose>
+  <igsn:samplingFeatures>
+    <igsn:samplingFeature>None</igsn:samplingFeature>
+  </igsn:samplingFeatures>
+  <igsn:sampleCollectors>
+    <igsn:sampleCollector>x</igsn:sampleCollector>
+  </igsn:sampleCollectors>
+  <igsn:samplingMethod>None</igsn:samplingMethod>
+  <igsn:samplingCampaign>x</igsn:samplingCampaign>
+  <igsn:relatedResources>
+    <igsn:relatedResource>x</igsn:relatedResource>
+  </igsn:relatedResources>
+  <igsn:logEvent timeStamp="2015-09-10T18:20:30" event="submitted"/>
+</igsn:sample>

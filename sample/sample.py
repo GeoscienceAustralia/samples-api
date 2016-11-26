@@ -5,6 +5,8 @@ from StringIO import StringIO
 from lxml.builder import ElementMaker
 import os
 import requests
+from datetime import datetime
+
 
 class Sample:
     """
@@ -152,7 +154,7 @@ class Sample:
         },
         # TODO: fix URI for 'unknown' in lith
         'lith': {
-            'biogenic sediment': 'http://resource.geosciml.org/classifier/cgi/lithology/biogenic_sediment',
+           'biogenic sediment': 'http://resource.geosciml.org/classifier/cgi/lithology/biogenic_sediment',
            'websterite': 'http://resource.geosciml.org/classifier/cgi/lithology/pyroxenite',
            'gypcrete': 'http://resource.geosciml.org/classifier/cgi/lithology/duricrust',
            'hardpan': 'http://resource.geosciml.org/classifier/cgi/lithology/duricrust',
@@ -704,12 +706,11 @@ class Sample:
            'porcellanite': 'http://resource.geosciml.org/classifier/cgi/lithology/non_clastic_siliceous_sedimentary_rock',
            'dolomite carbonatite': 'http://resource.geosciml.org/classifier/cgi/lithology/carbonatite'
                 },
-
         'entity_type': {
-            'BOREHOLE': 'http://vocabulary.odm2.org/samplingfeaturetype/borehole',
-            'FIELD SITE': 'http://vocabulary.odm2.org/samplingfeaturetype/site',
-            'SURVEY': 'http://pid.geoscience.gov.au/def/voc/ga-entities/Survey',  # TODO: create a vocab for all Entity types
-            # TODO: find matches for other types in the DB
+            'BOREHOLE': 'http://pid.geoscience.gov.au/def/voc/featureofinteresttype/borehole',
+            'FIELD SITE': 'http://pid.geoscience.gov.au/def/voc/featureofinteresttype/site',
+            'SURVEY': 'http://pid.geoscience.gov.au/def/voc/featureofinteresttype/survey',
+            # see vocab <http://pid.geoscience.gov.au/def/voc/featureofinteresttype>
         }
     }
 
@@ -784,7 +785,6 @@ class Sample:
         self.age = Sample.URI_MISSSING
         self.remark = Sample.URI_MISSSING
         self.lith = Sample.URI_MISSSING
-        self.entity_type = Sample.URI_MISSSING
         self.date_aquired = Sample.URI_MISSSING
         self.entity_uri = Sample.URI_MISSSING
         self.entity_name = Sample.URI_MISSSING
@@ -890,7 +890,6 @@ class Sample:
                 if elem.text is not None:
                     self.method_type = Sample.TERM_LOOKUP['method_type'].get(elem.text)
             elif elem.tag == "MATERIAL_CLASS":
-                print elem.text
                 if elem.text is not None:
                     self.material_type = Sample.TERM_LOOKUP['material_type'].get(elem.text)
             elif elem.tag == "SAMPLE_MIN_LONGITUDE":
@@ -1151,9 +1150,8 @@ class Sample:
                     sam:verticalDatum <http://www.opengis.net/def/crs/EPSG/0/xxxx>;
                 ]
             '''
-            fake_entity_type_uri = 'http://pid.geoscience.gov.au/def/voc/sites/' + self.entity_type.title()
-            g.add((this_parent, IGSN.featureType, URIRef(
-                fake_entity_type_uri)))  # TODO: sort out the parent type, both the predicate used and the value (need a vocab)
+            g.add((this_parent, RDF.type, GEOSP.Feature))
+            g.add((this_parent, IGSN.featureType, URIRef(self.entity_type)))
 
             parent_geometry = BNode()
             g.add((this_parent, GEOSP.hasGeometry, parent_geometry))
@@ -1385,6 +1383,11 @@ class Sample:
         '''
 
         URI_GA = 'http://pid.geoscience.gov.au/org/ga'
+        if isinstance(self.date_aquired, datetime):
+            samplingTime = self.date_aquired.isoformat()
+        else:
+            samplingTime = Sample.URI_MISSSING
+
         em = ElementMaker(namespace="http://igsn.org/schema/kernel-v.1.0",
                          nsmap={'igsn': "http://igsn.org/schema/kernel-v.1.0"})
 
@@ -1401,7 +1404,7 @@ class Sample:
                     em.materialType(self.material_type)
                 ),
                 em.samplingLocation(self.generate_sample_wkt()),
-                em.samplingTime(self.date_aquired.isoformat()),
+                em.samplingTime(samplingTime),
                 em.sampleCuration(
                     em.curation(
                         em.curator(URI_GA),
@@ -1411,33 +1414,33 @@ class Sample:
                 # we are always missing the classification value in our DB so we can add this URI statically
                 em.classification(Sample.URI_MISSSING),
                 em.comments(self.remark),
-                em.otherNames(
-                    em.otherName('x')
-                ),
-                em.purpose('x'),
+                # em.otherNames(
+                #     em.otherName()
+                # ),
+                # em.purpose('x'),
                 em.samplingFeatures(
                     em.samplingFeature(
                         em.samplingFeatureName(self.entity_name)
                     )
                 ),
                 em.sampleCollectors(
-                    em.sampleCollector('x')
+                    em.sampleCollector(Sample.URI_MISSSING)
                 ),
                 em.samplingMethod(self.method_type),
-                em.samplingCampaign('x'),
-                em.relatedResources(
-                    em.relatedResource(
-                        em.relatedResourceIdentifier(
-                            em.relatedIdentifierType('url'),
-                            em.relationType('IsCitedBy')
-                        )
-                    )
-                ),
+                # em.samplingCampaign('x'),
+                # em.relatedResources(
+                #     em.relatedResource(
+                #         em.relatedResourceIdentifier(
+                #             em.relatedIdentifierType('url'),
+                #             em.relationType('IsCitedBy')
+                #         )
+                #     )
+                # ),
                 em.logEvent(event='submitted', timeStamp='2015-09-10T18:20:30')
             )
         )
         xml = etree.tostring(doc, pretty_print=True, xml_declaration=True, encoding='UTF-8')
-        print xml
+        return xml
 
     def export_as_html(self, model_view='default'):
         """
