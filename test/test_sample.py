@@ -25,8 +25,10 @@ class TestSample(unittest.TestCase):
 
         # compare instance variables
         assert s.igsn == 'AU2648696', 'IGSN instance varable not correct'
-        assert s.entity_uri == 'http://pid.geoscience.gov.au/site/15846', 'entity_usi instance variable not correct'
-        assert s.lith == 'http://resource.geosciml.org/classifier/cgi/lithology/clastic_sediment',s.lith
+        assert s.entity_uri == 'http://pid.geoscience.gov.au/site/15846', 'entity_uri instance variable not correct'
+        assert s.lith == 'http://resource.geosciml.org/classifier/cgi/lithology/clastic_sediment', \
+            'lith instance variable not correct, expecting "http://resource.geosciml.org/classifier/cgi/lithology/clastic_sediment", got ' + s.lith
+
     def run_all_tests(self):
         self.test_populate_from_xml_file()
 

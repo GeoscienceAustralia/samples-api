@@ -31,6 +31,8 @@ class Sample:
         http://pid.geoscience.gov.au/def/voc/igsn-codelists/sridType
     """
 
+    URI_MISSSING = 'http://www.opengis.net/def/nil/OGC/0/missing'
+    URI_INAPPLICABLE = 'http://www.opengis.net/def/nil/OGC/0/inapplicable'
     TERM_LOOKUP = {
         'access': {
             'Public': 'http://pid.geoscience.gov.au/def/voc/igsn-codelists/Public',
@@ -98,16 +100,16 @@ class Sample:
             'vibrating': 'http://pid.geoscience.gov.au/def/voc/igsn-codelists/Vibrating'
         },
         'material_type': {
-            'air': 'http://vocabulary.odm2.org/medium/air',
-            'gas': 'http://vocabulary.odm2.org/medium/gas',
-            'ice': 'http://vocabulary.odm2.org/medium/ice',
+            'AIR': 'http://vocabulary.odm2.org/medium/air',
+            'GAS': 'http://vocabulary.odm2.org/medium/gas',
+            'ICE': 'http://vocabulary.odm2.org/medium/ice',
             'liquidAqueous': 'http://vocabulary.odm2.org/medium/liquidAqueous',
             'liquidOrganic': 'http://vocabulary.odm2.org/medium/liquidOrganic',
             'mineral': 'http://vocabulary.odm2.org/medium/mineral',
             'organism': 'http://vocabulary.odm2.org/medium/organism',
             'other': 'http://vocabulary.odm2.org/medium/other',
             'particulate': 'http://vocabulary.odm2.org/medium/particulate',
-            'rock': 'http://vocabulary.odm2.org/medium/rock',
+            'ROCK': 'http://vocabulary.odm2.org/medium/rock',
             'sediment': 'http://vocabulary.odm2.org/medium/sediment',
             'snow': 'http://vocabulary.odm2.org/medium/snow',
             'soil': 'http://vocabulary.odm2.org/medium/soil',
@@ -758,43 +760,43 @@ class Sample:
     '''
 
     def __init__(self):
-        self.igsn = None
-        self.sampleid = None
-        self.sample_type = None
-        self.method_type = None
-        self.material_type = None
-        self.long_min = None
-        self.long_max = None
-        self.lat_min = None
-        self.lat_max = None
-        self.gtype = None
-        self.srid = None
-        self.x = None
-        self.y = None
-        self.z = None
-        self.elem_info = None
-        self.ordinates = None
-        self.state = None
-        self.country = None
-        self.depth_top = None
-        self.depth_base = None
-        self.strath = None
-        self.age = None
-        self.remark = None
-        self.lith = None
-        self.entity_type = None
-        self.date_aquired = None
-        self.entity_uri = None
-        self.entity_name = None
-        self.entity_type = None
-        self.hole_long_min = None
-        self.hole_long_max = None
-        self.hole_lat_min = None
-        self.hole_lat_max = None
-        self.date_load = None
-        self.sample_no = None
+        self.igsn = Sample.URI_MISSSING
+        self.sampleid = Sample.URI_MISSSING
+        self.sample_type = Sample.URI_MISSSING
+        self.method_type = Sample.URI_MISSSING
+        self.material_type = Sample.URI_MISSSING
+        self.long_min = Sample.URI_MISSSING
+        self.long_max = Sample.URI_MISSSING
+        self.lat_min = Sample.URI_MISSSING
+        self.lat_max = Sample.URI_MISSSING
+        self.gtype = Sample.URI_MISSSING
+        self.srid = Sample.URI_MISSSING
+        self.x = Sample.URI_MISSSING
+        self.y = Sample.URI_MISSSING
+        self.z = Sample.URI_MISSSING
+        self.elem_info = Sample.URI_MISSSING
+        self.ordinates = Sample.URI_MISSSING
+        self.state = Sample.URI_MISSSING
+        self.country = Sample.URI_MISSSING
+        self.depth_top = Sample.URI_MISSSING
+        self.depth_base = Sample.URI_MISSSING
+        self.strath = Sample.URI_MISSSING
+        self.age = Sample.URI_MISSSING
+        self.remark = Sample.URI_MISSSING
+        self.lith = Sample.URI_MISSSING
+        self.entity_type = Sample.URI_MISSSING
+        self.date_aquired = Sample.URI_MISSSING
+        self.entity_uri = Sample.URI_MISSSING
+        self.entity_name = Sample.URI_MISSSING
+        self.entity_type = Sample.URI_MISSSING
+        self.hole_long_min = Sample.URI_MISSSING
+        self.hole_long_max = Sample.URI_MISSSING
+        self.hole_lat_min = Sample.URI_MISSSING
+        self.hole_lat_max = Sample.URI_MISSSING
+        self.date_load = Sample.URI_MISSSING
+        self.sample_no = Sample.URI_MISSSING
 
-    def populate_from_oracle_api(self,IGSN):
+    def populate_from_oracle_api(self, IGSN):
         """
         Populates this instance with data from the Oracle Samples table API
 
@@ -811,7 +813,7 @@ class Sample:
         else:
             return False
 
-    def validate_xml(self,xml):
+    def validate_xml(self, xml):
 
         parser = etree.XMLParser(dtd_validation=False)
 
@@ -882,72 +884,102 @@ class Sample:
             elif elem.tag == "SAMPLEID":
                 self.sampleid = elem.text
             elif elem.tag == "SAMPLE_TYPE_NEW":
-                self.sample_type = Sample.TERM_LOOKUP['sample_type'].get(elem.text)
+                if elem.text is not None:
+                    self.sample_type = Sample.TERM_LOOKUP['sample_type'].get(elem.text)
             elif elem.tag == "SAMPLING_METHOD":
-                self.method_type = Sample.TERM_LOOKUP['method_type'].get(elem.text)
+                if elem.text is not None:
+                    self.method_type = Sample.TERM_LOOKUP['method_type'].get(elem.text)
             elif elem.tag == "MATERIAL_CLASS":
-                if elem.text:
+                print elem.text
+                if elem.text is not None:
                     self.material_type = Sample.TERM_LOOKUP['material_type'].get(elem.text)
             elif elem.tag == "SAMPLE_MIN_LONGITUDE":
-                self.long_min = elem.text
+                if elem.text is not None:
+                    self.long_min = elem.text
             elif elem.tag == "SAMPLE_MAX_LONGITUDE":
-                self.long_max = elem.text
+                if elem.text is not None:
+                    self.long_max = elem.text
             elif elem.tag == "SAMPLE_MIN_LATITUDE":
-                self.lat_min = elem.text
+                if elem.text is not None:
+                    self.lat_min = elem.text
             elif elem.tag == "SAMPLE_MAX_LATITUDE":
-                self.lat_max = elem.text
+                if elem.text is not None:
+                    self.lat_max = elem.text
             elif elem.tag == "SDO_GTYPE":
-                self.gtype = elem.text
+                if elem.text is not None:
+                    self.gtype = elem.text
             elif elem.tag == "SDO_SRID":
-                self.srid = elem.text
+                if elem.text is not None:
+                    self.srid = elem.text
             elif elem.tag == "X":
-                self.x = elem.text
+                if elem.text is not None:
+                    self.x = elem.text
             elif elem.tag == "Y":
-                self.y = elem.text
+                if elem.text is not None:
+                    self.y = elem.text
             elif elem.tag == "Z":
-                self.z = elem.text
+                if elem.text is not None:
+                    self.z = elem.text
             elif elem.tag == "SDO_ELEM_INFO":
-                self.elem_info = elem.text
+                if elem.text is not None:
+                    self.elem_info = elem.text
             elif elem.tag == "SDO_ORDINATES":
-                self.ordinates = elem.text
+                if elem.text is not None:
+                    self.ordinates = elem.text
             elif elem.tag == "STATEID":
-                self.state = Sample.TERM_LOOKUP['state'].get(elem.text)
+                if elem.text is not None:
+                    self.state = Sample.TERM_LOOKUP['state'].get(elem.text)
             elif elem.tag == "COUNTRY":
-                self.country = Sample.TERM_LOOKUP['country'].get(elem.text)
+                if elem.text is not None:
+                    self.country = Sample.TERM_LOOKUP['country'].get(elem.text)
             elif elem.tag == "TOP_DEPTH":
-                self.depth_top = elem.text
+                if elem.text is not None:
+                    self.depth_top = elem.text
             elif elem.tag == "BASE_DEPTH":
-                self.depth_base = elem.text
+                if elem.text is not None:
+                    self.depth_base = elem.text
             elif elem.tag == "STRATNAME":
-                self.strath = elem.text
+                if elem.text is not None:
+                    self.strath = elem.text
             elif elem.tag == "AGE":
-                self.age = elem.text
+                if elem.text is not None:
+                    self.age = elem.text
             elif elem.tag == "REMARK":
                 if elem.text:
                     self.remark = elem.text
             elif elem.tag == "LITHNAME":
-                self.lith = Sample.TERM_LOOKUP['lith'].get(elem.text)
+                if elem.text is not None:
+                    self.lith = Sample.TERM_LOOKUP['lith'].get(elem.text)
             elif elem.tag == "ACQUIREDATE":
-                if elem.text:
+                if elem.text is not None:
                     self.date_aquired = datetime.strptime(elem.text, '%d-%b-%y')
             elif elem.tag == "ENO":
-                self.entity_uri = 'http://pid.geoscience.gov.au/site/' + elem.text
+                if elem.text is not None:
+                    self.entity_uri = 'http://pid.geoscience.gov.au/site/' + elem.text
             elif elem.tag == "ENTITYID":
-                self.entity_name = elem.text
+                if elem.text is not None:
+                    self.entity_name = elem.text
             elif elem.tag == "ENTITY_TYPE":
-                self.entity_type = elem.text
+                if elem.text is not None:
+                    self.entity_type = elem.text
             elif elem.tag == "HOLE_MIN_LONGITUDE":
-                self.hole_long_min = elem.text
+                if elem.text is not None:
+                    self.hole_long_min = elem.text
             elif elem.tag == "HOLE_MAX_LONGITUDE":
-                self.hole_long_max = elem.text
+                if elem.text is not None:
+                    self.hole_long_max = elem.text
             elif elem.tag == "HOLE_MIN_LATITUDE":
-                self.hole_lat_min = elem.text
+                if elem.text is not None:
+                    self.hole_lat_min = elem.text
             elif elem.tag == "HOLE_MAX_LATITUDE":
-                self.hole_lat_max = elem.text
+                if elem.text is not None:
+                    self.hole_lat_max = elem.text
             elif elem.tag == "LOADEDDATE":
-                self.date_load = elem.text
+                if elem.text is not None:
+                    self.date_load = elem.text
             elif elem.tag == "SAMPLENO":
-                self.sample_no = elem.text
+                if elem.text is not None:
+                    self.sample_no = elem.text
 
         return True
 
@@ -1097,8 +1129,8 @@ class Sample:
             if self.method_type is not None:
                 g.add((this_sample, SAM.samplingMethod, URIRef(self.method_type)))
             if self.date_aquired is not None:
-                g.add((this_sample, SAM.samplingTime, Literal(self.date_aquired.isoformat(), datatype=XSD.datetime)))
-                g.add((this_sample, SAM.samplingTime, Literal(self.date_aquired, datatype=datetime)))
+                if self.date_aquired != Sample.URI_MISSSING:
+                    g.add((this_sample, SAM.samplingTime, Literal(self.date_aquired.isoformat(), datatype=XSD.datetime)))
             # TODO: represent Public/Private (and other?) access methods in DB, add to terms in vocab?
             g.add((this_sample, DCT.accessRights, URIRef(Sample.TERM_LOOKUP['access']['Public'])))
             # TODO: make a register of Entities
@@ -1131,6 +1163,7 @@ class Sample:
 
             parent_elevation = BNode()
             g.add((this_parent, SAM.samplingElevation, parent_elevation))
+            g.add((this_parent, RDF.type, SAM.SamplingFeature))  # TODO: check this class definition in Ont
             g.add((parent_elevation, RDF.type, SAM.Elevation))
             g.add((parent_elevation, SAM.elevation, Literal(self.z, datatype=XSD.float)))
             g.add((parent_elevation, SAM.verticalDatum, Literal("GDA94", datatype=XSD.string)))
@@ -1351,53 +1384,56 @@ class Sample:
         </igsn:samples>
         '''
 
-        E = ElementMaker(namespace="http://igsn.org/schema/kernel-v.1.0",
+        URI_GA = 'http://pid.geoscience.gov.au/org/ga'
+        em = ElementMaker(namespace="http://igsn.org/schema/kernel-v.1.0",
                          nsmap={'igsn': "http://igsn.org/schema/kernel-v.1.0"})
 
-        doc = E.samples(
-                E.sample(
-                E.sampleNumber(str(self.igsn), identifierType='igsn'),
-                E.sampleName(""),
-                # TODO: fix acess rights
-                E.isPublic('0'),
-                E.landingPage('http://eg.com'),
-                E.sampleTypes(
-                    E.sampleType(str(self.sample_type))
+        doc = em.samples(
+            em.sample(
+                em.sampleNumber(self.igsn, identifierType='igsn'),
+                em.sampleName(Sample.URI_INAPPLICABLE),
+                em.isPublic('0'),  # always non-public? TODO: fix access rights
+                em.landingPage('http://pid.geoscience.gov.au/sample/' + self.igsn),
+                em.sampleTypes(
+                    em.sampleType(self.sample_type)
                 ),
-                E.materialTypes(
-                    E.materialType(str(self.material_type))
+                em.materialTypes(
+                    em.materialType(self.material_type)
                 ),
-                E.samplingLocation('AUS'),
-                E.samplingTime(str(self.date_aquired)),
-                E.sampleCuration('x'),
-                E.curation('x'),
-                E.curator('x'),
-                E.curationLocation('GA shed'),
-                E.classification('http://www.opengis.net/def/nil/OGC/0/missing'),
-                E.comments('x'),
-                E.otherNames(
-                    E.otherName('x')
-                ),
-                E.purpose('x'),
-                E.samplingFeatures(
-                    E.samplingFeature(
-                        E.samplingFeatureName(str(self.entity_name))
+                em.samplingLocation(self.generate_sample_wkt()),
+                em.samplingTime(self.date_aquired.isoformat()),
+                em.sampleCuration(
+                    em.curation(
+                        em.curator(URI_GA),
+                        em.curationLocation('Geoscience Australia, Jerrabomberra Avenue, Symonston, Australian Capital Territory')
                     )
                 ),
-                E.sampleCollectors(
-                    E.sampleCollector('x')
+                # we are always missing the classification value in our DB so we can add this URI statically
+                em.classification(Sample.URI_MISSSING),
+                em.comments(self.remark),
+                em.otherNames(
+                    em.otherName('x')
                 ),
-                E.samplingMethod(str(self.method_type)),
-                E.samplingCampaign('x'),
-                E.relatedResources(
-                    E.relatedResource(
-                        E.relatedResourceIdentifier(
-                            E.relatedIdentifierType('url'),
-                            E.relationType('IsCitedBy')
+                em.purpose('x'),
+                em.samplingFeatures(
+                    em.samplingFeature(
+                        em.samplingFeatureName(self.entity_name)
+                    )
+                ),
+                em.sampleCollectors(
+                    em.sampleCollector('x')
+                ),
+                em.samplingMethod(self.method_type),
+                em.samplingCampaign('x'),
+                em.relatedResources(
+                    em.relatedResource(
+                        em.relatedResourceIdentifier(
+                            em.relatedIdentifierType('url'),
+                            em.relationType('IsCitedBy')
                         )
                     )
                 ),
-                E.logEvent(event='submitted', timeStamp='2015-09-10T18:20:30')
+                em.logEvent(event='submitted', timeStamp='2015-09-10T18:20:30')
             )
         )
         xml = etree.tostring(doc, pretty_print=True, xml_declaration=True, encoding='UTF-8')
@@ -1451,7 +1487,7 @@ class Sample:
 if __name__ == '__main__':
     s = Sample()
     s.populate_from_xml_file('../test/sample_eg2.xml')
-    #print s.export_as_rdf(rdf_mime='application/rdf+xml')
+    #print s.export_as_rdf(rdf_mime='text/turtle')
 
     #print s.is_xml_export_valid(open('../test/sample_eg3_IGSN_schema.xml').read())
     print s.export_as_igsn_xml()
