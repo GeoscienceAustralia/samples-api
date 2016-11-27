@@ -7,4 +7,4 @@ THREADED = False
 DEBUG = True
 
 BASE_URI = 'http://localhost:' + str(PORT) + '/'
-WEB_SUBFOLDER = ''
+WEB_SUBFOLDER = ''  # no trailing slash

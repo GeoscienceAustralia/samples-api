@@ -1,5 +1,5 @@
 <table>
 {% for k, v in views_formats.iteritems() %}
-    <tr><td><a href="{{ k }}">{{ k }}</a></td></tr>
+    <tr><td><a href="{{base_uri}}{{web_subfolder}}?_view={{ k }}">{{ k }}</a></td></tr>
 {% endfor %}
 </table>

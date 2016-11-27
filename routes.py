@@ -53,6 +53,8 @@ def index():
     if view == 'alternates':
         return render_template(
             'sample.html',
+            base_uri=settings.BASE_URI,
+            web_subfolder=settings.WEB_SUBFOLDER,
             view=view,
             alternates_html=render_template('view_alternates.html', views_formats=views_formats)
         )
@@ -60,7 +62,8 @@ def index():
         if format == 'text/html':
             return render_template(
                 'index.html',
-                base_uri=settings.BASE_URI
+                base_uri=settings.BASE_URI,
+                web_subfolder = settings.WEB_SUBFOLDER,
             )
         else:
             return Response(
@@ -219,6 +222,8 @@ def sample(igsn):
     if view == 'alternates':
         return render_template(
             'sample.html',
+            base_uri=settings.BASE_URI,
+            web_subfolder=settings.WEB_SUBFOLDER,
             view=view,
             alternates_html=render_template('view_alternates.html', views_formats=views_formats)
         )
@@ -248,6 +253,8 @@ def sample(igsn):
         else:  # format == 'text/html'
             return render_template(
                 'sample.html',
+                base_uri=settings.BASE_URI,
+                web_subfolder=settings.WEB_SUBFOLDER,
                 view=view,
                 placed_html=s.export_as_html(model_view=view)
             )
@@ -261,5 +268,7 @@ def samples():
     :return: HTTP Response
     """
     return render_template(
-        'samples.html'
+        'samples.html',
+        base_uri=settings.BASE_URI,
+        web_subfolder=settings.WEB_SUBFOLDER,
     )
