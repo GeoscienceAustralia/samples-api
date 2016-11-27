@@ -1,6 +1,5 @@
 from lxml import etree
 from rdflib import Graph, URIRef, RDF, XSD, Namespace, Literal, BNode
-from datetime import datetime
 from StringIO import StringIO
 from lxml.builder import ElementMaker
 import os
@@ -10,7 +9,10 @@ from datetime import datetime
 
 class Sample:
     """
-    Sample class
+    This class represents a Sample and methods in this class allow a sample to be loaded from GA's internal Oracle
+    Samples database and to be exported in a number of formats including RDF, according to the 'IGSN Ontology' and an
+    expression of the Dublin Core ontology, HTML, XML in the form given by the GA Oracle DB's API and also XML according
+    to CSIRO's IGSN schema (v2).
     """
 
     """
