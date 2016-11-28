@@ -1043,6 +1043,8 @@ class Sample:
         g.bind('om', OM)
         AUROLE = Namespace('http://communications.data.gov.au/def/role/')
         g.bind('aurole', AUROLE)
+        PROV = Namespace('http://www.w3.org/ns/prov#')
+        g.bind('prov', PROV)
 
         # URI for this sample
         base_uri = 'http://pid.geoscience.gov.au/sample/'
@@ -1058,10 +1060,7 @@ class Sample:
         # select model view
         if model_view == 'default' or model_view == 'igsn' or model_view is None:
             # default model is the IGSN model
-
             # IGSN model required namespaces
-            PROV = Namespace('http://www.w3.org/ns/prov#')
-            g.bind('prov', PROV)
             SF = Namespace('http://www.opengis.net/ont/sf#')
             g.bind('sf', SF)
             IGSN = Namespace('http://pid.geoscience.gov.au/def/ont/igsn#')
@@ -1069,7 +1068,6 @@ class Sample:
 
             # classing the sample
             g.add((this_sample, RDF.type, SAM.Specimen))
-            g.add((this_sample, RDF.type, PROV.Entity))
 
             # linking the sample and the RDF document
             #g.add((this_sample, FOAF.isPrimaryTopicOf, PROV.Entity))
@@ -1130,7 +1128,8 @@ class Sample:
                 g.add((this_sample, SAM.samplingMethod, URIRef(self.method_type)))
             if self.date_aquired is not None:
                 if self.date_aquired != Sample.URI_MISSSING:
-                    g.add((this_sample, SAM.samplingTime, Literal(self.date_aquired.isoformat(), datatype=XSD.datetime)))
+                    print self.date_aquired
+                    #g.add((this_sample, SAM.samplingTime, Literal(self.date_aquired.isoformat(), datatype=XSD.datetime)))
             # TODO: represent Public/Private (and other?) access methods in DB, add to terms in vocab?
             g.add((this_sample, DCT.accessRights, URIRef(Sample.TERM_LOOKUP['access']['Public'])))
             # TODO: make a register of Entities
@@ -1174,19 +1173,18 @@ class Sample:
             g.add((qualified_attribution, PROV.agent, ga))
             g.add((qualified_attribution, PROV.hadRole, AUROLE.Publisher))
             g.add((this_sample, PROV.qualifiedAttribution, qualified_attribution))
-
         elif model_view == 'dc':
             # this is the cut-down IGSN --> Dublin core mapping describe at http://igsn.github.io/oai/
             g.add((this_sample, RDF.type, DCT.PhysicalResource))
             g.add((this_sample, DCT.coverage, wkt))
             # g.add((this_sample, DCT.creator, Literal('Unknown', datatype=XSD.string)))
-            if self.date_aquired is not None:
+            if self.date_aquired != Sample.URI_MISSSING:
                 g.add((this_sample, DCT.date, Literal(self.date_aquired.isoformat(), datatype=XSD.date)))
             if self.remark is not None:
-                g.add((this_sample, DCT.description, self.remark))
-            if self.material_type is not None:
+                g.add((this_sample, DCT.description, Literal(self.remark, datatype=XSD.string)))
+            if self.material_type != Sample.URI_MISSSING:
                 g.add((this_sample, DCT.format, URIRef(self.material_type)))
-            g.add((this_sample, DCT.identifier, Literal('igsn:' + self.igsn, datatype=XSD.string)))
+            g.add((this_sample, DCT.identifier, Literal(self.igsn, datatype=XSD.string)))
             # define GA as a dct:Agent
             g.add((ga, RDF.type, DCT.Agent))
             g.add((this_sample, DCT.publisher, ga))
@@ -1195,6 +1193,14 @@ class Sample:
             # g.add((this_sample, DCT.title, ga)) -- no value at GA
             if self.sample_type is not None:
                 g.add((this_sample, DCT.type, URIRef(self.sample_type)))
+        elif model_view == 'prov':
+            g.add((this_sample, RDF.type, PROV.Entity))
+            g.add((ga, RDF.type, PROV.Org))
+            qualified_attribution = BNode()
+            g.add((qualified_attribution, RDF.type, PROV.Attribution))
+            g.add((qualified_attribution, PROV.agent, ga))
+            g.add((qualified_attribution, PROV.hadRole, AUROLE.Publisher))
+            g.add((this_sample, PROV.qualifiedAttribution, qualified_attribution))
 
         return g.serialize(format=Sample.RDF_MIMETYPES[rdf_mime])
 
@@ -1490,7 +1496,7 @@ class Sample:
 if __name__ == '__main__':
     s = Sample()
     s.populate_from_xml_file('../test/sample_eg1.xml')
-    # print s.export_as_rdf(rdf_mime='text/turtle')
+    print s.export_as_rdf(model_view='prov', rdf_mime='text/turtle')
 
     # print s.is_xml_export_valid(open('../test/sample_eg3_IGSN_schema.xml').read())
-    print s.export_as_igsn_xml()
+    # print s.export_as_igsn_xml()
