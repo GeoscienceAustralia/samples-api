@@ -1036,15 +1036,16 @@ class Sample:
         # DC = Namespace('http://purl.org/dc/elements/1.1/')
         DCT = Namespace('http://purl.org/dc/terms/')
         g.bind('dct', DCT)
+
         SAMFL = Namespace('http://def.seegrid.csiro.au/ontology/om/sam-lite#')
         g.bind('samfl', SAMFL)
+
         GEOSP = Namespace('http://www.opengis.net/ont/geosparql#')
         g.bind('geosp', GEOSP)
-        # not currently using OM, just SAMFL
-        # OM = Namespace('http://def.seegrid.csiro.au/ontology/om/om-lite#')
-        # g.bind('om', OM)
+
         AUROLE = Namespace('http://communications.data.gov.au/def/role/')
         g.bind('aurole', AUROLE)
+
         PROV = Namespace('http://www.w3.org/ns/prov#')
         g.bind('prov', PROV)
 
