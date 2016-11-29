@@ -1035,11 +1035,11 @@ class Sample:
         # DC = Namespace('http://purl.org/dc/elements/1.1/')
         DCT = Namespace('http://purl.org/dc/terms/')
         g.bind('dct', DCT)
-        SAM = Namespace('http://def.seegrid.csiro.au/ontology/om/sam-lite#')
-        g.bind('sam', SAM)
+        SAMFL = Namespace('http://def.seegrid.csiro.au/ontology/om/sam-lite#')
+        g.bind('samfl', SAMFL)
         GEOSP = Namespace('http://www.opengis.net/ont/geosparql#')
         g.bind('geosp', GEOSP)
-        # not currently using OM, just SAM
+        # not currently using OM, just SAMFL
         # OM = Namespace('http://def.seegrid.csiro.au/ontology/om/om-lite#')
         # g.bind('om', OM)
         AUROLE = Namespace('http://communications.data.gov.au/def/role/')
@@ -1062,13 +1062,11 @@ class Sample:
         if model_view == 'default' or model_view == 'igsn' or model_view is None:
             # default model is the IGSN model
             # IGSN model required namespaces
-            SF = Namespace('http://www.opengis.net/ont/sf#')
-            g.bind('sf', SF)
             IGSN = Namespace('http://pid.geoscience.gov.au/def/ont/igsn#')
             g.bind('igsn', IGSN)
 
             # classing the sample
-            g.add((this_sample, RDF.type, SAM.Specimen))
+            g.add((this_sample, RDF.type, SAMFL.Specimen))
 
             # linking the sample and the RDF document
             # g.add((this_sample, FOAF.isPrimaryTopicOf, PROV.Entity))
@@ -1082,9 +1080,7 @@ class Sample:
             '''
             alternate_identifier = BNode()
             g.add((this_sample, DCT.identifier, alternate_identifier))
-            g.add((alternate_identifier, RDF.type, IGSN.AlternateIdentifier))
-            g.add((alternate_identifier, IGSN.identifierType,
-                   URIRef('http://pid.geoscience.gov.au/def/voc/igsn-codelists/IGSN')))
+            g.add((alternate_identifier, RDF.type, URIRef('http://pid.geoscience.gov.au/def/voc/igsn-codelists/IGSN')))
             g.add((alternate_identifier, PROV.value, Literal(self.igsn, datatype=XSD.string)))
 
             '''
@@ -1095,8 +1091,8 @@ class Sample:
             ];
             '''
             geometry = BNode()
-            g.add((this_sample, SAM.samplingLocation, geometry))
-            g.add((geometry, RDF.type, SF.Point))
+            g.add((this_sample, SAMFL.samplingLocation, geometry))
+            g.add((geometry, RDF.type, SAMFL.Point))
             g.add((geometry, GEOSP.asGML, gml))
             g.add((geometry, GEOSP.asWKT, wkt))
 
@@ -1108,10 +1104,10 @@ class Sample:
             ];
             '''
             elevation = BNode()
-            g.add((this_sample, SAM.samplingElevation, elevation))
-            g.add((elevation, RDF.type, SAM.Elevation))
-            g.add((elevation, SAM.elevation, Literal(self.z, datatype=XSD.float)))
-            g.add((elevation, SAM.verticalDatum, Literal("http://spatialreference.org/ref/epsg/4283/", datatype=XSD.anyUri)))
+            g.add((this_sample, SAMFL.samplingElevation, elevation))
+            g.add((elevation, RDF.type, SAMFL.Elevation))
+            g.add((elevation, SAMFL.elevation, Literal(self.z, datatype=XSD.float)))
+            g.add((elevation, SAMFL.verticalDatum, Literal("http://spatialreference.org/ref/epsg/4283/", datatype=XSD.anyUri)))
 
             '''
             sam:currentLocation "some note"^^xsd:string;
@@ -1122,14 +1118,11 @@ class Sample:
             dct:accessRights skos:Concept #http://pid.geoscience.gov.au/def/voc/igsn-codelists/Private
             obs:featureOfInterest <parent_uri>;
             '''
-            g.add((this_sample, SAM.currentLocation, Literal('GA Services building', datatype=XSD.string)))
-            if self.material_type is not None:
-                g.add((this_sample, SAM.materialClass, URIRef(self.material_type)))
-            if self.method_type is not None:
-                process = BNode()
-                g.add((this_sample, SAM.samplingMethod, process))
-                g.add((process, RDF.type, SAM.Process))
-                g.add((process, DCT.type, URIRef(self.method_type)))
+            g.add((this_sample, SAMFL.currentLocation, Literal('GA Services building', datatype=XSD.string)))
+            if self.material_type != 'http://www.opengis.net/def/nil/OGC/0/missing':
+                g.add((this_sample, SAMFL.materialClass, URIRef(self.material_type)))
+            if self.method_type != 'http://www.opengis.net/def/nil/OGC/0/missing':
+                g.add((this_sample, SAMFL.samplingMethod, URIRef(self.method_type)))
             if self.date_aquired is not None:
                 if self.date_aquired != Sample.URI_MISSSING:
                     print self.date_aquired
@@ -1138,7 +1131,7 @@ class Sample:
             g.add((this_sample, DCT.accessRights, URIRef(Sample.TERM_LOOKUP['access']['Public'])))
             # TODO: make a register of Entities
             this_parent = URIRef(self.entity_uri)
-            g.add((this_sample, SAM.relatedSamplingFeature, this_parent))  # could be OM.featureOfInterest
+            g.add((this_sample, SAMFL.relatedSamplingFeature, this_parent))  # could be OM.featureOfInterest
 
             '''
             <parent_uri> a geo:Feature;
@@ -1158,17 +1151,17 @@ class Sample:
 
             parent_geometry = BNode()
             g.add((this_parent, GEOSP.hasGeometry, parent_geometry))
-            g.add((parent_geometry, RDF.type, SF.Point))  # TODO: extend this for other geometry types
+            g.add((parent_geometry, RDF.type, SAMFL.Point))  # TODO: extend this for other geometry types
             g.add((parent_geometry, GEOSP.asWKT, Literal(self.generate_parent_wkt(), datatype=GEOSP.wktLiteral)))
             g.add((parent_geometry, GEOSP.asGML, Literal(self.generate_parent_gml(), datatype=GEOSP.wktLiteral)))
 
             parent_elevation = BNode()
-            g.add((this_parent, SAM.samplingElevation, parent_elevation))
-            g.add((parent_elevation, RDF.type, SAM.Elevation))
-            g.add((parent_elevation, SAM.elevation, Literal(self.z, datatype=XSD.float)))
-            g.add((parent_elevation, SAM.verticalDatum,
+            g.add((this_parent, SAMFL.samplingElevation, parent_elevation))
+            g.add((parent_elevation, RDF.type, SAMFL.Elevation))
+            g.add((parent_elevation, SAMFL.elevation, Literal(self.z, datatype=XSD.float)))
+            g.add((parent_elevation, SAMFL.verticalDatum,
                    Literal("http://spatialreference.org/ref/epsg/4283/", datatype=XSD.anyUri)))
-            g.add((this_parent, SAM.sampledFeature, this_sample))
+            g.add((this_parent, SAMFL.sampledFeature, this_sample))
 
             # define GA as an PROV Org with an ISO19115 role of Publisher
             g.add((ga, RDF.type, PROV.Org))
