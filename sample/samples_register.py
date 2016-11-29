@@ -1,5 +1,7 @@
 from lxml import etree
-from rdflib import Graph, URIRef, RDF, XSD, Namespace, Literal, BNode
+from rdflib import Graph, URIRef, RDF, RDFS, XSD, Namespace, Literal
+from ldapi import LDAPI
+import functions
 from StringIO import StringIO
 from lxml.builder import ElementMaker
 import os
@@ -11,6 +13,10 @@ class SampleRegister:
     """
     This class represents a Sample as listed in the Samples register.
     """
+
+    URI_GA = URIRef('http://pid.geoscience.gov.au/org/ga')
+    URI_DS_REG = URIRef('http://pid.geoscience.gov.au/dataset/')
+
     def __init__(self):
         self.samples = []
 
@@ -26,12 +32,95 @@ class SampleRegister:
                 self.samples.append(elem.text)
 
     def export_as_text(self):
-        return self.samples
+        return '"' + '", "'.join(self.samples) + '"'
+
+    def export_as_rdf(self, model_view='default', rdf_mime='text/turtle'):
+        """
+        Exports this instance in RDF, according to a given model from the list of supported models,
+        in a given rdflib RDF format
+
+        :param model_view: string of one of the model view names available for SampleRegister objects ['reg', 'dc', '',
+            'default']
+        :param format: string of one of the rdflib serlialization format ['n3', 'nquads', 'nt', 'pretty-xml', 'trig',
+            'trix', 'turtle', 'xml'], from http://rdflib3.readthedocs.io/en/latest/plugin_serializers.html
+        :return: RDF string
+        """
+
+        # things that are applicable to all model views; the graph and some namespaces
+        g = Graph()
+        # DC = Namespace('http://purl.org/dc/elements/1.1/')
+        DCT = Namespace('http://purl.org/dc/terms/')
+        g.bind('dct', DCT)
+
+        AUROLE = Namespace('http://communications.data.gov.au/def/role/')
+        g.bind('aurole', AUROLE)
+        PROV = Namespace('http://www.w3.org/ns/prov#')
+        g.bind('prov', PROV)
+
+        # URI for this register of Samples
+        this_register = 'http://pid.geoscience.gov.au/sample/'
+        this_register_uri = URIRef(this_register)
+        igsn_base_uri = this_register
+
+        # define GA
+        ga = URIRef(SampleRegister.URI_GA)
+
+        # select model view
+        if model_view == 'default' or model_view == 'reg' or model_view is None:
+            # default model is the reg model
+            # reg model required namespaces
+            REG = Namespace('http://purl.org/linked-data/registry#')
+            g.bind('reg', REG)
+
+            DPR = Namespace('http://promsns.org/def/dpr#')
+            g.bind('dpr', DPR)
+
+            IGSN = Namespace('http://pid.geoscience.gov.au/def/ont/igsn#')
+            g.bind('igsn', IGSN)
+
+            ORG = Namespace('http://www.w3.org/ns/org#')
+            g.bind('org', ORG)
+
+            DCAT = Namespace('https://www.w3.org/ns/dcat#')
+            g.bind('dcat', DCAT)
+
+            # classing the register
+            g.add((URIRef(this_register), RDF.type, REG.Register))
+
+            # metadata for the Register
+            g.add((SampleRegister.URI_GA, RDF.type, DPR.DataProviderRegister))
+            g.add((SampleRegister.URI_GA, RDF.type, ORG.Organization))
+            g.add((SampleRegister.URI_GA, RDFS.label, Literal('Geoscience Australia', datatype=XSD.string)))
+            g.add((SampleRegister.URI_GA, RDFS.comment, Literal('Geoscience Australia (GA) is Austriala\'s national custodian of geoscience information. As a Data Provider Register, GA publishes much information including samples\' metadata, datasets, web services, vocabularies and ontologies', datatype=XSD.string)))
+            g.add((SampleRegister.URI_GA, REG.subregister, SampleRegister.URI_DS_REG))
+
+            g.add((SampleRegister.URI_DS_REG, RDF.type, REG.FederatedRegister))
+            g.add((SampleRegister.URI_DS_REG, RDFS.label, Literal('GA\'s Dataset register', datatype=XSD.string)))
+            g.add((SampleRegister.URI_DS_REG, REG.containedItemClass, DCAT.Dataset))
+            g.add((SampleRegister.URI_DS_REG, REG.subregister, this_register_uri))
+
+            g.add((this_register_uri, RDF.type, REG.Register))
+            g.add((this_register_uri, RDFS.label, Literal('GA\'s Samples register', datatype=XSD.string)))
+            g.add((this_register_uri, REG.containedItemClass, IGSN.Sample))
+
+            # for each Sample
+            for sample_igsn_str in self.samples:
+                g.add((URIRef(igsn_base_uri + sample_igsn_str), RDF.type, IGSN.Sample))
+                g.add((URIRef(igsn_base_uri + sample_igsn_str), RDFS.label, Literal('Sample ' + sample_igsn_str, datatype=XSD.string)))
+                g.add((URIRef(igsn_base_uri + sample_igsn_str), REG.register, URIRef(this_register)))
+
+        elif model_view == 'dc':
+            pass
+        elif model_view == 'prov':
+            pass
+
+        return g.serialize(format=LDAPI.MIMETYPES_PARSERS.get(rdf_mime))
 
 if __name__ == '__main__':
     sr = SampleRegister()
     sr.populate_from_xml_file('../test/samples_register_eg1.xml')
-    print sr.export_as_text()
+    #print sr.export_as_text()
+    print sr.export_as_rdf()
     # print s.export_as_rdf(model_view='igsn', rdf_mime='text/turtle')
 
     # print s.is_xml_export_valid(open('../test/sample_eg3_IGSN_schema.xml').read())
