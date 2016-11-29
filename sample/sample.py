@@ -1039,8 +1039,9 @@ class Sample:
         g.bind('sam', SAM)
         GEOSP = Namespace('http://www.opengis.net/ont/geosparql#')
         g.bind('geosp', GEOSP)
-        OM = Namespace('http://def.seegrid.csiro.au/ontology/om/om-lite#')
-        g.bind('om', OM)
+        # not currently using OM, just SAM
+        # OM = Namespace('http://def.seegrid.csiro.au/ontology/om/om-lite#')
+        # g.bind('om', OM)
         AUROLE = Namespace('http://communications.data.gov.au/def/role/')
         g.bind('aurole', AUROLE)
         PROV = Namespace('http://www.w3.org/ns/prov#')
@@ -1070,7 +1071,7 @@ class Sample:
             g.add((this_sample, RDF.type, SAM.Specimen))
 
             # linking the sample and the RDF document
-            #g.add((this_sample, FOAF.isPrimaryTopicOf, PROV.Entity))
+            # g.add((this_sample, FOAF.isPrimaryTopicOf, PROV.Entity))
 
             '''
             dc:identifier [
@@ -1094,7 +1095,7 @@ class Sample:
             ];
             '''
             geometry = BNode()
-            g.add((this_sample, GEOSP.hasGeometry, geometry))
+            g.add((this_sample, SAM.samplingLocation, geometry))
             g.add((geometry, RDF.type, SF.Point))
             g.add((geometry, GEOSP.asGML, gml))
             g.add((geometry, GEOSP.asWKT, wkt))
@@ -1110,7 +1111,7 @@ class Sample:
             g.add((this_sample, SAM.samplingElevation, elevation))
             g.add((elevation, RDF.type, SAM.Elevation))
             g.add((elevation, SAM.elevation, Literal(self.z, datatype=XSD.float)))
-            g.add((elevation, SAM.verticalDatum, Literal("GDA94", datatype=XSD.string)))
+            g.add((elevation, SAM.verticalDatum, Literal("http://spatialreference.org/ref/epsg/4283/", datatype=XSD.anyUri)))
 
             '''
             sam:currentLocation "some note"^^xsd:string;
@@ -1125,7 +1126,10 @@ class Sample:
             if self.material_type is not None:
                 g.add((this_sample, SAM.materialClass, URIRef(self.material_type)))
             if self.method_type is not None:
-                g.add((this_sample, SAM.samplingMethod, URIRef(self.method_type)))
+                process = BNode()
+                g.add((this_sample, SAM.samplingMethod, process))
+                g.add((process, RDF.type, SAM.Process))
+                g.add((process, DCT.type, URIRef(self.method_type)))
             if self.date_aquired is not None:
                 if self.date_aquired != Sample.URI_MISSSING:
                     print self.date_aquired
@@ -1134,7 +1138,7 @@ class Sample:
             g.add((this_sample, DCT.accessRights, URIRef(Sample.TERM_LOOKUP['access']['Public'])))
             # TODO: make a register of Entities
             this_parent = URIRef(self.entity_uri)
-            g.add((this_sample, OM.featureOfInterest, this_parent))
+            g.add((this_sample, SAM.relatedSamplingFeature, this_parent))  # could be OM.featureOfInterest
 
             '''
             <parent_uri> a geo:Feature;
@@ -1150,8 +1154,7 @@ class Sample:
                     sam:verticalDatum <http://www.opengis.net/def/crs/EPSG/0/xxxx>;
                 ]
             '''
-            g.add((this_parent, RDF.type, GEOSP.Feature))
-            g.add((this_parent, IGSN.featureType, URIRef(self.entity_type)))
+            g.add((this_parent, RDF.type, URIRef(Sample.TERM_LOOKUP['entity_type'][self.entity_type])))
 
             parent_geometry = BNode()
             g.add((this_parent, GEOSP.hasGeometry, parent_geometry))
@@ -1161,10 +1164,11 @@ class Sample:
 
             parent_elevation = BNode()
             g.add((this_parent, SAM.samplingElevation, parent_elevation))
-            g.add((this_parent, RDF.type, SAM.SamplingFeature))  # TODO: check this class definition in Ont
             g.add((parent_elevation, RDF.type, SAM.Elevation))
             g.add((parent_elevation, SAM.elevation, Literal(self.z, datatype=XSD.float)))
-            g.add((parent_elevation, SAM.verticalDatum, Literal("GDA94", datatype=XSD.string)))
+            g.add((parent_elevation, SAM.verticalDatum,
+                   Literal("http://spatialreference.org/ref/epsg/4283/", datatype=XSD.anyUri)))
+            g.add((this_parent, SAM.sampledFeature, this_sample))
 
             # define GA as an PROV Org with an ISO19115 role of Publisher
             g.add((ga, RDF.type, PROV.Org))
@@ -1496,7 +1500,7 @@ class Sample:
 if __name__ == '__main__':
     s = Sample()
     s.populate_from_xml_file('../test/sample_eg1.xml')
-    print s.export_as_rdf(model_view='prov', rdf_mime='text/turtle')
+    print s.export_as_rdf(model_view='igsn', rdf_mime='text/turtle')
 
     # print s.is_xml_export_valid(open('../test/sample_eg3_IGSN_schema.xml').read())
     # print s.export_as_igsn_xml()
