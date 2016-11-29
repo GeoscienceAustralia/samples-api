@@ -803,6 +803,7 @@ class Sample:
         """
         Populates this instance with data from the Oracle Samples table API
 
+        :param igsn: the IGSN of the sample desired
         :return: None
         """
 
@@ -831,7 +832,7 @@ class Sample:
         """
         Populates this instance with data from an XML file.
 
-        :param xml_file:
+        :param xml: XML according to GA's Oracle XML API from the Samples DB
         :return: None
         """
         # iterate through the elements in the XML element tree and handle each

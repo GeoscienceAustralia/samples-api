@@ -1,1 +1,2 @@
 from sample import Sample
+from samples_register import SampleRegister
