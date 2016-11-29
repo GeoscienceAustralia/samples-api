@@ -66,7 +66,7 @@ class SampleRegister:
         ga = URIRef(SampleRegister.URI_GA)
 
         # select model view
-        if model_view == 'default' or model_view == 'reg' or model_view is None:
+        if model_view == 'default' or model_view == 'dpr' or model_view is None:
             # default model is the reg model
             # reg model required namespaces
             REG = Namespace('http://purl.org/linked-data/registry#')
@@ -116,11 +116,49 @@ class SampleRegister:
 
         return g.serialize(format=LDAPI.MIMETYPES_PARSERS.get(rdf_mime))
 
+    def export_as_html(self, model_view='default'):
+        """
+        Exports this instance in HTML, according to a given model from the list of supported models.
+
+        :param model_view: string of one of the model view names available for Sample objects ['igsn', 'dc', '',
+            'default']
+        :return: HTML string
+        """
+        html = '<style>' + \
+               '   table.data {' + \
+               '       border-collapse: collapse;' + \
+               '       border: solid 2px black;' + \
+               '   }' + \
+               '   table.data td, table.data th {' + \
+               '       border: solid 1px black;' + \
+               '       padding: 5px;' + \
+               '   }' + \
+               '</style>'
+
+        # the register itself
+        html += '<h2>This Register of Samples</h2>'
+        html += '<table class="data">'
+        html += '   <tr><th>Property</th><th>Value</th></tr>'
+        html += '   <tr><td>Type</td><td>reg:FederatedRegister</td></tr>'
+        html += '   <tr><td>reg:containedItemClass</td><td>igsn:Sample</td></tr>'
+        html += '   <tr><td>parent</td><td><a href="http://pid.geoscience.gov.au/dataset/">GA\'s Dataset Register</a></td></tr>'
+        html += '</table>'
+
+        # samples
+        html += '<h2>Samples</h2>'
+        html += '<ul>'
+        for sample_uri in self.samples:
+            html += '   <li><a href="' + sample_uri + '">' + sample_uri + '</a></li>'
+        html += '</ul>'
+
+        return html
+
+
 if __name__ == '__main__':
     sr = SampleRegister()
     sr.populate_from_xml_file('../test/samples_register_eg1.xml')
     #print sr.export_as_text()
-    print sr.export_as_rdf()
+    print sr.export_as_html()
     # print s.export_as_rdf(model_view='igsn', rdf_mime='text/turtle')
 
     # print s.is_xml_export_valid(open('../test/sample_eg3_IGSN_schema.xml').read())

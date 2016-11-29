@@ -2,6 +2,7 @@ from flask import Blueprint, Response, render_template, request
 from lxml import etree
 from lxml.builder import ElementMaker
 import settings
+import functions
 routes = Blueprint('routes', __name__)
 
 
@@ -184,7 +185,8 @@ def sample(igsn):
         'default': 'igsn',
         'alternates': ['text/html', 'text/turtle', 'application/rdf+xml', 'application/rdf+json'],
         'igsn': ['text/html', 'text/turtle', 'application/rdf+xml', 'application/rdf+json'],
-        'dc': ['text/html', 'text/turtle', 'application/rdf+xml', 'application/rdf+json']
+        'dc': ['text/html', 'text/turtle', 'application/rdf+xml', 'application/rdf+json'],
+        'prov': ['text/html', 'text/turtle', 'application/rdf+xml', 'application/rdf+json']
     }
 
     # TODO: generalise this and move it to functions.py
@@ -227,25 +229,20 @@ def sample(igsn):
             view=view,
             alternates_html=render_template('view_alternates.html', views_formats=views_formats)
         )
-    elif view in ['igsn', 'dc']:
+    elif view in ['igsn', 'dc', 'prov']:
         # for all these views we will need to populate a sample
-        from sample import sample
-        s = sample.Sample()
+        from sample.sample import Sample
+        s = Sample()
         s.populate_from_xml_file('test/sample_eg2.xml')
 
         if format in ['text/turtle', 'application/rdf+xml', 'application/rdf+json']:
-            file_extension = {
-                'text/turtle': '.ttl',
-                'application/rdf+xml': '.rdf',
-                'application/rdf+json': '.json'
-            }
             return Response(
                 s.export_as_rdf(
                     model_view=view,
                     rdf_mime=format),
                 status=200,
                 mimetype=format,
-                headers={'Content-Disposition': 'attachment; filename=' + igsn + file_extension[format]}
+                headers={'Content-Disposition': 'attachment; filename=' + igsn + functions.get_file_extension(format)}
             )
         elif format == 'application/xml':
             # TODO: implement IGSN XML format
@@ -267,8 +264,20 @@ def samples():
 
     :return: HTTP Response
     """
+
+    views_formats = {
+        'default': 'dpr',
+        'alternates': ['text/html', 'text/turtle', 'application/rdf+xml', 'application/rdf+json'],
+        'dpr': ['text/html', 'text/turtle', 'application/rdf+xml', 'application/rdf+json'],
+    }
+
+    from sample.samples_register import SampleRegister
+    sr = SampleRegister()
+    # load 25 samples from a static file for testing
+    sr.populate_from_xml_file('test/samples_register_eg1.xml')
     return render_template(
         'samples.html',
         base_uri=settings.BASE_URI,
         web_subfolder=settings.WEB_SUBFOLDER,
+        placed_html=sr.export_as_html(model_view='dpr')
     )

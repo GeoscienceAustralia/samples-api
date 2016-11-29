@@ -1121,14 +1121,12 @@ class Sample:
             obs:featureOfInterest <parent_uri>;
             '''
             g.add((this_sample, SAMFL.currentLocation, Literal('GA Services building', datatype=XSD.string)))
-            if self.material_type != 'http://www.opengis.net/def/nil/OGC/0/missing':
+            if self.material_type != Sample.URI_MISSSING:
                 g.add((this_sample, SAMFL.materialClass, URIRef(self.material_type)))
-            if self.method_type != 'http://www.opengis.net/def/nil/OGC/0/missing':
+            if self.method_type != Sample.URI_MISSSING:
                 g.add((this_sample, SAMFL.samplingMethod, URIRef(self.method_type)))
-            if self.date_aquired is not None:
-                if self.date_aquired != Sample.URI_MISSSING:
-                    print self.date_aquired
-                    #g.add((this_sample, SAM.samplingTime, Literal(self.date_aquired.isoformat(), datatype=XSD.datetime)))
+            if self.date_aquired != Sample.URI_MISSSING:
+                g.add((this_sample, SAMFL.samplingTime, Literal(self.date_aquired.isoformat(), datatype=XSD.datetime)))
             # TODO: represent Public/Private (and other?) access methods in DB, add to terms in vocab?
             g.add((this_sample, DCT.accessRights, URIRef(Sample.TERM_LOOKUP['access']['Public'])))
             # TODO: make a register of Entities
@@ -1182,7 +1180,7 @@ class Sample:
             if self.remark is not None:
                 g.add((this_sample, DCT.description, Literal(self.remark, datatype=XSD.string)))
             if self.material_type != Sample.URI_MISSSING:
-                g.add((this_sample, DCT.format, URIRef(self.material_type)))
+                g.add((this_sample, URIRef('http://purl.org/dc/terms/format'), URIRef(self.material_type)))
             g.add((this_sample, DCT.identifier, Literal(self.igsn, datatype=XSD.string)))
             # define GA as a dct:Agent
             g.add((ga, RDF.type, DCT.Agent))
@@ -1460,7 +1458,7 @@ class Sample:
                '       border-collapse: collapse;' + \
                '       border: solid 2px black;' + \
                '   }' + \
-               '   table.data tr, table.data th {' + \
+               '   table.data td, table.data th {' + \
                '       border: solid 1px black;' + \
                '       padding: 5px;' + \
                '   }' + \
