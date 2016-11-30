@@ -1449,7 +1449,7 @@ class Sample:
             # TODO: complete the properties in this view
             html += '   <tr><th>IGSN</th><td>' + self.igsn + '</td></tr>'
             if self.sampleid is not None:
-            html += '   <tr><th>Sample ID</th><td>' + self.sampleid + '</td></tr>'
+                html += '   <tr><th>Sample ID</th><td>' + self.sampleid + '</td></tr>'
             if self.sample_type is not None:
                 html += '   <tr><th>Sample Type</th><td>' + self.sample_type + '</td></tr>'
 
