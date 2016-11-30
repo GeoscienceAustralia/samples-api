@@ -20,6 +20,44 @@ class SampleRegister:
     def __init__(self):
         self.samples = []
 
+    def validate_xml(self, xml):
+
+        parser = etree.XMLParser(dtd_validation=False)
+
+        try:
+            etree.fromstring(xml, parser)
+            return True
+        except Exception:
+            print 'not valid xml'
+            return False
+
+    def populate_from_oracle_api(self, page_no):
+        """
+        Populates this instance with data from the Oracle Samples table API
+
+        :param page_no: the page number of the total resultset from the Samples Set API
+        :return: None
+        """
+
+        os.environ['NO_PROXY'] = 'ga.gov.au'
+        # internal URI
+        # target_url = 'http://biotite.ga.gov.au:7777/wwwstaff_distd/a.igsn_api.get_igsnSample?pIGSN=' + igsn
+        #external URI
+        target_url = 'http://dbforms.ga.gov.au/www_distp/a.igsn_api.get_igsnSampleSet?pOrder=IGSN&pPageNo={0}&pNoOfLinesPerPage=25'.format(page_no)
+        # call API
+        r = requests.get(target_url)
+        # deal with missing XML declaration
+        if not r.content.startswith('<?xml version="1.0" ?>'):
+            xml = '<?xml version="1.0" ?>\n' + r.content
+        else:
+            xml = r.content
+
+        if self.validate_xml(xml):
+            self.populate_from_xml_file(StringIO(xml))
+            return True
+        else:
+            return False
+
     def populate_from_xml_file(self, xml):
         """
         Populates this instance with data from an XML file.
@@ -156,10 +194,11 @@ class SampleRegister:
 
 if __name__ == '__main__':
     sr = SampleRegister()
-    sr.populate_from_xml_file('../test/samples_register_eg1.xml')
+    #sr.populate_from_xml_file('../test/samples_register_eg1.xml')
+    sr.populate_from_oracle_api(1)
     #print sr.export_as_text()
-    print sr.export_as_html()
-    # print s.export_as_rdf(model_view='igsn', rdf_mime='text/turtle')
+    #print sr.export_as_html()
+    print sr.export_as_rdf(model_view='dpr', rdf_mime='text/turtle')
 
     # print s.is_xml_export_valid(open('../test/sample_eg3_IGSN_schema.xml').read())
     # print s.export_as_igsn_xml()

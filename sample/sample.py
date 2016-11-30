@@ -77,6 +77,7 @@ class Sample:
             'Box': 'http://pid.geoscience.gov.au/def/voc/igsn-codelists/Box',
             'ChainBag': 'http://pid.geoscience.gov.au/def/voc/igsn-codelists/ChainBag',
             'Corer': 'http://pid.geoscience.gov.au/def/voc/igsn-codelists/Corer',
+            'CoreDiamond': 'http://pid.geoscience.gov.au/def/voc/igsn-codelists/CoreDiamons',  # TODO: add this to vocab
             'Dredge': 'http://pid.geoscience.gov.au/def/voc/igsn-codelists/Dredge',
             'Drill': 'http://pid.geoscience.gov.au/def/voc/igsn-codelists/Drill',
             'FreeFall': 'http://pid.geoscience.gov.au/def/voc/igsn-codelists/FreeFall',
@@ -114,7 +115,7 @@ class Sample:
             'organism': 'http://vocabulary.odm2.org/medium/organism',
             'other': 'http://vocabulary.odm2.org/medium/other',
             'particulate': 'http://vocabulary.odm2.org/medium/particulate',
-            'ROCK': 'http://vocabulary.odm2.org/medium/rock',
+            'rock': 'http://vocabulary.odm2.org/medium/rock',
             'sediment': 'http://vocabulary.odm2.org/medium/sediment',
             'snow': 'http://vocabulary.odm2.org/medium/snow',
             'soil': 'http://vocabulary.odm2.org/medium/soil',
@@ -764,58 +765,40 @@ class Sample:
     '''
 
     def __init__(self):
-        self.igsn = Sample.URI_MISSSING
-        self.sampleid = Sample.URI_MISSSING
-        self.sample_type = Sample.URI_MISSSING
-        self.method_type = Sample.URI_MISSSING
-        self.material_type = Sample.URI_MISSSING
-        self.long_min = Sample.URI_MISSSING
-        self.long_max = Sample.URI_MISSSING
-        self.lat_min = Sample.URI_MISSSING
-        self.lat_max = Sample.URI_MISSSING
-        self.gtype = Sample.URI_MISSSING
-        self.srid = Sample.URI_MISSSING
-        self.x = Sample.URI_MISSSING
-        self.y = Sample.URI_MISSSING
-        self.z = Sample.URI_MISSSING
-        self.elem_info = Sample.URI_MISSSING
-        self.ordinates = Sample.URI_MISSSING
-        self.state = Sample.URI_MISSSING
-        self.country = Sample.URI_MISSSING
-        self.depth_top = Sample.URI_MISSSING
-        self.depth_base = Sample.URI_MISSSING
-        self.strath = Sample.URI_MISSSING
-        self.age = Sample.URI_MISSSING
-        self.remark = Sample.URI_MISSSING
-        self.lith = Sample.URI_MISSSING
-        self.date_aquired = Sample.URI_MISSSING
-        self.entity_uri = Sample.URI_MISSSING
-        self.entity_name = Sample.URI_MISSSING
-        self.entity_type = Sample.URI_MISSSING
-        self.hole_long_min = Sample.URI_MISSSING
-        self.hole_long_max = Sample.URI_MISSSING
-        self.hole_lat_min = Sample.URI_MISSSING
-        self.hole_lat_max = Sample.URI_MISSSING
-        self.date_load = Sample.URI_MISSSING
-        self.sample_no = Sample.URI_MISSSING
-
-    def populate_from_oracle_api(self, igsn):
-        """
-        Populates this instance with data from the Oracle Samples table API
-
-        :param igsn: the IGSN of the sample desired
-        :return: None
-        """
-
-        os.environ['NO_PROXY'] = 'ga.gov.au'
-        target_url = 'http://biotite.ga.gov.au:7777/wwwstaff_distd/a.igsn_api.get_igsnSample?pIGSN=' + igsn
-        # call API
-        r = requests.get(target_url)
-        if self.validate_xml(r.content):
-            self.populate_from_xml_file(StringIO(r.content))
-            return True
-        else:
-            return False
+        self.igsn = None
+        self.sampleid = None
+        self.sample_type = None
+        self.method_type = None
+        self.material_type = None
+        self.long_min = None
+        self.long_max = None
+        self.lat_min = None
+        self.lat_max = None
+        self.gtype = None
+        self.srid = None
+        self.x = None
+        self.y = None
+        self.z = None
+        self.elem_info = None
+        self.ordinates = None
+        self.state = None
+        self.country = None
+        self.depth_top = None
+        self.depth_base = None
+        self.strath = None
+        self.age = None
+        self.remark = None
+        self.lith = None
+        self.date_aquired = None
+        self.entity_uri = None
+        self.entity_name = None
+        self.entity_type = None
+        self.hole_long_min = None
+        self.hole_long_max = None
+        self.hole_lat_min = None
+        self.hole_lat_max = None
+        self.date_load = None
+        self.sample_no = None
 
     def validate_xml(self, xml):
 
@@ -826,6 +809,32 @@ class Sample:
             return True
         except Exception:
             print 'not valid xml'
+            return False
+
+    def populate_from_oracle_api(self, igsn):
+        """
+        Populates this instance with data from the Oracle Samples table API
+
+        :param igsn: the IGSN of the sample desired
+        :return: None
+        """
+
+        os.environ['NO_PROXY'] = 'ga.gov.au'
+        # internal URI
+        # target_url = 'http://biotite.ga.gov.au:7777/wwwstaff_distd/a.igsn_api.get_igsnSample?pIGSN=' + igsn
+        #external URI
+        target_url = 'http://dbforms.ga.gov.au/www_distp/a.igsn_api.get_igsnSample?pIGSN=' + igsn
+        # call API
+        r = requests.get(target_url)
+        # deal with missing XML declaration
+        if not r.content.startswith('<?xml version="1.0" ?>'):
+            xml = '<?xml version="1.0" ?>\n' + r.content
+        else:
+            xml = r.content
+        if self.validate_xml(xml):
+            self.populate_from_xml_file(StringIO(xml))
+            return True
+        else:
             return False
 
     def populate_from_xml_file(self, xml):
@@ -888,12 +897,18 @@ class Sample:
             elif elem.tag == "SAMPLE_TYPE_NEW":
                 if elem.text is not None:
                     self.sample_type = Sample.TERM_LOOKUP['sample_type'].get(elem.text)
+                    if self.sample_type is None:
+                        self.sample_type = Sample.URI_MISSSING
             elif elem.tag == "SAMPLING_METHOD":
                 if elem.text is not None:
                     self.method_type = Sample.TERM_LOOKUP['method_type'].get(elem.text)
+                    if self.method_type is None:
+                        self.method_type = Sample.URI_MISSSING
             elif elem.tag == "MATERIAL_CLASS":
                 if elem.text is not None:
                     self.material_type = Sample.TERM_LOOKUP['material_type'].get(elem.text)
+                    if self.material_type is None:
+                        self.material_type = Sample.URI_MISSSING
             elif elem.tag == "SAMPLE_MIN_LONGITUDE":
                 if elem.text is not None:
                     self.long_min = elem.text
@@ -930,9 +945,13 @@ class Sample:
             elif elem.tag == "STATEID":
                 if elem.text is not None:
                     self.state = Sample.TERM_LOOKUP['state'].get(elem.text)
+                    if self.state is None:
+                        self.state = Sample.URI_MISSSING
             elif elem.tag == "COUNTRY":
                 if elem.text is not None:
                     self.country = Sample.TERM_LOOKUP['country'].get(elem.text)
+                    if self.country is None:
+                        self.country = Sample.URI_MISSSING
             elif elem.tag == "TOP_DEPTH":
                 if elem.text is not None:
                     self.depth_top = elem.text
@@ -951,6 +970,8 @@ class Sample:
             elif elem.tag == "LITHNAME":
                 if elem.text is not None:
                     self.lith = Sample.TERM_LOOKUP['lith'].get(elem.text)
+                    if self.lith is None:
+                        self.lith = Sample.URI_MISSSING
             elif elem.tag == "ACQUIREDATE":
                 if elem.text is not None:
                     self.date_aquired = datetime.strptime(elem.text, '%d-%b-%y')
@@ -1070,62 +1091,33 @@ class Sample:
             # classing the sample
             g.add((this_sample, RDF.type, SAMFL.Specimen))
 
-            # linking the sample and the RDF document
-            # g.add((this_sample, FOAF.isPrimaryTopicOf, PROV.Entity))
-
-            '''
-            dc:identifier [
-                a igsn:AlternateIdentifier;
-                igsn:identifierType <http://pid.geoscience.gov.au/def/voc/igsn-codelists/IGSN>; #skos:Concept;
-                prov:value "IGSN"^^xsd:string;
-            ];
-            '''
+            # AlternateIdentifier
             alternate_identifier = BNode()
             g.add((this_sample, DCT.identifier, alternate_identifier))
             g.add((alternate_identifier, RDF.type, URIRef('http://pid.geoscience.gov.au/def/voc/igsn-codelists/IGSN')))
             g.add((alternate_identifier, PROV.value, Literal(self.igsn, datatype=XSD.string)))
 
-            '''
-            geo:hasGeometry [
-                a sf:Point; # or Line
-                geo:asGML "<gml:Point srsDimension="3" srsName="http://www.opengis.net/def/crs/EPSG/0/4326"><gml:pos>49.40 -123.26</gml:pos></gml:Point>"^^geosp:gmlLiteral
-                geo:asWKT "<http://www.opengis.net/def/crs/EPSG/0/8311> POINTZ(144.2409874717 -18.1739861699)"^^geosp:wktLiteral
-            ];
-            '''
+            # Geometry
             geometry = BNode()
             g.add((this_sample, SAMFL.samplingLocation, geometry))
             g.add((geometry, RDF.type, SAMFL.Point))
             g.add((geometry, GEOSP.asGML, gml))
             g.add((geometry, GEOSP.asWKT, wkt))
 
-            '''
-            sam:samplingElevation [
-                a sam:Elevation;
-                sam:elevation 34.6;
-                sam:verticalDatum <http://www.opengis.net/def/crs/EPSG/0/xxxx>;
-            ];
-            '''
+            # Elevation
             elevation = BNode()
             g.add((this_sample, SAMFL.samplingElevation, elevation))
             g.add((elevation, RDF.type, SAMFL.Elevation))
             g.add((elevation, SAMFL.elevation, Literal(self.z, datatype=XSD.float)))
             g.add((elevation, SAMFL.verticalDatum, Literal("http://spatialreference.org/ref/epsg/4283/", datatype=XSD.anyUri)))
 
-            '''
-            sam:currentLocation "some note"^^xsd:string;
-            sam:materialClass <http://vocabulary.odm2.org/medium/rock/>;
-            sam:samplingMethod skos:Concept; (methodType) http://pid.geoscience.gov.au/def/voc/igsn-codelists/Drill
-            #sam:specimenType skos:Concept;
-            sam:samplingTime ""^^xsd:datetime;
-            dct:accessRights skos:Concept #http://pid.geoscience.gov.au/def/voc/igsn-codelists/Private
-            obs:featureOfInterest <parent_uri>;
-            '''
+            # properties
             g.add((this_sample, SAMFL.currentLocation, Literal('GA Services building', datatype=XSD.string)))
-            if self.material_type != Sample.URI_MISSSING:
+            if self.material_type is not None:
                 g.add((this_sample, SAMFL.materialClass, URIRef(self.material_type)))
-            if self.method_type != Sample.URI_MISSSING:
+            if self.method_type is not None:
                 g.add((this_sample, SAMFL.samplingMethod, URIRef(self.method_type)))
-            if self.date_aquired != Sample.URI_MISSSING:
+            if self.date_aquired is not None:
                 g.add((this_sample, SAMFL.samplingTime, Literal(self.date_aquired.isoformat(), datatype=XSD.datetime)))
             # TODO: represent Public/Private (and other?) access methods in DB, add to terms in vocab?
             g.add((this_sample, DCT.accessRights, URIRef(Sample.TERM_LOOKUP['access']['Public'])))
@@ -1133,20 +1125,7 @@ class Sample:
             this_parent = URIRef(self.entity_uri)
             g.add((this_sample, SAMFL.relatedSamplingFeature, this_parent))  # could be OM.featureOfInterest
 
-            '''
-            <parent_uri> a geo:Feature;
-                #xxx:gaFeatureType skos:Concept; # we limit this to our voc (parent feature type from Entity Types: BOREHOLE, SURVEY, PIPELINE -- these should be in a vocab)
-                #igsn:featureType (http://52.63.163.95/ga/sissvoc/ga-igsn-code-lists/resource?uri=http://pid.geoscience.gov.au/def/voc/igsn-codelists/featureType)
-                geo:hasGeometry [
-                    a sf:Point; # or anything (Line, Polygon, combo)
-                    geo:asGML "<gml:Point srsDimension="3" srsName="http://www.opengis.net/def/crs/EPSG/0/4326"><gml:pos>49.40 -123.26</gml:pos></gml:Point>"^^geosp:gmlLiteral
-                    geo:asWKT "<http://www.opengis.net/def/crs/EPSG/0/8311> POINTZ(144.2409874717 -18.1739861699)"^^geosp:wktLiteral
-                ]
-                sam:samplingElevation [
-                    sam:elevation 34.6;
-                    sam:verticalDatum <http://www.opengis.net/def/crs/EPSG/0/xxxx>;
-                ]
-            '''
+            # parent
             g.add((this_parent, RDF.type, URIRef(Sample.TERM_LOOKUP['entity_type'][self.entity_type])))
 
             parent_geometry = BNode()
@@ -1175,11 +1154,11 @@ class Sample:
             g.add((this_sample, RDF.type, DCT.PhysicalResource))
             g.add((this_sample, DCT.coverage, wkt))
             # g.add((this_sample, DCT.creator, Literal('Unknown', datatype=XSD.string)))
-            if self.date_aquired != Sample.URI_MISSSING:
+            if self.date_aquired is not None:
                 g.add((this_sample, DCT.date, Literal(self.date_aquired.isoformat(), datatype=XSD.date)))
             if self.remark is not None:
                 g.add((this_sample, DCT.description, Literal(self.remark, datatype=XSD.string)))
-            if self.material_type != Sample.URI_MISSSING:
+            if self.material_type is not None:
                 g.add((this_sample, URIRef('http://purl.org/dc/terms/format'), URIRef(self.material_type)))
             g.add((this_sample, DCT.identifier, Literal(self.igsn, datatype=XSD.string)))
             # define GA as a dct:Agent
@@ -1492,7 +1471,8 @@ class Sample:
 
 if __name__ == '__main__':
     s = Sample()
-    s.populate_from_xml_file('../test/sample_eg1.xml')
+    # s.populate_from_xml_file('../test/sample_eg1.xml')
+    s.populate_from_oracle_api('AU1')
     print s.export_as_rdf(model_view='igsn', rdf_mime='text/turtle')
 
     # print s.is_xml_export_valid(open('../test/sample_eg3_IGSN_schema.xml').read())

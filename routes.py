@@ -233,7 +233,8 @@ def sample(igsn):
         # for all these views we will need to populate a sample
         from sample.sample import Sample
         s = Sample()
-        s.populate_from_xml_file('test/sample_eg2.xml')
+        #s.populate_from_xml_file('test/sample_eg2.xml')
+        s.populate_from_oracle_api(igsn)
 
         if format in ['text/turtle', 'application/rdf+xml', 'application/rdf+json']:
             return Response(
@@ -257,6 +258,17 @@ def sample(igsn):
             )
 
 
+def is_an_int(s):
+    if s is not None:
+        try:
+            int(s)
+            return True
+        except ValueError:
+            return False
+    else:
+        return False
+
+
 @routes.route('/sample/')
 def samples():
     """
@@ -274,7 +286,12 @@ def samples():
     from sample.samples_register import SampleRegister
     sr = SampleRegister()
     # load 25 samples from a static file for testing
-    sr.populate_from_xml_file('test/samples_register_eg1.xml')
+    #sr.populate_from_xml_file('test/samples_register_eg1.xml')
+    if is_an_int(request.args.get('page_no')):
+        page_no = int(request.args.get('page_no'))
+    else:
+        page_no = 1
+    sr.populate_from_oracle_api(page_no)
     return render_template(
         'samples.html',
         base_uri=settings.BASE_URI,
