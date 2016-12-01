@@ -132,3 +132,14 @@ div#ga-nav a {
 div#ga-nav a:hover {
 	text-decoration:underline;
 }
+
+table.lined {
+    border-collapse: collapse;
+    border: solid 2px black;
+}
+
+table.lined th,
+table.lined td {
+    border: solid 1px black;
+    padding: 5px;
+}

@@ -57,7 +57,7 @@ def index():
             base_uri=settings.BASE_URI,
             web_subfolder=settings.WEB_SUBFOLDER,
             view=view,
-            alternates_html=render_template('view_alternates.html', views_formats=views_formats)
+            placed_html=render_template('view_alternates.html', views_formats=views_formats)
         )
     elif view == 'landingpage':
         if format == 'text/html':
@@ -183,42 +183,20 @@ def sample(igsn):
     # lists the views and formats available for a Sample
     views_formats = {
         'default': 'igsn',
-        'alternates': ['text/html', 'text/turtle', 'application/rdf+xml', 'application/rdf+json'],
+        'alternates': ['text/html'],
         'igsn': ['text/html', 'text/turtle', 'application/rdf+xml', 'application/rdf+json'],
         'dc': ['text/html', 'text/turtle', 'application/rdf+xml', 'application/rdf+json'],
         'prov': ['text/html', 'text/turtle', 'application/rdf+xml', 'application/rdf+json']
     }
 
-    # TODO: generalise this and move it to functions.py
-    # validate view
-    if request.args.get('_view') is not None:
-        if request.args.get('_view') not in views_formats.iterkeys():
-            return Response(
-                'You have selected a view that does not exist for Samples. Please choose one of ' +
-                ', '.join(views_formats.iterkeys()) + '.',
-                status=400,
-                mimetype='text/plain')
-        else:
-            view = request.args.get('_view')
-    else:
-        view = 'default'
-
-    # replace 'default' with nominated default view
-    if view == 'default':
-        view = views_formats['default']
-
-    # validate format
-    if request.args.get('_format') is not None:
-        if request.args.get('_format').replace(' ', '+') not in views_formats[view]:
-            return Response(
-                'You have selected a format that does not exist for the view of Samples you selected. ' +
-                'Please choose one of ' + ', '.join(views_formats[view]) + '.',
-                status=400,
-                mimetype='text/plain')
-        else:
-            format = request.args.get('_format').replace(' ', '+')
-    else:
-        format = 'text/html'
+    try:
+        view, format = functions.get_valid_view_and_format(
+            request.args.get('_view'),
+            request.args.get('_format'),
+            views_formats
+        )
+    except functions.ParameterError, e:
+        return functions.client_error_Response(e)
 
     # select view and format
     if view == 'alternates':
@@ -227,7 +205,7 @@ def sample(igsn):
             base_uri=settings.BASE_URI,
             web_subfolder=settings.WEB_SUBFOLDER,
             view=view,
-            alternates_html=render_template('view_alternates.html', views_formats=views_formats)
+            placed_html=render_template('view_alternates.html', views_formats=views_formats)
         )
     elif view in ['igsn', 'dc', 'prov']:
         # for all these views we will need to populate a sample
@@ -258,17 +236,6 @@ def sample(igsn):
             )
 
 
-def is_an_int(s):
-    if s is not None:
-        try:
-            int(s)
-            return True
-        except ValueError:
-            return False
-    else:
-        return False
-
-
 @routes.route('/sample/')
 def samples():
     """
@@ -279,22 +246,49 @@ def samples():
 
     views_formats = {
         'default': 'dpr',
-        'alternates': ['text/html', 'text/turtle', 'application/rdf+xml', 'application/rdf+json'],
+        'alternates': ['text/html'],
         'dpr': ['text/html', 'text/turtle', 'application/rdf+xml', 'application/rdf+json'],
     }
 
-    from sample.samples_register import SampleRegister
-    sr = SampleRegister()
-    # load 25 samples from a static file for testing
-    #sr.populate_from_xml_file('test/samples_register_eg1.xml')
-    if is_an_int(request.args.get('page_no')):
+    try:
+        view, format = functions.get_valid_view_and_format(
+            request.args.get('_view'),
+            request.args.get('_format'),
+            views_formats
+        )
+    except functions.ParameterError, e:
+        return functions.client_error_Response(e)
+
+    # validate page_no parameter
+    if functions.an_int(request.args.get('page_no')):
         page_no = int(request.args.get('page_no'))
     else:
         page_no = 1
-    sr.populate_from_oracle_api(page_no)
-    return render_template(
-        'samples.html',
-        base_uri=settings.BASE_URI,
-        web_subfolder=settings.WEB_SUBFOLDER,
-        placed_html=sr.export_as_html(model_view='dpr')
-    )
+
+    # select view and format
+    if view == 'alternates':
+        return functions.render_templates_alternates('samples.html', views_formats)
+    elif view in ['dpr']:
+        # only create and populate a SamplesRegister for views that need it
+        from sample.samples_register import SampleRegister
+        sr = SampleRegister()
+        sr.populate_from_oracle_api(page_no)
+
+        if format == 'text/html':
+            print 'hello'
+            return render_template(
+                'samples.html',
+                base_uri=settings.BASE_URI,
+                web_subfolder=settings.WEB_SUBFOLDER,
+                placed_html=sr.export_as_html(model_view='dpr')
+            )
+        elif format in views_formats['dpr']:
+            return Response(
+                sr.export_as_rdf(
+                    model_view=view,
+                    rdf_mime=format),
+                status=200,
+                mimetype=format,
+                headers={'Content-Disposition': 'attachment; filename=samples_register' + functions.get_file_extension(format)}
+            )
+        # no need for an else since views already validated

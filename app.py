@@ -2,6 +2,7 @@ import logging
 import settings
 from flask import Flask
 from routes import routes
+import functions
 app = Flask(__name__)
 
 # import the routes in routes.py

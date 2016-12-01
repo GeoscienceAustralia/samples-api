@@ -1,5 +1,18 @@
-<table>
-{% for k, v in views_formats.iteritems() %}
-    <tr><td><a href="{{base_uri}}{{web_subfolder}}?_view={{ k }}">{{ k }}</a></td></tr>
+<p>Other views available for this object, and their formats:</p>
+<table class="lined">
+    <tr><th>View</th><th>Formats</th></tr>
+{% for v, fs in views_formats.iteritems() %}
+    {% if v == 'default' %}
+    {% else %}
+        <tr>
+            <td><a href="{{base_uri}}{{web_subfolder}}?_view={{ v }}">{{ v }}</a></td>
+            <td>
+            {% for f in fs %}
+            <a href="{{base_uri}}{{web_subfolder}}?_view={{ v }}&_format={{ f }}">{{ f }}</a>,
+            {% endfor %}
+            </td>
+        </tr>
+    {% endif %}
 {% endfor %}
 </table>
+<p><em>Alternate views in RDF is coming soon!</em></p>
