@@ -51,7 +51,7 @@ def valid_view(view, views_formats):
             return view
         else:
             raise ParameterError(
-                'The _view parameter is invalid. For this object, it must be one of {0}'
+                'The _view parameter is invalid. For this object, it must be one of {0}.'
                 .format(', '.join(views_formats.iterkeys()))
             )
     else:
@@ -70,7 +70,7 @@ def valid_format(format, view, views_formats):
             return format.replace(' ', '+')
         else:
             raise ParameterError(
-                'The _format parameter is invalid. For this model view, format should be one of {0}'
+                'The _format parameter is invalid. For this model view, format should be one of {0}.'
                 .format(', '.join(views_formats[view]))
             )
     else:

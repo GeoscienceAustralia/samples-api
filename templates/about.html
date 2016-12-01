@@ -1,0 +1,14 @@
+{% extends "layout.html" %}
+
+{% block content %}
+
+<h1>About the Samples Linked Data API</h1>
+<p>This <a href="https://en.wikipedia.org/wiki/Application_programming_interface">Application Programming Interface</a> (API) is designed to provide access to GA's Sampled Database. GA has over 3 million samples that are each identified by an <a href="https://en.wikipedia.org/wiki/International_Geo_Sample_Number">International Geo Sample Number</a>.</p>
+<p>This API is a <a href="https://en.wikipedia.org/wiki/Linked_data">Linked Data</a> API in that it provides information about Samples and the list of Samples (the Sample Register) according to Linked Data principles. These include the principles that data items should be identified with persistent <a href="https://en.wikipedia.org/wiki/Uniform_Resource_Identifier">URI</a>s and that information should be provided in both human-redable and machine-readable formats. To these ends, this Linked Data API resolves URIs for Samples of the following form: <code>http://pid.geoscience.gov.au/sample/{IGSN}</code> where GA's base persistent URI is used (<code>http://pid.geoscience.gov.au</code>), the <code>sample</code> class of item is indicated and the individual sample is identified by its IGSN.</p>
+
+<p>This API uses the generic GA Linked Data API to handle the model views and formats of objects. <em>A link to this generic API will be given here soon!</em></p>
+
+<h2>Contact</h2>
+<p>To contact the people who built and maintain this API, please email <code>dataman@ga.gov.au</code>.</p>
+
+{% endblock %}

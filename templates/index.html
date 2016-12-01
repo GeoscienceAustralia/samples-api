@@ -2,10 +2,20 @@
 
 {% block content %}
     <h1>Samples Linked Data API</h1>
-    <p>This home page of the GA Samples Linked Data API is intended to provide basic information about this API (or 'Web Service'). It is the human-readable version of an <a href="http://www.opengeospatial.org/">OGC</a> <a href="http://www.opengeospatial.org/standards/wms">WMS web service standard</a>'s <em>GetCapabilities</em> function which:</p>
-    <blockquote>Retrieves metadata about the service, including supported operations and parameters, and a list of the available layers</blockquote>
-    <p>To view the <em>GetCapabilities</em> equivalent for this API, see:</p>
-    <ul>
-        <li><a href="{{base_uri}}{{web_subfolder}}?_view=getcapabilities&_format=application/xml">{{base_uri}}?_view=getcapabilities&_format=application/xml</a></li>
-    </ul>
+    {% if view == 'alternates' %}
+        <h2>Alternates view</h2>
+    {% else %}
+        <p>This home page of the GA Samples Linked Data API is intended to provide basic information about this API (or 'Web Service'). It is the human-readable version of an <a href="http://www.opengeospatial.org/">OGC</a> <a href="http://www.opengeospatial.org/standards/wms">WMS web service standard</a>'s <em>GetCapabilities</em> function which:</p>
+        <blockquote>Retrieves metadata about the service, including supported operations and parameters, and a list of the available layers</blockquote>
+        <p>To view the <em>GetCapabilities</em> equivalent for this API, see:</p>
+        <ul>
+            <li><a href="{{base_uri}}{{web_subfolder}}?_view=getcapabilities&_format=application/xml">{{base_uri}}?_view=getcapabilities&_format=application/xml</a></li>
+        </ul>
+    {% endif %}
+
+    {{ placed_html|safe }}
+
+    {% if view != 'alternates' %}
+    <p>Other views of this API information are listed in the <a href="?_view=alternates">Alternates View</a>.</p>
+    {% endif %}
 {% endblock %}
