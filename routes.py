@@ -1,9 +1,10 @@
-from flask import Blueprint, Response, render_template, request
+from flask import Blueprint, Response, render_template, request, make_response
 from lxml import etree
 from lxml.builder import ElementMaker
 import settings
 import functions
 from ldapi import LDAPI, LdapiParameterError
+import datetime
 routes = Blueprint('routes', __name__)
 
 
@@ -261,68 +262,25 @@ def about():
 
 @routes.route('/oai')
 def oai():
-
-
+    # TODO: validate args using functions_oai
     if request.args.get('verb'):
         verb = request.args.get('verb')
     else:
-        return Response(
-            '''
-<OAI-PMH xmlns="http://www.openarchives.org/OAI/2.0/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.openarchives.org/OAI/2.0/ http://www.openarchives.org/OAI/2.0/OAI-PMH.xsd">
-    <responseDate>2016-12-01T05:29:01Z</responseDate>
-    <request>http://memory.loc.gov/cgi-bin/oai2_0</request>
-    <error code="badVerb">Illegal OAI verb</error>
-</OAI-PMH>
-            ''',
-            status=200,
-            mimetype='application/xml'
-        )
+        values = {
+            'response_date': datetime.datetime.now().isoformat(),
+            'request_uri': 'http://54.66.133.7/igsn-ld-api/oai',
+            'error_code': 'badVerb',
+            'error_text': 'Illegal OAI verb'
+        }
+        template = render_template('oai_error.xml', values=values), 400
+        response = make_response(template)
+        response.headers['Content-Type'] = 'application/xml'
 
+        return response
+
+    # TODO: implement using XML template
     if verb == 'GetRecord':
-        return Response(
-            '''<?xml version="1.0" encoding="UTF-8"?>
-<OAI-PMH xmlns="http://www.openarchives.org/OAI/2.0/"
-    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-    xsi:schemaLocation="http://www.openarchives.org/OAI/2.0/
-    http://www.openarchives.org/OAI/2.0/OAI-PMH.xsd">
-    <responseDate>2016-12-01T05:32:43Z</responseDate>
-    <request verb="GetRecord" identifier="oai:lcoa1.loc.gov:loc.gmd/g3791p.rr002300" metadataPrefix="oai_dc">http://memory.loc.gov/cgi-bin/oai2_0</request>
-    <GetRecord>
-        <record>
-            <header>
-                <identifier>oai:lcoa1.loc.gov:loc.gmd/g3791p.rr002300</identifier>
-                <datestamp>2005-11-21T17:08:59Z</datestamp>
-                <setSpec>gmd</setSpec>
-            </header>
-            <metadata>
-                <oai_dc:dc
-                    xmlns:oai_dc="http://www.openarchives.org/OAI/2.0/oai_dc/"
-                    xmlns:dc="http://purl.org/dc/elements/1.1/"
-                    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-                    xsi:schemaLocation="http://www.openarchives.org/OAI/2.0/oai_dc/
-                    http://www.openarchives.org/OAI/2.0/oai_dc.xsd">
-                    <dc:title>New railroad map of the state of Maryland, Delaware, and the District of Columbia. Compiled and drawn by Frank Arnold Gray.</dc:title>
-                    <dc:creator>Gray, Frank Arnold.</dc:creator>
-                    <dc:subject>Railroads--Middle Atlantic States--Maps.</dc:subject>
-                    <dc:description>Shows drainage, canals, stations, cities and towns, counties, canals, roads completed, narrow gauge and proposed railroads with names of lines. Includes list of railroads.</dc:description>
-                    <dc:description>Scale 1:633,600.</dc:description>
-                    <dc:description>LC Railroad maps, 230</dc:description>
-                    <dc:description>Description derived from published bibliography.</dc:description>
-                    <dc:publisher>Philadelphia</dc:publisher>
-                    <dc:date>1876</dc:date>
-                    <dc:type>image</dc:type>
-                    <dc:type>map</dc:type>
-                    <dc:type>cartographic</dc:type>
-                    <dc:identifier>http://hdl.loc.gov/loc.gmd/g3791p.rr002300</dc:identifier>
-                    <dc:language>eng</dc:language>
-                    <dc:coverage>United States--Middle Atlantic States</dc:coverage>
-                </oai_dc:dc>
-            </metadata>
-        </record>
-    </GetRecord>
-  </OAI-PMH>
-            ''',
-            status=200,
-            mimetype='application/xml'
-        )
-    #?verb=GetRecord&metadataPrefix=oai_dc&identifier=oai:lcoa1.loc.gov:loc.gmd/g3791p.rr002300
+        # render_template
+        pass
+    elif verb == 'Identify':
+        pass

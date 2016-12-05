@@ -39,6 +39,9 @@ def valid_oai_args(verb, other_args):
 
     return args
 
+def validate_oai_parameters(args):
+    # validate using OAI_ARGS
+    pass
 
 class ParameterError(ValueError):
     pass
