@@ -31,6 +31,13 @@ OAI_ARGS = {
     },
 }
 
+# https://www.openarchives.org/OAI/openarchivesprotocol.html, 3.6 Error and Exception Conditions
+OAI_ERRORS = {
+    'badArgument': 'Value of the verb argument is not a legal OAI-PMH verb, the verb argument is missing, or the verb '
+                   'argument is repeated.',
+
+}
+
 
 def valid_oai_args(verb, other_args):
     args = OAI_ARGS.get(verb)
@@ -39,9 +46,11 @@ def valid_oai_args(verb, other_args):
 
     return args
 
+
 def validate_oai_parameters(args):
     # validate using OAI_ARGS
     pass
+
 
 class ParameterError(ValueError):
     pass
