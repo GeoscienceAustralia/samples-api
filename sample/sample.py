@@ -1471,10 +1471,11 @@ class Sample:
 
 
 if __name__ == '__main__':
-    s = Sample()
+    print "hello"
+    #s = Sample()
     # s.populate_from_xml_file('../test/sample_eg1.xml')
-    s.populate_from_oracle_api('AU1')
-    print s.export_as_rdf(model_view='igsn', rdf_mime='text/turtle')
+    #s.populate_from_oracle_api('AU100')
+    #print s.export_as_rdf(model_view='igsn', rdf_mime='text/turtle')
 
     # print s.is_xml_export_valid(open('../test/sample_eg3_IGSN_schema.xml').read())
     # print s.export_as_igsn_xml()

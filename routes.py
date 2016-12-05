@@ -3,6 +3,7 @@ from lxml import etree
 from lxml.builder import ElementMaker
 import settings
 import functions
+from ldapi import LDAPI, LdapiParameterError
 routes = Blueprint('routes', __name__)
 
 
@@ -21,12 +22,12 @@ def index():
     }
 
     try:
-        view, format = functions.get_valid_view_and_format(
+        view, format = LDAPI.get_valid_view_and_format(
             request.args.get('_view'),
             request.args.get('_format'),
             views_formats
         )
-    except functions.ParameterError, e:
+    except LdapiParameterError, e:
         return functions.client_error_Response(e)
 
     # select view and format
@@ -156,12 +157,12 @@ def sample(igsn):
     }
 
     try:
-        view, format = functions.get_valid_view_and_format(
+        view, format = LDAPI.get_valid_view_and_format(
             request.args.get('_view'),
             request.args.get('_format'),
             views_formats
         )
-    except functions.ParameterError, e:
+    except LdapiParameterError, e:
         return functions.client_error_Response(e)
 
     # select view and format
@@ -181,7 +182,7 @@ def sample(igsn):
                     rdf_mime=format),
                 status=200,
                 mimetype=format,
-                headers={'Content-Disposition': 'attachment; filename=' + igsn + functions.get_file_extension(format)}
+                headers={'Content-Disposition': 'attachment; filename=' + igsn + LDAPI.get_file_extension(format)}
             )
         elif format == 'application/xml':
             # TODO: implement IGSN XML format
@@ -211,12 +212,12 @@ def samples():
     }
 
     try:
-        view, format = functions.get_valid_view_and_format(
+        view, format = LDAPI.get_valid_view_and_format(
             request.args.get('_view'),
             request.args.get('_format'),
             views_formats
         )
-    except functions.ParameterError, e:
+    except LdapiParameterError, e:
         return functions.client_error_Response(e)
 
     # validate page_no parameter
@@ -248,7 +249,7 @@ def samples():
                     rdf_mime=format),
                 status=200,
                 mimetype=format,
-                headers={'Content-Disposition': 'attachment; filename=samples_register' + functions.get_file_extension(format)}
+                headers={'Content-Disposition': 'attachment; filename=samples_register' + LDAPI.get_file_extension(format)}
             )
         # no need for an else since views already validated
 
@@ -256,3 +257,72 @@ def samples():
 @routes.route('/page/about')
 def about():
     return render_template('about.html')
+
+
+@routes.route('/oai')
+def oai():
+
+
+    if request.args.get('verb'):
+        verb = request.args.get('verb')
+    else:
+        return Response(
+            '''
+<OAI-PMH xmlns="http://www.openarchives.org/OAI/2.0/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.openarchives.org/OAI/2.0/ http://www.openarchives.org/OAI/2.0/OAI-PMH.xsd">
+    <responseDate>2016-12-01T05:29:01Z</responseDate>
+    <request>http://memory.loc.gov/cgi-bin/oai2_0</request>
+    <error code="badVerb">Illegal OAI verb</error>
+</OAI-PMH>
+            ''',
+            status=200,
+            mimetype='application/xml'
+        )
+
+    if verb == 'GetRecord':
+        return Response(
+            '''<?xml version="1.0" encoding="UTF-8"?>
+<OAI-PMH xmlns="http://www.openarchives.org/OAI/2.0/"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://www.openarchives.org/OAI/2.0/
+    http://www.openarchives.org/OAI/2.0/OAI-PMH.xsd">
+    <responseDate>2016-12-01T05:32:43Z</responseDate>
+    <request verb="GetRecord" identifier="oai:lcoa1.loc.gov:loc.gmd/g3791p.rr002300" metadataPrefix="oai_dc">http://memory.loc.gov/cgi-bin/oai2_0</request>
+    <GetRecord>
+        <record>
+            <header>
+                <identifier>oai:lcoa1.loc.gov:loc.gmd/g3791p.rr002300</identifier>
+                <datestamp>2005-11-21T17:08:59Z</datestamp>
+                <setSpec>gmd</setSpec>
+            </header>
+            <metadata>
+                <oai_dc:dc
+                    xmlns:oai_dc="http://www.openarchives.org/OAI/2.0/oai_dc/"
+                    xmlns:dc="http://purl.org/dc/elements/1.1/"
+                    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                    xsi:schemaLocation="http://www.openarchives.org/OAI/2.0/oai_dc/
+                    http://www.openarchives.org/OAI/2.0/oai_dc.xsd">
+                    <dc:title>New railroad map of the state of Maryland, Delaware, and the District of Columbia. Compiled and drawn by Frank Arnold Gray.</dc:title>
+                    <dc:creator>Gray, Frank Arnold.</dc:creator>
+                    <dc:subject>Railroads--Middle Atlantic States--Maps.</dc:subject>
+                    <dc:description>Shows drainage, canals, stations, cities and towns, counties, canals, roads completed, narrow gauge and proposed railroads with names of lines. Includes list of railroads.</dc:description>
+                    <dc:description>Scale 1:633,600.</dc:description>
+                    <dc:description>LC Railroad maps, 230</dc:description>
+                    <dc:description>Description derived from published bibliography.</dc:description>
+                    <dc:publisher>Philadelphia</dc:publisher>
+                    <dc:date>1876</dc:date>
+                    <dc:type>image</dc:type>
+                    <dc:type>map</dc:type>
+                    <dc:type>cartographic</dc:type>
+                    <dc:identifier>http://hdl.loc.gov/loc.gmd/g3791p.rr002300</dc:identifier>
+                    <dc:language>eng</dc:language>
+                    <dc:coverage>United States--Middle Atlantic States</dc:coverage>
+                </oai_dc:dc>
+            </metadata>
+        </record>
+    </GetRecord>
+  </OAI-PMH>
+            ''',
+            status=200,
+            mimetype='application/xml'
+        )
+    #?verb=GetRecord&metadataPrefix=oai_dc&identifier=oai:lcoa1.loc.gov:loc.gmd/g3791p.rr002300
