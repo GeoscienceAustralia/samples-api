@@ -3,8 +3,12 @@ from lxml import etree
 from lxml.builder import ElementMaker
 import settings
 import functions
+import functions_oai
 from ldapi import LDAPI, LdapiParameterError
 import datetime
+
+from oaipmh.datestamp import datestamp_to_datetime, datetime_to_datestamp
+
 routes = Blueprint('routes', __name__)
 
 
@@ -277,6 +281,30 @@ def oai():
         response.headers['Content-Type'] = 'application/xml'
 
         return response
+
+
+    try:
+        functions_oai.validate_oai_parameters(request.args)
+    except ValueError:
+        values = {
+            'response_date': datetime.datetime.now().isoformat(),
+            'request_uri': 'http://54.66.133.7/igsn-ld-api/oai',
+            'error_code': 'badArgument',
+            'error_text': 'The request includes illegal arguments, is missing required arguments,\
+                           includes a repeated argument, or values for arguments have an illegal syntax.'
+        }
+        template = render_template('oai_error.xml', values=values), 400
+        response = make_response(template)
+        response.headers['Content-Type'] = 'application/xml'
+
+        return response
+
+
+
+    # encode datetimes as datestamps?? https://github.com/infrae/pyoai/blob/beced901ea0b494f23053cbb3c6495872acb96a3/src/oaipmh/client.py#L61
+
+    # now call underlying implementation
+
 
     # TODO: implement using XML template
     if verb == 'GetRecord':
