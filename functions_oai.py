@@ -39,38 +39,39 @@
 
 OAI_ARGS = {
     'GetRecord': {
-        'identifier':'required',
-        'metadataPrefix':'required'
-        },
+        'identifier': 'required',
+        'metadataPrefix': 'required'
+    },
+
     'GetMetadata': {
-        'identifier':'required',
-        'metadataPrefix':'required'
-        },
+        'identifier': 'required',
+        'metadataPrefix': 'required'
+    },
 
     'Identify': {
-        },
+    },
 
     'ListIdentifiers': {
-        'from':'optional',
-        'until':'optional',
-        'metadataPrefix':'required',
-        'set':'optional',
-        },
+        'from': 'optional',
+        'until': 'optional',
+        'metadataPrefix': 'required',
+        'set': 'optional',
+    },
 
     'ListMetadataFormats': {
-        'identifier':'optional'
-        },
+        'identifier': 'optional'
+    },
 
     'ListRecords': {
-        'from_':'optional',
-        'until':'optional',
-        'set':'optional',
-        'metadataPrefix':'required',
-        },
+        'from_': 'optional',
+        'until': 'optional',
+        'set': 'optional',
+        'metadataPrefix': 'required',
+    },
 
     'ListSets': {
-        },
-    }
+    },
+}
 
 # https://www.openarchives.org/OAI/openarchivesprotocol.html, 3.6 Error and Exception Conditions
 OAI_ERRORS = {
@@ -89,9 +90,9 @@ def valid_oai_args(verb):
     pass
 
 
-def validate_oai_parameters(args):
-    verb = args['verb']
-    other_args = args.copy()
+def validate_oai_parameters(qsa_args):
+    verb = qsa_args['verb']
+    other_args = qsa_args.copy()
     del other_args['verb']
 
     argspec = OAI_ARGS.get(verb)
@@ -105,7 +106,7 @@ def validate_oai_parameters(args):
 
     # check if we have unknown arguments
     for key, value in list(other_args.items()):
-        if not key in argspec:
+        if key not in argspec:
             msg = "Unknown argument: %s" % key
             raise ParameterError(msg)
     # first investigate if we have exclusive argument
@@ -119,9 +120,8 @@ def validate_oai_parameters(args):
     for arg_name, arg_type in list(argspec.items()):
         if arg_type == 'required':
             msg = "Argument required but not found: %s" % arg_name
-            if not arg_name in other_args:
+            if arg_name not in other_args:
                 raise ParameterError(msg)
-
 
     pass
 
@@ -132,9 +132,10 @@ class ParameterError(ValueError):
 
 if __name__ == '__main__':
     args = {
-        'verb':'GetRecord',
-        'identifier':'AU100',
-        'metadataPrefix':'oai_dc'}
+        'verb': 'GetRecord',
+        'identifier': 'AU100',
+        'metadataPrefix': 'oai_dc'
+    }
 
     print 'valid_oai_args(args[\'verb\'])', valid_oai_args(args['verb'])
     print 'validate_oai_parameters(args)', validate_oai_parameters(args)
