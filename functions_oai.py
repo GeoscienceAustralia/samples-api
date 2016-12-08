@@ -1,41 +1,3 @@
-# OAI_ARGS = {
-#     'GetRecord': {
-#         'required': ['identifier', 'metadataPrefix'],
-#         'optional': [],
-#         'exclusive': []
-#     },
-#     'GetMetadata': {
-#         'required': ['identifier', 'metadataPrefix'],
-#         'optional': [],
-#         'exclusive': []
-#     },
-#
-#     'Identify': {
-#         'required': [],
-#         'optional': [],
-#         'exclusive': []
-#     },
-#     'ListIdentifiers': {
-#         'required': ['metadataPrefix'],
-#         'optional': ['from', 'until', 'set'],
-#         'exclusive': ['resumptionToken']
-#     },
-#     'ListMetadataFormats': {
-#         'required': [],
-#         'optional': ['identifier'],
-#         'exclusive': []
-#     },
-#     'ListRecords': {
-#         'required': ['metadataPrefix'],
-#         'optional': ['from', 'until', 'set'],
-#         'exclusive': ['resumptionToken']
-#     },
-#     'ListSets': {
-#         'required': [],
-#         'optional': [],
-#         'exclusive': ['resumptionToken']
-#     },
-# }
 
 OAI_ARGS = {
     'GetRecord': {
@@ -56,6 +18,7 @@ OAI_ARGS = {
         'until': 'optional',
         'metadataPrefix': 'required',
         'set': 'optional',
+        'resumptionToken': 'exclusive'
     },
 
     'ListMetadataFormats': {
@@ -67,9 +30,11 @@ OAI_ARGS = {
         'until': 'optional',
         'set': 'optional',
         'metadataPrefix': 'required',
+        'resumptionToken': 'exclusive'
     },
 
     'ListSets': {
+        'resumptionToken': 'exclusive'
     },
 }
 
@@ -87,7 +52,7 @@ def valid_oai_args(verb):
     if argspec is None:
         raise ParameterError('The OAI verb is not correct. Must be one of {0}'.format(', '.join(OAI_ARGS.iterkeys())))
 
-    pass
+    return True
 
 
 def validate_oai_parameters(qsa_args):
@@ -123,7 +88,7 @@ def validate_oai_parameters(qsa_args):
             if arg_name not in other_args:
                 raise ParameterError(msg)
 
-    pass
+    return True
 
 
 class ParameterError(ValueError):
