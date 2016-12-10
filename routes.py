@@ -7,7 +7,7 @@ import functions_oai
 from ldapi import LDAPI, LdapiParameterError
 import datetime
 
-from oaipmh.datestamp import datestamp_to_datetime, datetime_to_datestamp
+# from oaipmh.datestamp import datestamp_to_datetime, datetime_to_datestamp
 
 routes = Blueprint('routes', __name__)
 
@@ -43,7 +43,7 @@ def index():
             return render_template(
                 'index.html',
                 base_uri=settings.BASE_URI,
-                web_subfolder = settings.WEB_SUBFOLDER,
+                web_subfolder=settings.WEB_SUBFOLDER,
             )
         else:
             return Response(
@@ -51,15 +51,20 @@ def index():
                 status=400,
                 mimetype='text/plain')
     elif view == 'getcapabilities':
+        # move GetCapabilities response formulation to a Renderer class
         # only a single format for this view
-        em = ElementMaker(namespace="http://fake.com/ldapi",
-                          nsmap={
-                              'ldapi': "http://fake.com/ldapi"
-                          })
-        onl = ElementMaker(namespace="http://fake.com/ldapi",
-                          nsmap={
-                              'xlink': "http://www.w3.org/1999/xlink",
-                          })
+        em = ElementMaker(
+            namespace="http://fake.com/ldapi",
+            nsmap={
+                'ldapi': "http://fake.com/ldapi"
+             }
+        )
+        onl = ElementMaker(
+            namespace="http://fake.com/ldapi",
+            nsmap={
+                'xlink': "http://www.w3.org/1999/xlink",
+            }
+        )
         doc = em.LDAPI_Capabilities(
             em.Service(
                 em.Name('Linked Data API'),
@@ -91,7 +96,11 @@ def index():
                     )
                 ),
                 em.Fees('none'),
-                em.AccessConstraints('(c) Commonwealth of Australia (Geoscience Australia) 2016. This product is released under the Creative Commons Attribution 4.0 International Licence. http://creativecommons.org/licenses/by/4.0/legalcode')
+                em.AccessConstraints(
+                    '(c) Commonwealth of Australia (Geoscience Australia) 2016. This product is released under the ' +
+                    'Creative Commons Attribution 4.0 International Licence. ' +
+                    'http://creativecommons.org/licenses/by/4.0/legalcode'
+                )
             ),
             em.Capability(
                 em.Request(
@@ -102,7 +111,9 @@ def index():
                                 em.Get(
                                     onl.OnlineResource(
                                         type="simple",
-                                        href="http://pid.geoscience.gov.au/service/samples/?_view=getcapabilities&_format=application/xml"),
+                                        href="http://pid.geoscience.gov.au/service/samples/" +
+                                             "?_view=getcapabilities&_format=application/xml"
+                                    ),
                                 )
                             )
                         )
@@ -117,7 +128,8 @@ def index():
                                 em.Get(
                                     onl.OnlineResource(
                                         type="simple",
-                                        href="http://pid.geoscience.gov.au/service/samples/{SAMPLE_IGSN}"),
+                                        href="http://pid.geoscience.gov.au/service/samples/{SAMPLE_IGSN}"
+                                    ),
                                 )
                             )
                         )
@@ -132,7 +144,8 @@ def index():
                                 em.Get(
                                     onl.OnlineResource(
                                         type="simple",
-                                        href="http://pid.geoscience.gov.au/service/samples/"),
+                                        href="http://pid.geoscience.gov.au/service/samples/"
+                                    ),
                                 )
                             )
                         )
@@ -177,8 +190,8 @@ def sample(igsn):
         # for all these views we will need to populate a sample
         from sample.sample import Sample
         s = Sample()
-        #s.populate_from_xml_file('test/sample_eg2.xml')
-        s.populate_from_oracle_api(igsn)
+        s.populate_from_xml_file('test/sample_eg2.xml')
+        # s.populate_from_oracle_api(igsn)
 
         if format in ['text/turtle', 'application/rdf+xml', 'application/rdf+json']:
             return Response(
@@ -198,7 +211,10 @@ def sample(igsn):
                 base_uri=settings.BASE_URI,
                 web_subfolder=settings.WEB_SUBFOLDER,
                 view=view,
-                placed_html=s.export_as_html(model_view=view)
+                placed_html=s.export_as_html(model_view=view),
+                igsn=s.igsn,
+                year_acquired=datetime.datetime.strftime(s.date_aquired, '%Y'),
+                date_now=datetime.datetime.now().strftime('%-d %B %Y')
             )
 
 
@@ -254,7 +270,9 @@ def samples():
                     rdf_mime=format),
                 status=200,
                 mimetype=format,
-                headers={'Content-Disposition': 'attachment; filename=samples_register' + LDAPI.get_file_extension(format)}
+                headers={
+                    'Content-Disposition': 'attachment; filename=samples_register' + LDAPI.get_file_extension(format)
+                }
             )
         # no need for an else since views already validated
 
@@ -282,7 +300,6 @@ def oai():
 
         return response
 
-
     try:
         functions_oai.validate_oai_parameters(request.args)
     except ValueError:
@@ -299,12 +316,10 @@ def oai():
 
         return response
 
-
-
-    # encode datetimes as datestamps?? https://github.com/infrae/pyoai/blob/beced901ea0b494f23053cbb3c6495872acb96a3/src/oaipmh/client.py#L61
+    # encode datetimes as datestamps??
+    # https://github.com/infrae/pyoai/blob/beced901ea0b494f23053cbb3c6495872acb96a3/src/oaipmh/client.py#L61
 
     # now call underlying implementation
-
 
     # TODO: implement using XML template
     if verb == 'GetRecord':
