@@ -37,11 +37,11 @@ def index():
 
     # select view and format
     if view == 'alternates':
-        return functions.render_templates_alternates('index.html', views_formats)
+        return functions.render_templates_alternates('page_index.html', views_formats)
     elif view == 'landingpage':
         if format == 'text/html':
             return render_template(
-                'index.html',
+                'page_index.html',
                 base_uri=settings.BASE_URI,
                 web_subfolder=settings.WEB_SUBFOLDER,
             )
@@ -185,13 +185,13 @@ def sample(igsn):
 
     # select view and format
     if view == 'alternates':
-        return functions.render_templates_alternates('sample.html', views_formats)
+        return functions.render_templates_alternates('page_sample.html', views_formats)
     elif view in ['igsn', 'dc', 'prov']:
         # for all these views we will need to populate a sample
         from sample.sample import Sample
         s = Sample()
-        s.populate_from_xml_file('test/sample_eg2.xml')
-        # s.populate_from_oracle_api(igsn)
+        #s.populate_from_xml_file('test/sample_eg2.xml')
+        s.populate_from_oracle_api(igsn)
 
         if format in ['text/turtle', 'application/rdf+xml', 'application/rdf+json']:
             return Response(
@@ -206,15 +206,19 @@ def sample(igsn):
             # TODO: implement IGSN XML format
             pass
         else:  # format == 'text/html'
+            if s.date_aquired is not None:
+                year_acquired = datetime.datetime.strftime(s.date_aquired, '%Y')
+            else:
+                year_acquired = '2016'
             return render_template(
-                'sample.html',
+                'page_sample.html',
                 base_uri=settings.BASE_URI,
                 web_subfolder=settings.WEB_SUBFOLDER,
                 view=view,
                 placed_html=s.export_as_html(model_view=view),
                 igsn=s.igsn,
-                year_acquired=datetime.datetime.strftime(s.date_aquired, '%Y'),
-                date_now=datetime.datetime.now().strftime('%-d %B %Y')
+                year_acquired=year_acquired,
+                date_now=datetime.datetime.now().strftime('%d %B %Y')
             )
 
 
@@ -249,7 +253,7 @@ def samples():
 
     # select view and format
     if view == 'alternates':
-        return functions.render_templates_alternates('samples.html', views_formats)
+        return functions.render_templates_alternates('page_samples.html', views_formats)
     elif view in ['dpr']:
         # only create and populate a SamplesRegister for views that need it
         from sample.samples_register import SampleRegister
@@ -258,7 +262,7 @@ def samples():
 
         if format == 'text/html':
             return render_template(
-                'samples.html',
+                'page_samples.html',
                 base_uri=settings.BASE_URI,
                 web_subfolder=settings.WEB_SUBFOLDER,
                 placed_html=sr.export_as_html(model_view='dpr')
@@ -279,7 +283,7 @@ def samples():
 
 @routes.route('/page/about')
 def about():
-    return render_template('about.html')
+    return render_template('page_about.html')
 
 
 @routes.route('/oai')
