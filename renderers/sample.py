@@ -5,6 +5,7 @@ from lxml.builder import ElementMaker
 import os
 import requests
 from datetime import datetime
+from ldapi import LDAPI
 
 
 class Sample:
@@ -166,9 +167,11 @@ class Sample:
            'pyroxene spinifex-textured basalt': 'http://resource.geosciml.org/classifier/cgi/lithology/basalt',
            'olivine hornblendite': 'http://resource.geosciml.org/classifier/cgi/lithology/hornblendite',
            'saprolite, highly weathered': 'http://resource.geosciml.org/classifier/cgi/lithology/residual_material',
-           'fragmental igneous material': 'http://resource.geosciml.org/classifier/cgi/lithology/fragmental_igneous_material',
+           'fragmental igneous material':
+               'http://resource.geosciml.org/classifier/cgi/lithology/fragmental_igneous_material',
            'silty mud': 'http://resource.geosciml.org/classifier/cgi/lithology/mud',
-           'kalsilitic and melilitic rocks': 'http://resource.geosciml.org/classifier/cgi/lithology/kalsilitic_and_melilitic_rock',
+           'kalsilitic and melilitic rocks':
+               'http://resource.geosciml.org/classifier/cgi/lithology/kalsilitic_and_melilitic_rock',
            'muddy silt': 'http://resource.geosciml.org/classifier/cgi/lithology/silt',
            'tephra': 'http://resource.geosciml.org/classifier/cgi/lithology/tephra',
            'intrusive rock': 'http://resource.geosciml.org/classifier/cgi/lithology/phaneritic_igneous_rock',
@@ -184,8 +187,10 @@ class Sample:
            'sodalite monzodiorite': 'http://resource.geosciml.org/classifier/cgi/lithology/foid_monzodiorite',
            'quartz rock': 'http://resource.geosciml.org/classifier/cgi/lithology/rock',
            'volcanic rock': 'http://resource.geosciml.org/classifier/cgi/lithology/fine_grained_igneous_rock',
-           'diopside sanidine phlogopite lamproite': 'http://resource.geosciml.org/classifier/cgi/lithology/exotic_alkaline_rock',
-           'greenschist facies rock': 'http://resource.geosciml.org/classifier/cgi/lithology/chlorite_actinolite_epidote_metamorphic_rock',
+           'diopside sanidine phlogopite lamproite':
+               'http://resource.geosciml.org/classifier/cgi/lithology/exotic_alkaline_rock',
+           'greenschist facies rock':
+               'http://resource.geosciml.org/classifier/cgi/lithology/chlorite_actinolite_epidote_metamorphic_rock',
            'loess': 'http://resource.geosciml.org/classifier/cgi/lithology/silt',
            'estuarine sediment': 'http://resource.geosciml.org/classifier/cgi/lithology/clastic_sediment',
            'sand': 'http://resource.geosciml.org/classifier/cgi/lithology/sand',
@@ -206,7 +211,8 @@ class Sample:
            'schist': 'http://resource.geosciml.org/classifier/cgi/lithology/schist',
            'aplite': 'http://resource.geosciml.org/classifier/cgi/lithology/aplite',
            'komatiitic (high-Mg) basalt': 'http://resource.geosciml.org/classifier/cgi/lithology/basalt',
-           'foid-bearing alkali feldspar syenite': 'http://resource.geosciml.org/classifier/cgi/lithology/foid_bearing_alkali_feldspar_syenite',
+           'foid-bearing alkali feldspar syenite':
+               'http://resource.geosciml.org/classifier/cgi/lithology/foid_bearing_alkali_feldspar_syenite',
            'porphyry': 'http://resource.geosciml.org/classifier/cgi/lithology/porphyry',
            'rudstone': 'http://resource.geosciml.org/classifier/cgi/lithology/carbonate_sedimentary_rock',
            'breccia': 'http://resource.geosciml.org/classifier/cgi/lithology/breccia',
@@ -222,7 +228,8 @@ class Sample:
            'metamorphosed mafic igneous rock': 'http://resource.geosciml.org/classifier/cgi/lithology/metamorphic_rock',
            'oil shale': 'http://resource.geosciml.org/classifier/cgi/lithology/organic_bearing_mudstone',
            'basic volcanic rock': 'http://resource.geosciml.org/classifier/cgi/lithology/basic_igneous_rock',
-           'weathered material, unknown origin': 'http://resource.geosciml.org/classifier/cgi/lithology/material_formed_in_surficial_environment',
+           'weathered material, unknown origin':
+               'http://resource.geosciml.org/classifier/cgi/lithology/material_formed_in_surficial_environment',
            'vein epidote': 'http://resource.geosciml.org/classifier/cgi/lithology/metasomatic_rock',
            'minette': 'http://resource.geosciml.org/classifier/cgi/lithology/exotic_alkaline_rock',
            'pebbly silt': 'http://resource.geosciml.org/classifier/cgi/lithology/silt',
@@ -263,24 +270,29 @@ class Sample:
            'hornblende gabbro': 'http://resource.geosciml.org/classifier/cgi/lithology/gabbro',
            'clayey gravel': 'http://resource.geosciml.org/classifier/cgi/lithology/gravel',
            'banded iron formation': 'http://resource.geosciml.org/classifier/cgi/lithology/iron_rich_sedimentary_rock',
-           'foliated metamorphic rock': 'http://resource.geosciml.org/classifier/cgi/lithology/foliated_metamorphic_rock',
+           'foliated metamorphic rock':
+               'http://resource.geosciml.org/classifier/cgi/lithology/foliated_metamorphic_rock',
            'muddy sandy gravel': 'http://resource.geosciml.org/classifier/cgi/lithology/gravel',
            'sandstone': 'http://resource.geosciml.org/classifier/cgi/lithology/clastic_sandstone',
            'quartz gabbro': 'http://resource.geosciml.org/classifier/cgi/lithology/quartz_gabbro',
            'vein quartz': 'http://resource.geosciml.org/classifier/cgi/lithology/metasomatic_rock',
            'till': 'http://resource.geosciml.org/classifier/cgi/lithology/clastic_sediment',
            'eolian sediment': 'http://resource.geosciml.org/classifier/cgi/lithology/clastic_sediment',
-           'magnetite iron formation': 'http://resource.geosciml.org/classifier/cgi/lithology/iron_rich_sedimentary_rock',
+           'magnetite iron formation':
+               'http://resource.geosciml.org/classifier/cgi/lithology/iron_rich_sedimentary_rock',
            'crystalline dolostone/dolomite': 'http://resource.geosciml.org/classifier/cgi/lithology/dolostone',
-           'metasedimentary siliciclastic rock': 'http://resource.geosciml.org/classifier/cgi/lithology/metamorphic_rock',
+           'metasedimentary siliciclastic rock':
+               'http://resource.geosciml.org/classifier/cgi/lithology/metamorphic_rock',
            'shonkinite': 'http://resource.geosciml.org/classifier/cgi/lithology/foid_syenite',
            'volcanic breccia': 'http://resource.geosciml.org/classifier/cgi/lithology/fragmental_igneous_rock',
            'lag': 'http://resource.geosciml.org/classifier/cgi/lithology/residual_material',
            'pyroxene peridotite': 'http://resource.geosciml.org/classifier/cgi/lithology/peridotite',
-           'picrobasalt': 'http://resource.geosciml.org/classifier/cgi/lithology/high_magnesium_fine_grained_igneous_rocks',
+           'picrobasalt':
+               'http://resource.geosciml.org/classifier/cgi/lithology/high_magnesium_fine_grained_igneous_rocks',
            'wackestone': 'http://resource.geosciml.org/classifier/cgi/lithology/carbonate_wackestone',
            'olivine gabbro': 'http://resource.geosciml.org/classifier/cgi/lithology/gabbro',
-           'kalsilite phlogopite olivine leucite melilitite': 'http://resource.geosciml.org/classifier/cgi/lithology/kalsilitic_and_melilitic_rock',
+           'kalsilite phlogopite olivine leucite melilitite':
+               'http://resource.geosciml.org/classifier/cgi/lithology/kalsilitic_and_melilitic_rock',
            'granophyre': 'http://resource.geosciml.org/classifier/cgi/lithology/granitoid',
            'tuffite': 'http://resource.geosciml.org/classifier/cgi/lithology/tuffite',
            'dolostone/dolomite mudstone': 'http://resource.geosciml.org/classifier/cgi/lithology/dolostone',
@@ -289,7 +301,8 @@ class Sample:
            'benmoreite': 'http://resource.geosciml.org/classifier/cgi/lithology/trachytoid',
            'dolomitic limestone': 'http://resource.geosciml.org/classifier/cgi/lithology/limestone',
            'olivine pyroxene hornblendite': 'http://resource.geosciml.org/classifier/cgi/lithology/hornblendite',
-           'diopside leucite richterite phlogopite lamproite': 'http://resource.geosciml.org/classifier/cgi/lithology/exotic_alkaline_rock',
+           'diopside leucite richterite phlogopite lamproite':
+               'http://resource.geosciml.org/classifier/cgi/lithology/exotic_alkaline_rock',
            'foid-bearing diorite': 'http://resource.geosciml.org/classifier/cgi/lithology/foid_bearing_diorite',
            'olivine melilitite': 'http://resource.geosciml.org/classifier/cgi/lithology/kalsilitic_and_melilitic_rock',
            'felsic rock': 'http://resource.geosciml.org/classifier/cgi/lithology/rock',
@@ -317,7 +330,8 @@ class Sample:
            'hornfels': 'http://resource.geosciml.org/classifier/cgi/lithology/hornfels',
            'gravelly clayey sand': 'http://resource.geosciml.org/classifier/cgi/lithology/sand',
            'charnockite': 'http://resource.geosciml.org/classifier/cgi/lithology/granite',
-           'non-carbonate chemical or biochemical sedimentary rock': 'http://resource.geosciml.org/classifier/cgi/lithology/sedimentary_rock',
+           'non-carbonate chemical or biochemical sedimentary rock':
+               'http://resource.geosciml.org/classifier/cgi/lithology/sedimentary_rock',
            'tuffaceous siltstone': 'http://resource.geosciml.org/classifier/cgi/lithology/tuffite',
            'greisen': 'http://resource.geosciml.org/classifier/cgi/lithology/metasomatic_rock',
            'psammite': 'http://resource.geosciml.org/classifier/cgi/lithology/metamorphic_rock',
@@ -326,15 +340,18 @@ class Sample:
            'exotic alkaline igneous rock': 'http://resource.geosciml.org/classifier/cgi/lithology/exotic_alkaline_rock',
            'nephelinolite': 'http://resource.geosciml.org/classifier/cgi/lithology/foidolite',
            'sandy silty clay': 'http://resource.geosciml.org/classifier/cgi/lithology/clay',
-           'olivine diopside richterite phlogopite lamproite': 'http://resource.geosciml.org/classifier/cgi/lithology/exotic_alkaline_rock',
+           'olivine diopside richterite phlogopite lamproite':
+               'http://resource.geosciml.org/classifier/cgi/lithology/exotic_alkaline_rock',
            'pedolith, mottled zone': 'http://resource.geosciml.org/classifier/cgi/lithology/residual_material',
-           'olivine melilitolite': 'http://resource.geosciml.org/classifier/cgi/lithology/kalsilitic_and_melilitic_rock',
+           'olivine melilitolite':
+               'http://resource.geosciml.org/classifier/cgi/lithology/kalsilitic_and_melilitic_rock',
            'quartz feldspar rock': 'http://resource.geosciml.org/classifier/cgi/lithology/rock',
            'bitumen': 'http://resource.geosciml.org/classifier/cgi/lithology/organic_rich_sedimentary_material',
            'urtite': 'http://resource.geosciml.org/classifier/cgi/lithology/foidolite',
            'plagioclase-bearing hornblendite': 'http://resource.geosciml.org/classifier/cgi/lithology/hornblendite',
            'limestone boundstone': 'http://resource.geosciml.org/classifier/cgi/lithology/limestone',
-           'intermediate igneous rock': 'http://resource.geosciml.org/classifier/cgi/lithology/intermediate_composition_igneous_rock',
+           'intermediate igneous rock':
+               'http://resource.geosciml.org/classifier/cgi/lithology/intermediate_composition_igneous_rock',
            'calcrete': 'http://resource.geosciml.org/classifier/cgi/lithology/duricrust',
            'rodingite': 'http://resource.geosciml.org/classifier/cgi/lithology/metasomatic_rock',
            'limestone packstone': 'http://resource.geosciml.org/classifier/cgi/lithology/limestone',
@@ -349,17 +366,21 @@ class Sample:
            'sedimentary rock': 'http://resource.geosciml.org/classifier/cgi/lithology/sedimentary_rock',
            'limestone mudstone': 'http://resource.geosciml.org/classifier/cgi/lithology/limestone',
            'calcite carbonatite': 'http://resource.geosciml.org/classifier/cgi/lithology/carbonatite',
-           'metamorphosed intermediate igneous rock': 'http://resource.geosciml.org/classifier/cgi/lithology/metamorphic_rock',
-           'iron segregations': 'http://resource.geosciml.org/classifier/cgi/lithology/material_formed_in_surficial_environment',
+           'metamorphosed intermediate igneous rock':
+               'http://resource.geosciml.org/classifier/cgi/lithology/metamorphic_rock',
+           'iron segregations':
+               'http://resource.geosciml.org/classifier/cgi/lithology/material_formed_in_surficial_environment',
            'pyroclastic rock': 'http://resource.geosciml.org/classifier/cgi/lithology/pyroclastic_rock',
            'hornblende pyroxenite': 'http://resource.geosciml.org/classifier/cgi/lithology/pyroxenite',
            'metasedimentary rock': 'http://resource.geosciml.org/classifier/cgi/lithology/metamorphic_rock',
            'lamprophyre': 'http://resource.geosciml.org/classifier/cgi/lithology/exotic_alkaline_rock',
-           'quartz alkali feldspar syenite': 'http://resource.geosciml.org/classifier/cgi/lithology/quartz_alkali_feldspar_syenite',
+           'quartz alkali feldspar syenite':
+               'http://resource.geosciml.org/classifier/cgi/lithology/quartz_alkali_feldspar_syenite',
            'quartz sandstone': 'http://resource.geosciml.org/classifier/cgi/lithology/clastic_sandstone',
            'gossan': 'http://resource.geosciml.org/classifier/cgi/lithology/residual_material',
            'lherzolite': 'http://resource.geosciml.org/classifier/cgi/lithology/peridotite',
-           'lapilli tuff': 'http://resource.geosciml.org/classifier/cgi/lithology/ash_tuff_lapillistone_and_lapilli_tuff',
+           'lapilli tuff':
+               'http://resource.geosciml.org/classifier/cgi/lithology/ash_tuff_lapillistone_and_lapilli_tuff',
            'unknown': 'http://www.opengis.net/def/nil/OGC/0/unknown',  # OGC nill type
            'pantellerite': 'http://resource.geosciml.org/classifier/cgi/lithology/rhyolite',
            'limestone': 'http://resource.geosciml.org/classifier/cgi/lithology/limestone',
@@ -378,12 +399,15 @@ class Sample:
            'hydrothermal breccia': 'http://resource.geosciml.org/classifier/cgi/lithology/metasomatic_rock',
            'phyllonite': 'http://resource.geosciml.org/classifier/cgi/lithology/phyllonite',
            'anorthosite': 'http://resource.geosciml.org/classifier/cgi/lithology/anorthosite',
-           'non-clastic siliceous sedimentary rock': 'http://resource.geosciml.org/classifier/cgi/lithology/non_clastic_siliceous_sedimentary_rock',
+           'non-clastic siliceous sedimentary rock':
+               'http://resource.geosciml.org/classifier/cgi/lithology/non_clastic_siliceous_sedimentary_rock',
            'grapestone': 'http://resource.geosciml.org/classifier/cgi/lithology/carbonate_sedimentary_rock',
            'pedolith': 'http://resource.geosciml.org/classifier/cgi/lithology/residual_material',
            'carbonatite': 'http://resource.geosciml.org/classifier/cgi/lithology/carbonatite',
-           'hyalo enstatite phlogopite lamproite': 'http://resource.geosciml.org/classifier/cgi/lithology/exotic_alkaline_rock',
-           'pyroxene olivine melilitolite': 'http://resource.geosciml.org/classifier/cgi/lithology/kalsilitic_and_melilitic_rock',
+           'hyalo enstatite phlogopite lamproite':
+               'http://resource.geosciml.org/classifier/cgi/lithology/exotic_alkaline_rock',
+           'pyroxene olivine melilitolite':
+               'http://resource.geosciml.org/classifier/cgi/lithology/kalsilitic_and_melilitic_rock',
            'chromitite': 'http://resource.geosciml.org/classifier/cgi/lithology/ultramafic_igneous_rock',
            'gyttja': 'http://resource.geosciml.org/classifier/cgi/lithology/mud',
            'theralite': 'http://resource.geosciml.org/classifier/cgi/lithology/foid_gabbro',
@@ -402,7 +426,8 @@ class Sample:
            'ferricrete': 'http://resource.geosciml.org/classifier/cgi/lithology/duricrust',
            'magnetite rock': 'http://resource.geosciml.org/classifier/cgi/lithology/rock',
            'regolith': 'http://resource.geosciml.org/classifier/cgi/lithology/material_formed_in_surficial_environment',
-           'foid-bearing intrusive rock': 'http://resource.geosciml.org/classifier/cgi/lithology/phaneritic_igneous_rock',
+           'foid-bearing intrusive rock':
+               'http://resource.geosciml.org/classifier/cgi/lithology/phaneritic_igneous_rock',
            'sandy clay': 'http://resource.geosciml.org/classifier/cgi/lithology/clay',
            'mugearite': 'http://resource.geosciml.org/classifier/cgi/lithology/trachytoid',
            'phosphorite': 'http://resource.geosciml.org/classifier/cgi/lithology/phosphorite',
@@ -420,18 +445,21 @@ class Sample:
            'phonolitic foidite': 'http://resource.geosciml.org/classifier/cgi/lithology/phonolitic_foidite',
            'pseudotachylite': 'http://resource.geosciml.org/classifier/cgi/lithology/fault_related_material',
            'monchiquite': 'http://resource.geosciml.org/classifier/cgi/lithology/exotic_alkaline_rock',
-           'foid-bearing volcanic rock': 'http://resource.geosciml.org/classifier/cgi/lithology/fine_grained_igneous_rock',
+           'foid-bearing volcanic rock':
+               'http://resource.geosciml.org/classifier/cgi/lithology/fine_grained_igneous_rock',
            'clastic sediment': 'http://resource.geosciml.org/classifier/cgi/lithology/clastic_sediment',
            'radiolarite': 'http://resource.geosciml.org/classifier/cgi/lithology/biogenic_silica_sedimentary_rock',
            'muddy sand': 'http://resource.geosciml.org/classifier/cgi/lithology/sand',
            'residual soil on fresh bedrock': 'http://resource.geosciml.org/classifier/cgi/lithology/residual_material',
            'obsidian': 'http://resource.geosciml.org/classifier/cgi/lithology/glassy_igneous_rock',
-           'pyroxene melilitolite': 'http://resource.geosciml.org/classifier/cgi/lithology/kalsilitic_and_melilitic_rock',
+           'pyroxene melilitolite':
+               'http://resource.geosciml.org/classifier/cgi/lithology/kalsilitic_and_melilitic_rock',
            'quartz feldspar porphyry': 'http://resource.geosciml.org/classifier/cgi/lithology/porphyry',
            'anthracite': 'http://resource.geosciml.org/classifier/cgi/lithology/anthracite_coal',
            'nepheline syenite': 'http://resource.geosciml.org/classifier/cgi/lithology/foid_syenite',
            'quartz trachyte': 'http://resource.geosciml.org/classifier/cgi/lithology/trachytic_rock',
-           'foid-bearing monzodiorite': 'http://resource.geosciml.org/classifier/cgi/lithology/foid_bearing_monzodiorite',
+           'foid-bearing monzodiorite':
+               'http://resource.geosciml.org/classifier/cgi/lithology/foid_bearing_monzodiorite',
            'norite': 'http://resource.geosciml.org/classifier/cgi/lithology/gabbroic_rock',
            'alnoite': 'http://resource.geosciml.org/classifier/cgi/lithology/kalsilitic_and_melilitic_rock',
            'ironstone': 'http://resource.geosciml.org/classifier/cgi/lithology/rock',
@@ -446,31 +474,38 @@ class Sample:
            'andesite': 'http://resource.geosciml.org/classifier/cgi/lithology/andesite',
            'foid diorite': 'http://resource.geosciml.org/classifier/cgi/lithology/foid_diorite',
            'wood': 'http://resource.geosciml.org/classifier/cgi/lithology/organic_rich_sedimentary_material',
-           'vitric tuff': 'http://resource.geosciml.org/classifier/cgi/lithology/ash_tuff_lapillistone_and_lapilli_tuff',
+           'vitric tuff':
+               'http://resource.geosciml.org/classifier/cgi/lithology/ash_tuff_lapillistone_and_lapilli_tuff',
            'silt': 'http://resource.geosciml.org/classifier/cgi/lithology/silt',
            'iron formation': 'http://resource.geosciml.org/classifier/cgi/lithology/iron_rich_sedimentary_rock',
            'ijolite': 'http://resource.geosciml.org/classifier/cgi/lithology/foidolite',
            'spongolite': 'http://resource.geosciml.org/classifier/cgi/lithology/biogenic_silica_sedimentary_rock',
            'pegmatite': 'http://resource.geosciml.org/classifier/cgi/lithology/pegmatite',
-           'exotic composition igneous rock': 'http://resource.geosciml.org/classifier/cgi/lithology/exotic_composition_igneous_rock',
+           'exotic composition igneous rock':
+               'http://resource.geosciml.org/classifier/cgi/lithology/exotic_composition_igneous_rock',
            'beachrock': 'http://resource.geosciml.org/classifier/cgi/lithology/calcareous_carbonate_sedimentary_rock',
-           'carbonate sedimentary rock': 'http://resource.geosciml.org/classifier/cgi/lithology/carbonate_sedimentary_rock',
+           'carbonate sedimentary rock':
+               'http://resource.geosciml.org/classifier/cgi/lithology/carbonate_sedimentary_rock',
            'calcilutite': 'http://resource.geosciml.org/classifier/cgi/lithology/limestone',
            'swamp sediment': 'http://resource.geosciml.org/classifier/cgi/lithology/clastic_sediment',
            'sandy gravel': 'http://resource.geosciml.org/classifier/cgi/lithology/gravel',
            'orthopyroxene gabbro': 'http://resource.geosciml.org/classifier/cgi/lithology/gabbro',
            'pyroxene hornblende gabbro': 'http://resource.geosciml.org/classifier/cgi/lithology/gabbro',
            'marine sediment': 'http://resource.geosciml.org/classifier/cgi/lithology/clastic_sediment',
-           'foid-bearing alkali feldspar trachyte': 'http://resource.geosciml.org/classifier/cgi/lithology/foid_bearing_alkali_feldspar_trachyte',
-           'greenstone': 'http://resource.geosciml.org/classifier/cgi/lithology/chlorite_actinolite_epidote_metamorphic_rock',
+           'foid-bearing alkali feldspar trachyte':
+               'http://resource.geosciml.org/classifier/cgi/lithology/foid_bearing_alkali_feldspar_trachyte',
+           'greenstone':
+               'http://resource.geosciml.org/classifier/cgi/lithology/chlorite_actinolite_epidote_metamorphic_rock',
            'augen gneiss': 'http://resource.geosciml.org/classifier/cgi/lithology/gneiss',
            'vein breccia': 'http://resource.geosciml.org/classifier/cgi/lithology/breccia',
            'arenite': 'http://resource.geosciml.org/classifier/cgi/lithology/arenite',
-           'olivine pyroxene melilitolite': 'http://resource.geosciml.org/classifier/cgi/lithology/kalsilitic_and_melilitic_rock',
+           'olivine pyroxene melilitolite':
+               'http://resource.geosciml.org/classifier/cgi/lithology/kalsilitic_and_melilitic_rock',
            'trondhjemite': 'http://resource.geosciml.org/classifier/cgi/lithology/tonalite',
            'foidolite': 'http://resource.geosciml.org/classifier/cgi/lithology/foidolite',
            'foid gabbro': 'http://resource.geosciml.org/classifier/cgi/lithology/foid_gabbro',
-           'lithic tuff': 'http://resource.geosciml.org/classifier/cgi/lithology/ash_tuff_lapillistone_and_lapilli_tuff',
+           'lithic tuff':
+               'http://resource.geosciml.org/classifier/cgi/lithology/ash_tuff_lapillistone_and_lapilli_tuff',
            'quartz monzonite': 'http://resource.geosciml.org/classifier/cgi/lithology/quartz_monzonite',
            'limburgite': 'http://resource.geosciml.org/classifier/cgi/lithology/basanite',
            'clinopyroxene norite': 'http://resource.geosciml.org/classifier/cgi/lithology/gabbroic_rock',
@@ -486,7 +521,8 @@ class Sample:
            'foid syenite': 'http://resource.geosciml.org/classifier/cgi/lithology/foid_syenite',
            'scoria': 'http://resource.geosciml.org/classifier/cgi/lithology/basalt',
            'foid-bearing monzogabbro': 'http://resource.geosciml.org/classifier/cgi/lithology/foid_bearing_monzogabbro',
-           'olivine pyroxene kalsilitite': 'http://resource.geosciml.org/classifier/cgi/lithology/kalsilitic_and_melilitic_rock',
+           'olivine pyroxene kalsilitite':
+               'http://resource.geosciml.org/classifier/cgi/lithology/kalsilitic_and_melilitic_rock',
            'pyroxene hornblende norite': 'http://resource.geosciml.org/classifier/cgi/lithology/gabbroic_rock',
            'basaltic trachyandesite': 'http://resource.geosciml.org/classifier/cgi/lithology/trachytoid',
            'lateritic duricrust': 'http://resource.geosciml.org/classifier/cgi/lithology/duricrust',
@@ -494,7 +530,8 @@ class Sample:
            'bouldery clay': 'http://resource.geosciml.org/classifier/cgi/lithology/clay',
            'boundstone': 'http://resource.geosciml.org/classifier/cgi/lithology/boundstone',
            'glacial sediment': 'http://resource.geosciml.org/classifier/cgi/lithology/clastic_sediment',
-           'breccia, bomb or block tephra': 'http://resource.geosciml.org/classifier/cgi/lithology/ash_breccia_bomb_or_block_tephra',
+           'breccia, bomb or block tephra':
+               'http://resource.geosciml.org/classifier/cgi/lithology/ash_breccia_bomb_or_block_tephra',
            'tillite': 'http://resource.geosciml.org/classifier/cgi/lithology/clastic_sedimentary_rock',
            'igneous rock': 'http://resource.geosciml.org/classifier/cgi/lithology/igneous_rock',
            'leucite richterite lamproite': 'http://resource.geosciml.org/classifier/cgi/lithology/exotic_alkaline_rock',
@@ -507,7 +544,8 @@ class Sample:
            'clayey silt': 'http://resource.geosciml.org/classifier/cgi/lithology/silt',
            'loam': 'http://resource.geosciml.org/classifier/cgi/lithology/material_formed_in_surficial_environment',
            'extra-terrestrial material': 'http://resource.geosciml.org/classifier/cgi/lithology/rock',
-           'agglomerate': 'http://resource.geosciml.org/classifier/cgi/lithology/tuff_breccia_agglomerate_or_pyroclastic_breccia',
+           'agglomerate':
+               'http://resource.geosciml.org/classifier/cgi/lithology/tuff_breccia_agglomerate_or_pyroclastic_breccia',
            'biosparite': 'http://resource.geosciml.org/classifier/cgi/lithology/limestone',
            'tourmalite': 'http://resource.geosciml.org/classifier/cgi/lithology/metasomatic_rock',
            'pyroxene hornblende peridotite': 'http://resource.geosciml.org/classifier/cgi/lithology/peridotite',
@@ -525,7 +563,8 @@ class Sample:
            'duricrust': 'http://resource.geosciml.org/classifier/cgi/lithology/duricrust',
            'granofels': 'http://resource.geosciml.org/classifier/cgi/lithology/granofels',
            'argillaceous sandstone': 'http://resource.geosciml.org/classifier/cgi/lithology/clastic_sandstone',
-           'blueschist facies rock': 'http://resource.geosciml.org/classifier/cgi/lithology/glaucophane_lawsonite_epidote_metamorphic_rock',
+           'blueschist facies rock':
+               'http://resource.geosciml.org/classifier/cgi/lithology/glaucophane_lawsonite_epidote_metamorphic_rock',
            'fenite': 'http://resource.geosciml.org/classifier/cgi/lithology/metasomatic_rock',
            'limestone grainstone': 'http://resource.geosciml.org/classifier/cgi/lithology/limestone',
            'olivine clinopyroxene norite': 'http://resource.geosciml.org/classifier/cgi/lithology/gabbroic_rock',
@@ -535,7 +574,8 @@ class Sample:
            'grainstone': 'http://resource.geosciml.org/classifier/cgi/lithology/grainstone',
            'silty clay': 'http://resource.geosciml.org/classifier/cgi/lithology/clay',
            'nephelinite': 'http://resource.geosciml.org/classifier/cgi/lithology/foidite',
-           'organic rich sedimentary material': 'http://resource.geosciml.org/classifier/cgi/lithology/organic_rich_sedimentary_material',
+           'organic rich sedimentary material':
+               'http://resource.geosciml.org/classifier/cgi/lithology/organic_rich_sedimentary_material',
            'dolostone/dolomite bindstone': 'http://resource.geosciml.org/classifier/cgi/lithology/dolostone',
            'peridotite': 'http://resource.geosciml.org/classifier/cgi/lithology/peridotite',
            'greensand': 'http://resource.geosciml.org/classifier/cgi/lithology/clastic_sandstone',
@@ -559,8 +599,10 @@ class Sample:
            'magnetitite': 'http://resource.geosciml.org/classifier/cgi/lithology/ultramafic_igneous_rock',
            'sannaite': 'http://resource.geosciml.org/classifier/cgi/lithology/exotic_alkaline_rock',
            'monzonite': 'http://resource.geosciml.org/classifier/cgi/lithology/monzonite',
-           'intermediate intrusive rock': 'http://resource.geosciml.org/classifier/cgi/lithology/intermediate_composition_igneous_rock',
-           'diopside leucite phlogopite lamproite': 'http://resource.geosciml.org/classifier/cgi/lithology/exotic_alkaline_rock',
+           'intermediate intrusive rock':
+               'http://resource.geosciml.org/classifier/cgi/lithology/intermediate_composition_igneous_rock',
+           'diopside leucite phlogopite lamproite':
+               'http://resource.geosciml.org/classifier/cgi/lithology/exotic_alkaline_rock',
            'packstone': 'http://resource.geosciml.org/classifier/cgi/lithology/packstone',
            'saprolite': 'http://resource.geosciml.org/classifier/cgi/lithology/residual_material',
            'foidite': 'http://resource.geosciml.org/classifier/cgi/lithology/foidite',
@@ -571,7 +613,8 @@ class Sample:
            'potassic trachybasalt': 'http://resource.geosciml.org/classifier/cgi/lithology/trachytoid',
            'missourite': 'http://resource.geosciml.org/classifier/cgi/lithology/foidolite',
            'latite': 'http://resource.geosciml.org/classifier/cgi/lithology/latite',
-           'ferruginised rock fragments': 'http://resource.geosciml.org/classifier/cgi/lithology/material_formed_in_surficial_environment',
+           'ferruginised rock fragments':
+               'http://resource.geosciml.org/classifier/cgi/lithology/material_formed_in_surficial_environment',
            'clayey sandy gravel': 'http://resource.geosciml.org/classifier/cgi/lithology/gravel',
            'ultrabasic igneous rock': 'http://resource.geosciml.org/classifier/cgi/lithology/ultrabasic_igneous_rock',
            'calcarenite': 'http://resource.geosciml.org/classifier/cgi/lithology/limestone',
@@ -595,9 +638,11 @@ class Sample:
            'metamorphic rock': 'http://resource.geosciml.org/classifier/cgi/lithology/metamorphic_rock',
            'felsic schist': 'http://resource.geosciml.org/classifier/cgi/lithology/schist',
            'melilitolite': 'http://resource.geosciml.org/classifier/cgi/lithology/kalsilitic_and_melilitic_rock',
-           'boninite': 'http://resource.geosciml.org/classifier/cgi/lithology/high_magnesium_fine_grained_igneous_rocks',
+           'boninite':
+               'http://resource.geosciml.org/classifier/cgi/lithology/high_magnesium_fine_grained_igneous_rocks',
            'tephrite': 'http://resource.geosciml.org/classifier/cgi/lithology/tephrite',
-           'kalsilite phlogopite melilitite': 'http://resource.geosciml.org/classifier/cgi/lithology/kalsilitic_and_melilitic_rock',
+           'kalsilite phlogopite melilitite':
+               'http://resource.geosciml.org/classifier/cgi/lithology/kalsilitic_and_melilitic_rock',
            'phyllite': 'http://resource.geosciml.org/classifier/cgi/lithology/phyllite',
            'trachybasalt': 'http://resource.geosciml.org/classifier/cgi/lithology/trachytoid',
            'skarn': 'http://resource.geosciml.org/classifier/cgi/lithology/skarn',
@@ -610,12 +655,14 @@ class Sample:
            'terrestrial sediment': 'http://resource.geosciml.org/classifier/cgi/lithology/clastic_sediment',
            'limestone bindstone': 'http://resource.geosciml.org/classifier/cgi/lithology/limestone',
            'grus': 'http://resource.geosciml.org/classifier/cgi/lithology/residual_material',
-           'anthropogenic material': 'http://resource.geosciml.org/classifier/cgi/lithology/anthropogenic_unconsolidated_material',
+           'anthropogenic material':
+               'http://resource.geosciml.org/classifier/cgi/lithology/anthropogenic_unconsolidated_material',
            'vogesite': 'http://resource.geosciml.org/classifier/cgi/lithology/exotic_alkaline_rock',
            'biocarbonate': 'http://resource.geosciml.org/classifier/cgi/lithology/carbonate_sedimentary_rock',
            'siltstone': 'http://resource.geosciml.org/classifier/cgi/lithology/siltstone',
            'sodalitite': 'http://resource.geosciml.org/classifier/cgi/lithology/foidite',
-           'kalsilite leucite olivine melilitite': 'http://resource.geosciml.org/classifier/cgi/lithology/kalsilitic_and_melilitic_rock',
+           'kalsilite leucite olivine melilitite':
+               'http://resource.geosciml.org/classifier/cgi/lithology/kalsilitic_and_melilitic_rock',
            'olivine orthopyroxenite': 'http://resource.geosciml.org/classifier/cgi/lithology/pyroxenite',
            'melange': 'http://resource.geosciml.org/classifier/cgi/lithology/rock',
            'clinopyroxene gabbro': 'http://resource.geosciml.org/classifier/cgi/lithology/gabbro',
@@ -623,7 +670,8 @@ class Sample:
            'vein iron oxide': 'http://resource.geosciml.org/classifier/cgi/lithology/metasomatic_rock',
            'clinopyroxenite': 'http://resource.geosciml.org/classifier/cgi/lithology/pyroxenite',
            'anhydrite': 'http://resource.geosciml.org/classifier/cgi/lithology/rock_gypsum_or_anhydrite',
-           'diopside phlogopite lamproite': 'http://resource.geosciml.org/classifier/cgi/lithology/exotic_alkaline_rock',
+           'diopside phlogopite lamproite':
+               'http://resource.geosciml.org/classifier/cgi/lithology/exotic_alkaline_rock',
            'opdalite': 'http://resource.geosciml.org/classifier/cgi/lithology/granodiorite',
            'limestone breccia': 'http://resource.geosciml.org/classifier/cgi/lithology/limestone',
            'gravelly mud': 'http://resource.geosciml.org/classifier/cgi/lithology/mud',
@@ -637,12 +685,14 @@ class Sample:
            'amber': 'http://resource.geosciml.org/classifier/cgi/lithology/organic_rich_sedimentary_material',
            'shoshonite': 'http://resource.geosciml.org/classifier/cgi/lithology/trachytoid',
            'limestone floatstone': 'http://resource.geosciml.org/classifier/cgi/lithology/limestone',
-           'hyalo olivine diopside phlogopite lamproite': 'http://resource.geosciml.org/classifier/cgi/lithology/exotic_alkaline_rock',
+           'hyalo olivine diopside phlogopite lamproite':
+               'http://resource.geosciml.org/classifier/cgi/lithology/exotic_alkaline_rock',
            'dolostone/dolomite bafflestone': 'http://resource.geosciml.org/classifier/cgi/lithology/dolostone',
            'dolocrete': 'http://resource.geosciml.org/classifier/cgi/lithology/duricrust',
            'jasper': 'http://resource.geosciml.org/classifier/cgi/lithology/non_clastic_siliceous_sedimentary_rock',
            'mudflow deposit': 'http://resource.geosciml.org/classifier/cgi/lithology/clastic_sediment',
-           'saprolite, very highly weathered': 'http://resource.geosciml.org/classifier/cgi/lithology/residual_material',
+           'saprolite, very highly weathered':
+               'http://resource.geosciml.org/classifier/cgi/lithology/residual_material',
            'olivine gabbronorite': 'http://resource.geosciml.org/classifier/cgi/lithology/gabbroic_rock',
            'monzogabbro': 'http://resource.geosciml.org/classifier/cgi/lithology/monzogabbro',
            'komatiite': 'http://resource.geosciml.org/classifier/cgi/lithology/komatiitic_rock',
@@ -658,21 +708,25 @@ class Sample:
            'parna': 'http://resource.geosciml.org/classifier/cgi/lithology/clay',
            'mafic rock': 'http://resource.geosciml.org/classifier/cgi/lithology/rock',
            'volcaniclastic rock': 'http://resource.geosciml.org/classifier/cgi/lithology/fragmental_igneous_rock',
-           'organic rich sedimentary rock': 'http://resource.geosciml.org/classifier/cgi/lithology/organic_rich_sedimentary_rock',
+           'organic rich sedimentary rock':
+               'http://resource.geosciml.org/classifier/cgi/lithology/organic_rich_sedimentary_rock',
            'mafic schist': 'http://resource.geosciml.org/classifier/cgi/lithology/schist',
            'dololutite': 'http://resource.geosciml.org/classifier/cgi/lithology/dolostone',
            'torbanite': 'http://resource.geosciml.org/classifier/cgi/lithology/coal',
            'alkali feldspar granite': 'http://resource.geosciml.org/classifier/cgi/lithology/alkali_feldspar_granite',
            'dolostone/dolomite breccia': 'http://resource.geosciml.org/classifier/cgi/lithology/dolostone',
-           'pisoliths': 'http://resource.geosciml.org/classifier/cgi/lithology/material_formed_in_surficial_environment',
-           'enstatite sanidine phlogopite lamproite': 'http://resource.geosciml.org/classifier/cgi/lithology/exotic_alkaline_rock',
+           'pisoliths':
+               'http://resource.geosciml.org/classifier/cgi/lithology/material_formed_in_surficial_environment',
+           'enstatite sanidine phlogopite lamproite':
+               'http://resource.geosciml.org/classifier/cgi/lithology/exotic_alkaline_rock',
            'creep deposit': 'http://resource.geosciml.org/classifier/cgi/lithology/clastic_sediment',
            'gneiss': 'http://resource.geosciml.org/classifier/cgi/lithology/gneiss',
            'gravelly sand': 'http://resource.geosciml.org/classifier/cgi/lithology/sand',
            'trachydacite': 'http://resource.geosciml.org/classifier/cgi/lithology/trachytoid',
            'quartz diorite': 'http://resource.geosciml.org/classifier/cgi/lithology/quartz_diorite',
            'metamorphosed acid igneous rock': 'http://resource.geosciml.org/classifier/cgi/lithology/metamorphic_rock',
-           'crystal tuff': 'http://resource.geosciml.org/classifier/cgi/lithology/ash_tuff_lapillistone_and_lapilli_tuff',
+           'crystal tuff':
+               'http://resource.geosciml.org/classifier/cgi/lithology/ash_tuff_lapillistone_and_lapilli_tuff',
            'alkali basalt': 'http://resource.geosciml.org/classifier/cgi/lithology/alkali-olivine_basalt',
            'quartzolite': 'http://resource.geosciml.org/classifier/cgi/lithology/quartz_rich_igneous_rock',
            'colluvial sediment': 'http://resource.geosciml.org/classifier/cgi/lithology/clastic_sediment',
@@ -683,12 +737,14 @@ class Sample:
            'quartz monzodiorite': 'http://resource.geosciml.org/classifier/cgi/lithology/quartz_monzodiorite',
            'olivine websterite': 'http://resource.geosciml.org/classifier/cgi/lithology/pyroxenite',
            'silcrete': 'http://resource.geosciml.org/classifier/cgi/lithology/duricrust',
-           'intermediate volcanic rock': 'http://resource.geosciml.org/classifier/cgi/lithology/intermediate_composition_igneous_rock',
+           'intermediate volcanic rock':
+               'http://resource.geosciml.org/classifier/cgi/lithology/intermediate_composition_igneous_rock',
            'carbonaceous siltstone': 'http://resource.geosciml.org/classifier/cgi/lithology/siltstone',
            'mineralisation': 'http://resource.geosciml.org/classifier/cgi/lithology/metasomatic_rock',
            'rock salt': 'http://resource.geosciml.org/classifier/cgi/lithology/rock_salt',
            'granite': 'http://resource.geosciml.org/classifier/cgi/lithology/granite',
-           'carbonate iron formation': 'http://resource.geosciml.org/classifier/cgi/lithology/iron_rich_sedimentary_rock',
+           'carbonate iron formation':
+               'http://resource.geosciml.org/classifier/cgi/lithology/iron_rich_sedimentary_rock',
            'lacustrine sediment': 'http://resource.geosciml.org/classifier/cgi/lithology/clastic_sediment',
            'calcisiltite': 'http://resource.geosciml.org/classifier/cgi/lithology/limestone',
            'peat': 'http://resource.geosciml.org/classifier/cgi/lithology/peat',
@@ -702,12 +758,14 @@ class Sample:
            'foid monzodiorite': 'http://resource.geosciml.org/classifier/cgi/lithology/foid_monzodiorite',
            'evaporite': 'http://resource.geosciml.org/classifier/cgi/lithology/evaporite',
            'ultramafic igneous rock': 'http://resource.geosciml.org/classifier/cgi/lithology/ultramafic_igneous_rock',
-           'siliciclastic sedimentary rock': 'http://resource.geosciml.org/classifier/cgi/lithology/clastic_sedimentary_rock',
+           'siliciclastic sedimentary rock':
+               'http://resource.geosciml.org/classifier/cgi/lithology/clastic_sedimentary_rock',
            'sandy siltstone': 'http://resource.geosciml.org/classifier/cgi/lithology/siltstone',
            'dolostone/dolomite wackestone': 'http://resource.geosciml.org/classifier/cgi/lithology/dolostone',
            'spessartite': 'http://resource.geosciml.org/classifier/cgi/lithology/exotic_alkaline_rock',
            'calcirudite': 'http://resource.geosciml.org/classifier/cgi/lithology/limestone',
-           'porcellanite': 'http://resource.geosciml.org/classifier/cgi/lithology/non_clastic_siliceous_sedimentary_rock',
+           'porcellanite':
+               'http://resource.geosciml.org/classifier/cgi/lithology/non_clastic_siliceous_sedimentary_rock',
            'dolomite carbonatite': 'http://resource.geosciml.org/classifier/cgi/lithology/carbonatite'
                 },
         'entity_type': {
@@ -718,15 +776,6 @@ class Sample:
         }
     }
 
-    # Associates an RDF mimetype to an rdflib RDF format
-    RDF_MIMETYPES = {
-        'text/turtle': 'turtle',
-        'text/ntriples': 'nt',
-        'text/nt': 'nt',
-        'text/n3': 'nt',
-        'application/rdf+xml': 'xml',
-        'application/rdf+json': 'json-ld'
-    }
     '''
     Entity Types not yet in a vocab
 
@@ -822,7 +871,7 @@ class Sample:
         os.environ['NO_PROXY'] = 'ga.gov.au'
         # internal URI
         # target_url = 'http://biotite.ga.gov.au:7777/wwwstaff_distd/a.igsn_api.get_igsnSample?pIGSN=' + igsn
-        #external URI
+        # external URI
         target_url = 'http://dbforms.ga.gov.au/www_distp/a.igsn_api.get_igsnSample?pIGSN=' + igsn
         # call API
         r = requests.get(target_url)
@@ -1008,7 +1057,8 @@ class Sample:
     def generate_sample_wkt(self):
         if self.z is not None:
             # wkt = "SRID=" + self.srid + ";POINTZ(" + self.x + " " + self.y + " " + self.z + ")"
-            wkt = "<http://www.opengis.net/def/crs/EPSG/0/" + self.srid + "> POINTZ(" + self.x + " " + self.y + " " + self.z + ")"
+            wkt = "<http://www.opengis.net/def/crs/EPSG/0/" + \
+                  self.srid + "> POINTZ(" + self.x + " " + self.y + " " + self.z + ")"
         else:
             # wkt = "SRID=" + self.srid + ";POINT(" + self.x + " " + self.y + ")"
             wkt = "<http://www.opengis.net/def/crs/EPSG/0/" + self.srid + "> POINT(" + self.x + " " + self.y + ")"
@@ -1018,26 +1068,27 @@ class Sample:
     def generate_sample_gml(self):
         if self.z is not None:
             gml = '<gml:Point srsDimension="3" srsName="http://www.opengis.net/def/crs/EPSG/0/' + self.srid + '">' \
-                                                                                                              '<gml:pos>' + self.x + ' ' + self.y + ' ' + self.z + '</gml:pos>' \
-                                                                                                                                                                   '</gml:Point>'
+                  '<gml:pos>' + self.x + ' ' + self.y + ' ' + self.z + '</gml:pos>' \
+                   '</gml:Point>'
         else:
             gml = '<gml:Point srsDimension="2" srsName="http://www.opengis.net/def/crs/EPSG/0/' + self.srid + '">' \
-                                                                                                              '<gml:pos>' + self.x + ' ' + self.y + '</gml:pos>' \
-                                                                                                                                                    '</gml:Point>'
+                  '<gml:pos>' + self.x + ' ' + self.y + '</gml:pos>' \
+                  '</gml:Point>'
 
         return gml
 
     def generate_parent_wkt(self):
         # TODO: add support for geometries other than Point
-        wkt = "<http://www.opengis.net/def/crs/EPSG/0/" + self.srid + "> POINT(" + self.hole_long_min + " " + self.hole_lat_min + ")"
+        wkt = "<http://www.opengis.net/def/crs/EPSG/0/" + \
+              self.srid + ">POINT(" + self.hole_long_min + " " + self.hole_lat_min + ")"
 
         return wkt
 
     def generate_parent_gml(self):
         # TODO: add support for geometries other than Point
-        gml = '<gml:Point srsDimension="2" srsName="http://www.opengis.net/def/crs/EPSG/0/' + self.srid + '">' \
-                                                                                                          ' <gml:pos>' + self.hole_long_min + ' ' + self.hole_lat_min + '</gml:pos>' \
-                                                                                                                                                                        '</gml:Point>'
+        gml = '<gml:Point srsDimension="2" srsName="http://www.opengis.net/def/crs/EPSG/0/' + \
+              self.srid + '"><gml:pos>' + self.hole_long_min + ' ' + self.hole_lat_min + '</gml:pos>' \
+              '</gml:Point>'
         return gml
 
     def export_as_rdf(self, model_view='default', rdf_mime='text/turtle'):
@@ -1047,7 +1098,7 @@ class Sample:
 
         :param model_view: string of one of the model view names available for Sample objects ['igsn', 'dc', '',
             'default']
-        :param format: string of one of the rdflib serlialization format ['n3', 'nquads', 'nt', 'pretty-xml', 'trig',
+        :param rdf_mime: string of one of the rdflib serlialization format ['n3', 'nquads', 'nt', 'pretty-xml', 'trig',
             'trix', 'turtle', 'xml'], from http://rdflib3.readthedocs.io/en/latest/plugin_serializers.html
         :return: RDF string
         """
@@ -1109,7 +1160,9 @@ class Sample:
             g.add((this_sample, SAMFL.samplingElevation, elevation))
             g.add((elevation, RDF.type, SAMFL.Elevation))
             g.add((elevation, SAMFL.elevation, Literal(self.z, datatype=XSD.float)))
-            g.add((elevation, SAMFL.verticalDatum, Literal("http://spatialreference.org/ref/epsg/4283/", datatype=XSD.anyUri)))
+            g.add((elevation, SAMFL.verticalDatum, Literal(
+                "http://spatialreference.org/ref/epsg/4283/",
+                datatype=XSD.anyUri)))
 
             # properties
             g.add((this_sample, SAMFL.currentLocation, Literal('GA Services building', datatype=XSD.string)))
@@ -1178,7 +1231,7 @@ class Sample:
             g.add((qualified_attribution, PROV.hadRole, AUROLE.Publisher))
             g.add((this_sample, PROV.qualifiedAttribution, qualified_attribution))
 
-        return g.serialize(format=Sample.RDF_MIMETYPES[rdf_mime])
+        return g.serialize(format=LDAPI.get_file_extension(rdf_mime))
 
     def is_xml_export_valid(self, xml_string):
         """
@@ -1212,7 +1265,9 @@ class Sample:
 
         <?xml version="1.0" encoding="UTF-8"?>
         <results>
-            <qrcode_img_src>app.geosamples.org/barcode/image.php?igsn=LCZ7700AK&amp;sample_id=CDR4_100mesh</qrcode_img_src>
+            <qrcode_img_src>
+                app.geosamples.org/barcode/image.php?igsn=LCZ7700AK&amp;sample_id=CDR4_100mesh
+            </qrcode_img_src>
             <user_code>LCZ</user_code>
             <igsn>LCZ7700AK</igsn>
             <name>CDR4_100mesh</name>
@@ -1472,10 +1527,10 @@ class Sample:
 
 if __name__ == '__main__':
     print "hello"
-    #s = Sample()
+    # s = Sample()
     # s.populate_from_xml_file('../test/sample_eg1.xml')
-    #s.populate_from_oracle_api('AU100')
-    #print s.export_as_rdf(model_view='igsn', rdf_mime='text/turtle')
+    # s.populate_from_oracle_api('AU100')
+    # print s.export_as_rdf(model_view='igsn', rdf_mime='text/turtle')
 
     # print s.is_xml_export_valid(open('../test/sample_eg3_IGSN_schema.xml').read())
     # print s.export_as_igsn_xml()

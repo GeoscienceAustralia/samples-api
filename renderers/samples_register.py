@@ -41,8 +41,9 @@ class SampleRegister:
         os.environ['NO_PROXY'] = 'ga.gov.au'
         # internal URI
         # target_url = 'http://biotite.ga.gov.au:7777/wwwstaff_distd/a.igsn_api.get_igsnSample?pIGSN=' + igsn
-        #external URI
-        target_url = 'http://dbforms.ga.gov.au/www_distp/a.igsn_api.get_igsnSampleSet?pOrder=IGSN&pPageNo={0}&pNoOfLinesPerPage=25'.format(page_no)
+        # external URI
+        target_url = 'http://dbforms.ga.gov.au/www_distp/a.igsn_api.get_igsnSampleSet?pOrder=IGSN&pPageNo={0}' \
+                     '&pNoOfLinesPerPage=25'.format(page_no)
         # call API
         r = requests.get(target_url)
         # deal with missing XML declaration
@@ -78,7 +79,7 @@ class SampleRegister:
 
         :param model_view: string of one of the model view names available for SampleRegister objects ['reg', 'dc', '',
             'default']
-        :param format: string of one of the rdflib serlialization format ['n3', 'nquads', 'nt', 'pretty-xml', 'trig',
+        :param rdf_mime: string of one of the rdflib serlialization format ['n3', 'nquads', 'nt', 'pretty-xml', 'trig',
             'trix', 'turtle', 'xml'], from http://rdflib3.readthedocs.io/en/latest/plugin_serializers.html
         :return: RDF string
         """
@@ -98,9 +99,6 @@ class SampleRegister:
         this_register = 'http://pid.geoscience.gov.au/renderers/'
         this_register_uri = URIRef(this_register)
         igsn_base_uri = this_register
-
-        # define GA
-        ga = URIRef(SampleRegister.URI_GA)
 
         # select model view
         if model_view == 'default' or model_view == 'dpr' or model_view is None:
@@ -128,7 +126,12 @@ class SampleRegister:
             g.add((SampleRegister.URI_GA, RDF.type, DPR.DataProviderRegister))
             g.add((SampleRegister.URI_GA, RDF.type, ORG.Organization))
             g.add((SampleRegister.URI_GA, RDFS.label, Literal('Geoscience Australia', datatype=XSD.string)))
-            g.add((SampleRegister.URI_GA, RDFS.comment, Literal('Geoscience Australia (GA) is Austriala\'s national custodian of geoscience information. As a Data Provider Register, GA publishes much information including samples\' metadata, datasets, web services, vocabularies and ontologies', datatype=XSD.string)))
+            g.add((
+                SampleRegister.URI_GA,
+                RDFS.comment,
+                Literal('Geoscience Australia (GA) is Austriala\'s national custodian of geoscience information. As a '
+                        'Data Provider Register, GA publishes much information including samples\' metadata, datasets, '
+                        'web services, vocabularies and ontologies', datatype=XSD.string)))
             g.add((SampleRegister.URI_GA, REG.subregister, SampleRegister.URI_DS_REG))
 
             g.add((SampleRegister.URI_DS_REG, RDF.type, REG.FederatedRegister))
@@ -143,7 +146,9 @@ class SampleRegister:
             # for each Sample
             for sample_igsn_str in self.samples:
                 g.add((URIRef(igsn_base_uri + sample_igsn_str), RDF.type, IGSN.Sample))
-                g.add((URIRef(igsn_base_uri + sample_igsn_str), RDFS.label, Literal('Sample ' + sample_igsn_str, datatype=XSD.string)))
+                g.add((URIRef(igsn_base_uri + sample_igsn_str), RDFS.label, Literal(
+                    'Sample ' + sample_igsn_str,
+                    datatype=XSD.string)))
                 g.add((URIRef(igsn_base_uri + sample_igsn_str), REG.register, URIRef(this_register)))
 
         elif model_view == 'dc':
@@ -151,7 +156,7 @@ class SampleRegister:
         elif model_view == 'prov':
             pass
 
-        return g.serialize(format=LDAPI.MIMETYPES_PARSERS.get(rdf_mime))
+        return g.serialize(format=LDAPI.get_file_extension(rdf_mime))
 
     def export_as_html(self, model_view='default'):
         """
@@ -178,7 +183,8 @@ class SampleRegister:
         html += '   <tr><th>Property</th><th>Value</th></tr>'
         html += '   <tr><td>Type</td><td>reg:FederatedRegister</td></tr>'
         html += '   <tr><td>reg:containedItemClass</td><td>igsn:Sample</td></tr>'
-        html += '   <tr><td>parent</td><td><a href="http://pid.geoscience.gov.au/dataset/">GA\'s Dataset Register</a></td></tr>'
+        html += '   <tr><td>parent</td><td><a href="http://pid.geoscience.gov.au/dataset/">' \
+                'GA\'s Dataset Register</a></td></tr>'
         html += '</table>'
 
         # samples
@@ -193,10 +199,10 @@ class SampleRegister:
 
 if __name__ == '__main__':
     sr = SampleRegister()
-    #sr.populate_from_xml_file('../test/samples_register_eg1.xml')
+    # sr.populate_from_xml_file('../test/samples_register_eg1.xml')
     sr.populate_from_oracle_api(1)
-    #print sr.export_as_text()
-    #print sr.export_as_html()
+    # print sr.export_as_text()
+    # print sr.export_as_html()
     print sr.export_as_rdf(model_view='dpr', rdf_mime='text/turtle')
 
     # print s.is_xml_export_valid(open('../test/sample_eg3_IGSN_schema.xml').read())
