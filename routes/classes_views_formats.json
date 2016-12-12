@@ -1,0 +1,20 @@
+{
+  "_comment": [
+    "For every class in the provenance DB, we will have the following model views:",
+    "   default     -- any one of the provided views for the class, chosen as the default - usually the igsn",
+    "   alternates  -- a list of all available views and formats",
+    "   igsn  -- the igsn-specific view based on the IGSN Ontology",
+    ""],
+  "http://pid.geoscience.gov.au/def/ont/igsn#Sample": {
+    "renderer": "SampleRenderer",
+    "default": "igsn",
+    "alternates": ["text/html", "text/turtle", "application/rdf+xml", "application/rdf+json"],
+    "igsn": ["text/html", "text/turtle", "application/rdf+xml", "application/rdf+json"]
+  },
+  "http://pid.geoscience.gov.au/def/ont/igsn#SampleRegister": {
+    "renderer": "SampleRegisterRenderer",
+    "default": "igsn",
+    "alternates": ["text/html", "text/turtle", "application/rdf+xml", "application/rdf+json"],
+    "igsn": ["text/html", "text/turtle", "application/rdf+xml", "application/rdf+json"]
+  }
+}

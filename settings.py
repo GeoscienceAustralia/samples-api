@@ -6,5 +6,5 @@ PORT = 8080
 THREADED = False
 DEBUG = True
 
-BASE_URI = 'http://localhost:' + str(PORT) + '/'
+BASE_URI = 'http://localhost:' + str(PORT)
 WEB_SUBFOLDER = ''  # no trailing slash
