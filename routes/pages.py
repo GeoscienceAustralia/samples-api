@@ -1,3 +1,6 @@
+"""
+This file contains all the HTTP routes for basic pages (usually HTML)
+"""
 from flask import Blueprint, Response, request, render_template
 from lxml import etree
 from lxml.builder import ElementMaker

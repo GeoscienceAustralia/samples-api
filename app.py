@@ -1,10 +1,10 @@
 import logging
 import settings
 from flask import Flask
-from routes import pages, db_classes
+from routes import pages, model_classes
 app = Flask(__name__)
 
-app.register_blueprint(db_classes.db_classes)
+app.register_blueprint(model_classes.model_classes)
 app.register_blueprint(pages.pages)
 
 

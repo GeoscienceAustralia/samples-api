@@ -1,3 +1,6 @@
+"""
+This file contains all the HTTP routes for classes from the IGSN model, such as Samples and the Sample Register
+"""
 import datetime
 
 from flask import Blueprint, Response, render_template, request, make_response
@@ -9,10 +12,10 @@ from ldapi import LDAPI, LdapiParameterError
 
 # from oaipmh.datestamp import datestamp_to_datetime, datetime_to_datestamp
 
-db_classes = Blueprint('db_classes', __name__)
+model_classes = Blueprint('model_classes', __name__)
 
 
-@db_classes.route('/renderers/<string:igsn>')
+@model_classes.route('/sample/<string:igsn>')
 def sample(igsn):
     """
     A single Sample
@@ -76,7 +79,7 @@ def sample(igsn):
             )
 
 
-@db_classes.route('/renderers/')
+@model_classes.route('/sample/')
 def samples():
     """
     Samples register
@@ -135,7 +138,7 @@ def samples():
         # no need for an else since views already validated
 
 
-@db_classes.route('/oai')
+@model_classes.route('/oai')
 def oai():
     # TODO: validate args using functions_oai
     if request.args.get('verb'):
