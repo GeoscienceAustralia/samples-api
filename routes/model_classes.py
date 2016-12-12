@@ -6,7 +6,6 @@ import datetime
 from flask import Blueprint, Response, render_template, request, make_response
 
 import routes_functions
-import functions_oai
 import settings
 from ldapi import LDAPI, LdapiParameterError
 
@@ -45,7 +44,7 @@ def sample(igsn):
         return routes_functions.render_templates_alternates('page_sample.html', views_formats)
     elif view in ['igsn', 'dc', 'prov']:
         # for all these views we will need to populate a renderers
-        from renderers.sample import Sample
+        from renderers.Sample import Sample
         s = Sample()
         #s.populate_from_xml_file('test/sample_eg2.xml')
         s.populate_from_oracle_api(igsn)
@@ -113,7 +112,7 @@ def samples():
         return routes_functions.render_templates_alternates('page_samples.html', views_formats)
     elif view in ['dpr']:
         # only create and populate a SamplesRegister for views that need it
-        from renderers.samples_register import SampleRegister
+        from renderers.SamplesRegister import SampleRegister
         sr = SampleRegister()
         sr.populate_from_oracle_api(page_no)
 
@@ -138,48 +137,3 @@ def samples():
         # no need for an else since views already validated
 
 
-@model_classes.route('/oai')
-def oai():
-    # TODO: validate args using functions_oai
-    if request.args.get('verb'):
-        verb = request.args.get('verb')
-    else:
-        values = {
-            'response_date': datetime.datetime.now().isoformat(),
-            'request_uri': 'http://54.66.133.7/igsn-ld-api/oai',
-            'error_code': 'badVerb',
-            'error_text': 'Illegal OAI verb'
-        }
-        template = render_template('oai_error.xml', values=values), 400
-        response = make_response(template)
-        response.headers['Content-Type'] = 'application/xml'
-
-        return response
-
-    try:
-        functions_oai.validate_oai_parameters(request.args)
-    except ValueError:
-        values = {
-            'response_date': datetime.datetime.now().isoformat(),
-            'request_uri': 'http://54.66.133.7/igsn-ld-api/oai',
-            'error_code': 'badArgument',
-            'error_text': 'The request includes illegal arguments, is missing required arguments,\
-                           includes a repeated argument, or values for arguments have an illegal syntax.'
-        }
-        template = render_template('oai_error.xml', values=values), 400
-        response = make_response(template)
-        response.headers['Content-Type'] = 'application/xml'
-
-        return response
-
-    # encode datetimes as datestamps??
-    # https://github.com/infrae/pyoai/blob/beced901ea0b494f23053cbb3c6495872acb96a3/src/oaipmh/client.py#L61
-
-    # now call underlying implementation
-
-    # TODO: implement using XML template
-    if verb == 'GetRecord':
-        # render_template
-        pass
-    elif verb == 'Identify':
-        pass

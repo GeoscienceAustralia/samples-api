@@ -1,11 +1,12 @@
 import logging
 import settings
 from flask import Flask
-from routes import pages, model_classes
+from routes import pages, model_classes, oai
 app = Flask(__name__)
 
-app.register_blueprint(model_classes.model_classes)
 app.register_blueprint(pages.pages)
+app.register_blueprint(model_classes.model_classes)
+app.register_blueprint(oai.oai_)
 
 
 # run the Flask app
