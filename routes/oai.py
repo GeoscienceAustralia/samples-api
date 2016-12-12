@@ -1,6 +1,6 @@
 import datetime
 from flask import Blueprint, Response, render_template, request, make_response
-import functions_oai
+import oai_functions
 oai_ = Blueprint('oai', __name__)
 
 
@@ -23,7 +23,7 @@ def oai():
         return response
 
     try:
-        functions_oai.validate_oai_parameters(request.args)
+        oai_functions.validate_oai_parameters(request.args)
     except ValueError:
         values = {
             'response_date': datetime.datetime.now().isoformat(),

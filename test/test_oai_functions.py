@@ -1,6 +1,6 @@
 import unittest
 
-from routes.functions_oai import valid_oai_args, validate_oai_parameters
+from routes.oai_functions import valid_oai_args, validate_oai_parameters
 
 
 class TestFunctionsOAI(unittest.TestCase):
