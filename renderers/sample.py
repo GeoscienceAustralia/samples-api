@@ -9,7 +9,7 @@ from datetime import datetime
 
 class Sample:
     """
-    This class represents a Sample and methods in this class allow a sample to be loaded from GA's internal Oracle
+    This class represents a Sample and methods in this class allow a renderers to be loaded from GA's internal Oracle
     Samples database and to be exported in a number of formats including RDF, according to the 'IGSN Ontology' and an
     expression of the Dublin Core ontology, HTML, XML in the form given by the GA Oracle DB's API and also XML according
     to CSIRO's IGSN schema (v2).
@@ -815,7 +815,7 @@ class Sample:
         """
         Populates this instance with data from the Oracle Samples table API
 
-        :param igsn: the IGSN of the sample desired
+        :param igsn: the IGSN of the renderers desired
         :return: None
         """
 
@@ -1070,14 +1070,14 @@ class Sample:
         PROV = Namespace('http://www.w3.org/ns/prov#')
         g.bind('prov', PROV)
 
-        # URI for this sample
-        base_uri = 'http://pid.geoscience.gov.au/sample/'
+        # URI for this renderers
+        base_uri = 'http://pid.geoscience.gov.au/renderers/'
         this_sample = URIRef(base_uri + self.igsn)
 
         # define GA
         ga = URIRef(Sample.URI_GA)
 
-        # sample location in GML & WKT, formulation from GeoSPARQL
+        # renderers location in GML & WKT, formulation from GeoSPARQL
         wkt = Literal(self.generate_sample_wkt(), datatype=GEOSP.wktLiteral)
         gml = Literal(self.generate_sample_gml(), datatype=GEOSP.gmlLiteral)
 
@@ -1088,7 +1088,7 @@ class Sample:
             IGSN = Namespace('http://pid.geoscience.gov.au/def/ont/igsn#')
             g.bind('igsn', IGSN)
 
-            # classing the sample
+            # classing the renderers
             g.add((this_sample, RDF.type, SAMFL.Specimen))
 
             # AlternateIdentifier
@@ -1249,12 +1249,12 @@ class Sample:
         http://www.iedadata.org/services/sesar_examplexml
 
     <samples>
-        <sample>
+        <renderers>
             <sample_type>Dredge</sample_type>
             <igsn>R05333444</igsn>
             <user_code>R05</user_code>
-            <name>Primary name of sample</name>
-            <sample_other_name>Another name by which the sample is known</sample_other_name>
+            <name>Primary name of renderers</name>
+            <sample_other_name>Another name by which the renderers is known</sample_other_name>
             <parent_igsn>R05000001</parent_igsn>
             <parent_sample_type>Core</parent_sample_type>
             <parent_name>Rebeccas Original Core</parent_name>
@@ -1263,7 +1263,7 @@ class Sample:
             <material>Rock</material>
             <classification>Igneous>Plutonic>Exotic</classification>
             <field_name>Name of field, ie. Basalt</field_name>
-            <description>description of sample</description>
+            <description>description of renderers</description>
             <age_min>10.02</age_min>
             <age_max>10.02</age_max>
             <age_unit>Million Years (Ma)</age_unit>
@@ -1307,10 +1307,10 @@ class Sample:
             <depth_min>10.2</depth_min>
             <depth_max>10.2</depth_max>
             <depth_scale>cm</depth_scale>
-            <other_names>Another name by which this sample may be known</other_names>
-            <other_names>Yet another name by which this sample may be known</other_names>
-            <other_names>And yet another name by which this sample may be known</other_names>
-        </sample>
+            <other_names>Another name by which this renderers may be known</other_names>
+            <other_names>Yet another name by which this renderers may be known</other_names>
+            <other_names>And yet another name by which this renderers may be known</other_names>
+        </renderers>
     </samples>
         '''
         # CSIRO
@@ -1322,7 +1322,7 @@ class Sample:
                 xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
             <!-- from https://github.com/kitchenprinzessin3880/csiro-igsn-schema/blob/master/example-capricon.xml -->
             <!--igsn:subNamespace>CAP</igsn:subNamespace -->
-            <igsn:sample>
+            <igsn:renderers>
                 <igsn:sampleNumber identifierType="igsn">CSCAP0001</igsn:sampleNumber>
                 <igsn:sampleName>Cap0001-JHP8</igsn:sampleName>
                 <igsn:isPublic>1</igsn:isPublic>
@@ -1361,7 +1361,7 @@ class Sample:
                     <igsn:relatedResourceIdentifier>abcd1234</igsn:relatedResourceIdentifier>
                 </igsn:relatedResources>
                 <igsn:logElement event="submitted" timeStamp="2015-09-10T18:20:30" />
-            </igsn:sample>
+            </igsn:renderers>
         </igsn:samples>
         '''
 
@@ -1378,7 +1378,7 @@ class Sample:
                 em.sampleNumber(self.igsn, identifierType='igsn'),
                 em.sampleName(Sample.URI_INAPPLICABLE),
                 em.isPublic('0'),  # always non-public? TODO: fix access rights
-                em.landingPage('http://pid.geoscience.gov.au/sample/' + self.igsn),
+                em.landingPage('http://pid.geoscience.gov.au/renderers/' + self.igsn),
                 em.sampleTypes(
                     em.sampleType(self.sample_type)
                 ),

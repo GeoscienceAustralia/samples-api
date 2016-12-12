@@ -1,12 +1,11 @@
+import os
+from StringIO import StringIO
+
+import requests
 from lxml import etree
 from rdflib import Graph, URIRef, RDF, RDFS, XSD, Namespace, Literal
+
 from ldapi import LDAPI
-import functions
-from StringIO import StringIO
-from lxml.builder import ElementMaker
-import os
-import requests
-from datetime import datetime
 
 
 class SampleRegister:
@@ -96,7 +95,7 @@ class SampleRegister:
         g.bind('prov', PROV)
 
         # URI for this register of Samples
-        this_register = 'http://pid.geoscience.gov.au/sample/'
+        this_register = 'http://pid.geoscience.gov.au/renderers/'
         this_register_uri = URIRef(this_register)
         igsn_base_uri = this_register
 
