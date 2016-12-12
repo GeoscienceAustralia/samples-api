@@ -45,7 +45,7 @@
 									</xs:simpleContent>
 								</xs:complexType>
 							</xs:element>
-							<!-- sample number, e.g., igsn -->
+							<!-- renderers number, e.g., igsn -->
 							<xs:element name="sampleName">
 								<xs:annotation>
 									<xs:documentation>Name of the sample.</xs:documentation>

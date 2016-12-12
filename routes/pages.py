@@ -1,9 +1,11 @@
-from flask import Blueprint, Response, request, redirect, render_template
-from ldapi import LDAPI, LdapiParameterError
-import settings
-import functions
+from flask import Blueprint, Response, request, render_template
 from lxml import etree
 from lxml.builder import ElementMaker
+
+import settings
+from ldapi import LDAPI, LdapiParameterError
+from routes import routes_functions
+
 pages = Blueprint('routes', __name__)
 
 
@@ -28,11 +30,11 @@ def index():
             views_formats
         )
     except LdapiParameterError, e:
-        return functions.client_error_Response(e)
+        return routes_functions.client_error_Response(e)
 
     # select view and format
     if view == 'alternates':
-        return functions.render_templates_alternates('page_index.html', views_formats)
+        return routes_functions.render_templates_alternates('page_index.html', views_formats)
     elif view == 'landingpage':
         if format == 'text/html':
             return render_template(
@@ -65,7 +67,7 @@ def index():
                 em.Name('Linked Data API'),
                 em.Title('Geoscience Australia\'s Physical Samples'),
                 em.KeywordList(
-                    em.Keyword('sample'),
+                    em.Keyword('renderers'),
                     em.Keyword('IGSN'),
                     em.Keyword('Linked Data'),
                     em.Keyword('XML'),

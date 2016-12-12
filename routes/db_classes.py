@@ -1,18 +1,18 @@
-from flask import Blueprint, Response, render_template, request, make_response
-from lxml import etree
-from lxml.builder import ElementMaker
-import settings
-import functions
-import functions_oai
-from ldapi import LDAPI, LdapiParameterError
 import datetime
+
+from flask import Blueprint, Response, render_template, request, make_response
+
+import routes_functions
+import functions_oai
+import settings
+from ldapi import LDAPI, LdapiParameterError
 
 # from oaipmh.datestamp import datestamp_to_datetime, datetime_to_datestamp
 
 db_classes = Blueprint('db_classes', __name__)
 
 
-@db_classes.route('/sample/<string:igsn>')
+@db_classes.route('/renderers/<string:igsn>')
 def sample(igsn):
     """
     A single Sample
@@ -35,14 +35,14 @@ def sample(igsn):
             views_formats
         )
     except LdapiParameterError, e:
-        return functions.client_error_Response(e)
+        return routes_functions.client_error_Response(e)
 
     # select view and format
     if view == 'alternates':
-        return functions.render_templates_alternates('page_sample.html', views_formats)
+        return routes_functions.render_templates_alternates('page_sample.html', views_formats)
     elif view in ['igsn', 'dc', 'prov']:
-        # for all these views we will need to populate a sample
-        from sample.sample import Sample
+        # for all these views we will need to populate a renderers
+        from renderers.sample import Sample
         s = Sample()
         #s.populate_from_xml_file('test/sample_eg2.xml')
         s.populate_from_oracle_api(igsn)
@@ -76,7 +76,7 @@ def sample(igsn):
             )
 
 
-@db_classes.route('/sample/')
+@db_classes.route('/renderers/')
 def samples():
     """
     Samples register
@@ -97,20 +97,20 @@ def samples():
             views_formats
         )
     except LdapiParameterError, e:
-        return functions.client_error_Response(e)
+        return routes_functions.client_error_Response(e)
 
     # validate page_no parameter
-    if functions.an_int(request.args.get('page_no')):
+    if routes_functions.an_int(request.args.get('page_no')):
         page_no = int(request.args.get('page_no'))
     else:
         page_no = 1
 
     # select view and format
     if view == 'alternates':
-        return functions.render_templates_alternates('page_samples.html', views_formats)
+        return routes_functions.render_templates_alternates('page_samples.html', views_formats)
     elif view in ['dpr']:
         # only create and populate a SamplesRegister for views that need it
-        from sample.samples_register import SampleRegister
+        from renderers.samples_register import SampleRegister
         sr = SampleRegister()
         sr.populate_from_oracle_api(page_no)
 
