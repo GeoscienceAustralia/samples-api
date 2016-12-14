@@ -2,6 +2,7 @@ from lxml import etree
 from rdflib import Graph, URIRef, RDF, XSD, Namespace, Literal, BNode
 from StringIO import StringIO
 from lxml.builder import ElementMaker
+from lxml.builder import E
 import os
 import requests
 from datetime import datetime
@@ -1024,8 +1025,6 @@ class Sample:
             elif elem.tag == "ACQUIREDATE":
                 if elem.text is not None:
                     self.date_acquired = datetime.strptime(elem.text, '%d-%b-%y')
-                else:
-                    self.date_acquired = Sample.URI_MISSSING
             elif elem.tag == "ENO":
                 if elem.text is not None:
                     self.entity_uri = 'http://pid.geoscience.gov.au/site/' + elem.text
@@ -1425,145 +1424,78 @@ class Sample:
         # CSIRO v3
         sample_wkt = self.generate_sample_wkt()
         xsi = 'http://www.w3.org/2001/XMLSchema-instance'
-        em = ElementMaker(
-            namespace='https://igsn.csiro.au/schemas/3.0',
-            nsmap={
-                'xsi': xsi,
-                'cs': 'https://igsn.csiro.au/schemas/3.0'
-            })
-        doc = em.resources(
-            em.resource(
-                em.resourceIdentifier(self.igsn),
-                em.landingPage('https://pid.geoscience.gov.au/sample/' + self.igsn),
-                # em.isPublic('true'),
-                em.resourceTitle('Sample ' + self.igsn),
-                em.alternateIdentifiers(
-                   em.alternateIdentifier(self.sample_no)
-                ),
-                em.resourceTypes(
-                    em.resourceType(self.sample_type)
-                ),
-                em.materialTypes(
-                    em.materialType(self.material_type)
-                ),
-                # em.classifications(
-                #     em.classification('')
-                # ),
-                # em.purpose('a'),
-                # em.sampledFeatures(
-                #     em.sampledFeature('token', sampledFeatureURI='http://www.altova.com')
-                # ),
-                em.location(
-                    em.geometry(
-                        sample_wkt,
-                        srid='<http://www.opengis.net/def/crs/EPSG/0/' + self.srid,
-                        verticalDatum='http://spatialreference.org/ref/epsg/4283/',
-                        #geometryURI='http://www.altova.com'
-                    ),
-                ),
-                em.date(
-                    em.timeInstant(self.date_acquired)
-                ),
-                # em.collectors(
-                #     em.collector(
-                #         em.collectorName('a'),
-                #         em.collectorIdentifier(
-                #             'token',
-                #             collectorIdentifierType='http://pid.geoscience.gov.au/def/voc/igsn-codelists/URL'
-                #         )
-                #     )
-                # ),
-                em.method(self.method_type),
-                # em.campaign('a'),
-                em.curationDetails(
-                    em.curation(
-                        em.curator('Geoscience Australia'),
-                        em.curationDate(datetime.now().strftime('%Y')),
-                        em.curationLocation('Geoscience Australia, Jerrabomberra Ave, Symonston, ACT, Australia'),
-                        em.curatingInstitution(institutionURI='http://pid.geoscience.gov.au/org/ga')
-                    )
-                ),
-                # em.contributors(
-                #     em.contributor(
-                #         em.contributorName('a'),
-                #         em.contributorIdentifier(
-                #             'token',
-                #             contributorIdentifierType='http://pid.geoscience.gov.au/def/voc/igsn-codelists/Handle'
-                #         ),
-                #         contributorType='http://pid.geoscience.gov.au/def/voc/igsn-codelists/Other'
-                #     )
-                # ),
-                # em.relatedResourceIdentifiers(
-                #     em.relatedResourceIdentifier(
-                #         'String',
-                #         relatedIdentifierType='http://pid.geoscience.gov.au/def/voc/igsn-codelists/bibcode',
-                #         relationType='http://pid.geoscience.gov.au/def/voc/igsn-codelists/IsSourceOf'
-                #     ),
-                # ),
-                em.comments(self.remark),
-                # em.logDate('2001', eventType='registered')
-            )
-        )
-        doc.attrib['{{{pre}}}schemaLocation'.format(pre=xsi)] = 'https://igsn.csiro.au/schemas/3.0 igsn-csiro-v3.0.xsd'
+        cs = 'https://igsn.csiro.au/schemas/3.0'
+        root = etree.Element(
+            '{%s}resources' % cs,
+            # namespace='https://igsn.csiro.au/schemas/3.0',
+            nsmap={'xsi': xsi, 'cs': cs})
+        root.attrib['{%s}schemaLocation' % xsi] = \
+            'https://igsn.csiro.au/schemas/3.0 igsn-csiro-v3.0.xsd'
+        r = etree.SubElement(root, '{%s}resource' % cs)
+        r.attrib['registrationType'] = 'http://pid.geoscience.gov.au/def/voc/igsn-codelists/SampleResource'
+        etree.SubElement(r, '{%s}resourceIdentifier' % cs).text = self.igsn
+        etree.SubElement(r, '{%s}landingPage' % cs).text = 'https://pid.geoscience.gov.au/sample/' + self.igsn
+        # etree.SubElement(r, '{%s}isPublic' % cs).text = 'true'
+        etree.SubElement(r, '{%s}resourceTitle' % cs).text = 'Sample igsn:' + self.igsn
+        rt = etree.SubElement(r, '{%s}resourceTypes' % cs)
+        etree.SubElement(rt, '{%s}resourceType' % cs).text = self.sample_type
+        mt = etree.SubElement(r, '{%s}materialTypes' % cs)
+        etree.SubElement(mt, '{%s}materialType' % cs).text = self.material_type
+        etree.SubElement(r, '{%s}method' % cs).text = self.method_type
+        # etree.SubElement(r, '{%s}campaign' % cs).text = ''
+        l = etree.SubElement(r, '{%s}location' % cs)
+        g = etree.SubElement(l, '{%s}geometry' % cs)
+        g.text = sample_wkt
+        g.attrib['srid'] = 'http://www.opengis.net/def/crs/EPSG/0/' + self.srid
+        g.attrib['verticalDatum'] = 'http://spatialreference.org/ref/epsg/4283/'
+        # g.attrib['geometryURI'] = 'http://www.altova.com'
+        cd = etree.SubElement(r, '{%s}curationDetails' % cs)
+        c = etree.SubElement(cd, '{%s}curation' % cs)
+        etree.SubElement(c, '{%s}curator' % cs).text = 'Geoscience Australia'
+        etree.SubElement(c, '{%s}curationDate' % cs).text = datetime.now().strftime('%Y')
+        etree.SubElement(c, '{%s}curationLocation' % cs).text = \
+            'Geoscience Australia, Jerrabomberra Ave, Symonston, ACT, Australia'
+        etree.SubElement(c, '{%s}curatingInstitution' % cs).attrib['institutionURI'] = \
+            'http://pid.geoscience.gov.au/org/ga'
 
+        if self.sample_no is not None:
+            ai = etree.SubElement(r, '{%s}alternateIdentifiers' % cs)
+            etree.SubElement(ai, '{%s}alternateIdentifiers' % cs).text = self.sample_no
 
-                # if isinstance(self.date_aquired, datetime):
-        #     sampling_time = self.date_aquired.isoformat()
-        # else:
-        #     sampling_time = Sample.URI_MISSSING
-        #
-        # em = ElementMaker(namespace="http://igsn.org/schema/kernel-v.1.0",
-        #                   nsmap={'igsn': "http://igsn.org/schema/kernel-v.1.0"})
-        #
-        # doc = em.samples(
-        #     em.sample(
-        #         em.sampleNumber(self.igsn, identifierType='igsn'),
-        #         em.sampleName(Sample.URI_INAPPLICABLE),
-        #         em.isPublic('0'),  # always non-public? TODO: fix access rights
-        #         em.landingPage('http://pid.geoscience.gov.au/sample/' + self.igsn),
-        #         em.sampleTypes(
-        #             em.sampleType(self.sample_type)
+        if self.date_acquired is not None:
+            ti = etree.SubElement(r, '{%s}date' % cs)
+            etree.SubElement(ti, '{%s}timeInstant' % cs).text = self.date_acquired
+
+        if self.remark is not None:
+            etree.SubElement(r, '{%s}comment' % cs).text = self.remark
+
+        # em.classifications(
+        #     em.classification('')),
+        # em.purpose('a'),
+        # em.sampledFeatures(
+        #     em.sampledFeature('token', sampledFeatureURI='http://www.altova.com')),
+        # em.collectors(
+        #     em.collector(
+        #         em.collectorName('a'),
+        #         em.collectorIdentifier(
+        #             'token',
+        #             collectorIdentifierType='http://pid.geoscience.gov.au/def/voc/igsn-codelists/URL'))),
+        # em.contributors(
+        #     em.contributor(
+        #         em.contributorName('a'),
+        #         em.contributorIdentifier(
+        #             'token',
+        #             contributorIdentifierType='http://pid.geoscience.gov.au/def/voc/igsn-codelists/Handle'
         #         ),
-        #         em.materialTypes(
-        #             em.materialType(self.material_type)
-        #         ),
-        #         em.samplingLocation(self.generate_sample_wkt()),
-        #         em.samplingTime(sampling_time),
-        #         em.sampleCuration(
-        #             em.curation(
-        #                 em.curator(Sample.URI_GA),
-        #                 em.curationLocation('Geoscience Australia, Jerrabomberra Ave, Symonston, ACT, Australia')
-        #             )
-        #         ),
-        #         # we are always missing the classification value in our DB so we can add this URI statically
-        #         # em.classification(Sample.URI_MISSSING),
-        #         em.comments(self.remark),
-        #         # em.otherNames(
-        #         #     em.otherName()
-        #         # ),
-        #         # em.purpose('x'),
-        #         em.samplingFeatures(
-        #             em.samplingFeature(
-        #                 em.samplingFeatureName(self.entity_name)
-        #             )
-        #         ),
-        #         # em.sampleCollectors(
-        #         #     em.sampleCollector(Sample.URI_MISSSING)
-        #         # ),
-        #         em.samplingMethod(self.method_type),
-        #         # em.samplingCampaign('x'),
-        #         # em.relatedResources(
-        #         #     em.relatedResource(
-        #         #         em.relatedResourceIdentifier(
-        #         #             em.relatedIdentifierType('url'),
-        #         #             em.relationType('IsCitedBy')
-        #         #         )
-        #         #     )
-        #         # ),
-        #         em.logEvent(event='submitted', timeStamp='2015-09-10T18:20:30')
-        #    )
-        #)
-        xml = etree.tostring(doc, pretty_print=True, xml_declaration=True, encoding='UTF-8')
+        #         contributorType='http://pid.geoscience.gov.au/def/voc/igsn-codelists/Other')),
+        # em.relatedResourceIdentifiers(
+        #     em.relatedResourceIdentifier(
+        #         'String',
+        #         relatedIdentifierType='http://pid.geoscience.gov.au/def/voc/igsn-codelists/bibcode',
+        #         relationType='http://pid.geoscience.gov.au/def/voc/igsn-codelists/IsSourceOf')),
+        # em.logDate('2001', eventType='registered')
+
+        xml = etree.tostring(root, pretty_print=True, xml_declaration=True, encoding='UTF-8')
         return xml
 
     def export_as_html(self, model_view='default'):

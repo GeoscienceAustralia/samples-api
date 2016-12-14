@@ -64,7 +64,7 @@ def sample(igsn):
                 s.export_as_csirov3_xml(),
                 status=200,
                 mimetype='application/xml',
-                headers={'Content-Disposition': 'attachment; filename=' + igsn + '.xml'}
+                #headers={'Content-Disposition': 'attachment; filename=' + igsn + '.xml'}
             )
         elif format == 'application/xml':
             # TODO: implement IGSN XML format
@@ -73,7 +73,7 @@ def sample(igsn):
             if s.date_acquired is not None:
                 year_acquired = datetime.datetime.strftime(s.date_acquired, '%Y')
             else:
-                year_acquired = '2016'
+                year_acquired = 'XXXX'
             return render_template(
                 'page_sample.html',
                 base_uri=settings.BASE_URI,
