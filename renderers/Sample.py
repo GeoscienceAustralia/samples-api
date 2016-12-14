@@ -1058,7 +1058,7 @@ class Sample:
     def generate_sample_wkt(self):
         if self.z is not None:
             # wkt = "SRID=" + self.srid + ";POINTZ(" + self.x + " " + self.y + " " + self.z + ")"
-            wkt = "https://epsg.io/" + self.srid + "> " \
+            wkt = "<https://epsg.io/" + self.srid + "> " \
                   "POINTZ(" + self.x + " " + self.y + " " + self.z + ")"
         else:
             # wkt = "SRID=" + self.srid + ";POINT(" + self.x + " " + self.y + ")"
