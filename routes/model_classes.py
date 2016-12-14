@@ -70,8 +70,8 @@ def sample(igsn):
             # TODO: implement IGSN XML format
             pass
         else:  # format == 'text/html'
-            if s.date_aquired is not None:
-                year_acquired = datetime.datetime.strftime(s.date_aquired, '%Y')
+            if s.date_acquired is not None:
+                year_acquired = datetime.datetime.strftime(s.date_acquired, '%Y')
             else:
                 year_acquired = '2016'
             return render_template(

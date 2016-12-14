@@ -838,7 +838,7 @@ class Sample:
         self.age = None
         self.remark = None
         self.lith = None
-        self.date_aquired = None
+        self.date_acquired = None
         self.entity_uri = None
         self.entity_name = None
         self.entity_type = None
@@ -1023,7 +1023,9 @@ class Sample:
                         self.lith = Sample.URI_MISSSING
             elif elem.tag == "ACQUIREDATE":
                 if elem.text is not None:
-                    self.date_aquired = datetime.strptime(elem.text, '%d-%b-%y')
+                    self.date_acquired = datetime.strptime(elem.text, '%d-%b-%y')
+                else:
+                    self.date_acquired = Sample.URI_MISSSING
             elif elem.tag == "ENO":
                 if elem.text is not None:
                     self.entity_uri = 'http://pid.geoscience.gov.au/site/' + elem.text
@@ -1161,7 +1163,7 @@ class Sample:
             g.add((elevation, RDF.type, SAMFL.Elevation))
             g.add((elevation, SAMFL.elevation, Literal(self.z, datatype=XSD.float)))
             g.add((elevation, SAMFL.verticalDatum, Literal(
-                "http://spatialreference.org/ref/epsg/4283/",
+                'http://spatialreference.org/ref/epsg/4283/',
                 datatype=XSD.anyUri)))
 
             # properties
@@ -1170,8 +1172,8 @@ class Sample:
                 g.add((this_sample, SAMFL.materialClass, URIRef(self.material_type)))
             if self.method_type is not None:
                 g.add((this_sample, SAMFL.samplingMethod, URIRef(self.method_type)))
-            if self.date_aquired is not None:
-                g.add((this_sample, SAMFL.samplingTime, Literal(self.date_aquired.isoformat(), datatype=XSD.datetime)))
+            if self.date_acquired is not None:
+                g.add((this_sample, SAMFL.samplingTime, Literal(self.date_acquired.isoformat(), datatype=XSD.datetime)))
             # TODO: represent Public/Private (and other?) access methods in DB, add to terms in vocab?
             g.add((this_sample, DCT.accessRights, URIRef(Sample.TERM_LOOKUP['access']['Public'])))
             # TODO: make a register of Entities
@@ -1207,8 +1209,8 @@ class Sample:
             g.add((this_sample, RDF.type, DCT.PhysicalResource))
             g.add((this_sample, DCT.coverage, wkt))
             # g.add((this_sample, DCT.creator, Literal('Unknown', datatype=XSD.string)))
-            if self.date_aquired is not None:
-                g.add((this_sample, DCT.date, Literal(self.date_aquired.isoformat(), datatype=XSD.date)))
+            if self.date_acquired is not None:
+                g.add((this_sample, DCT.date, Literal(self.date_acquired.isoformat(), datatype=XSD.date)))
             if self.remark is not None:
                 g.add((this_sample, DCT.description, Literal(self.remark, datatype=XSD.string)))
             if self.material_type is not None:
@@ -1421,6 +1423,7 @@ class Sample:
         '''
 
         # CSIRO v3
+        sample_wkt = self.generate_sample_wkt()
         xsi = 'http://www.w3.org/2001/XMLSchema-instance'
         em = ElementMaker(
             namespace='https://igsn.csiro.au/schemas/3.0',
@@ -1428,148 +1431,77 @@ class Sample:
                 'xsi': xsi,
                 'cs': 'https://igsn.csiro.au/schemas/3.0'
             })
-        # <cs:resources
-        #       xsi:schemaLocation="https://igsn.csiro.au/schemas/3.0 igsn-csiro-v3.0.xsd"
-        #       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:cs="https://igsn.csiro.au/schemas/3.0">
-        #   <cs:resource registrationType="http://pid.geoscience.gov.au/def/voc/igsn-codelists/SamplingFeature">
         doc = em.resources(
             em.resource(
-                # <cs:resourceIdentifier>CSRWASC00630</cs:resourceIdentifier>
-                # <cs:landingPage>https://rockstore.csiro.au/arrc/#/browsesubcollections/CSRWASC00630</cs:landingPage>
-                # <cs:isPublic>true</cs:isPublic>
-                # <cs:resourceTitle>a</cs:resourceTitle>
-                em.resourceIdentifier('CSRWASC00630'),
-                em.landingPage('https://rockstore.csiro.au/arrc/#/browsesubcollections/CSRWASC00630'),
-                em.isPublic('true'),
-                em.resourceTitle('a'),
-                # <cs:alternateIdentifiers>
-                #     <cs:alternateIdentifier>token</cs:alternateIdentifier>
-                # </cs:alternateIdentifiers>
+                em.resourceIdentifier(self.igsn),
+                em.landingPage('https://pid.geoscience.gov.au/sample/' + self.igsn),
+                # em.isPublic('true'),
+                em.resourceTitle('Sample ' + self.igsn),
                 em.alternateIdentifiers(
-                    em.alternateIdentifier('token')
+                   em.alternateIdentifier(self.sample_no)
                 ),
-                # <cs:resourceTypes>
-                #     <cs:resourceType>http://pid.geoscience.gov.au/def/voc/igsn-codelists/core</cs:resourceType>
-                # </cs:resourceTypes>
-                # <cs:materialTypes>
-                #     <cs:materialType>http://pid.geoscience.gov.au/def/voc/igsn-codelists/regolith</cs:materialType>
-                # </cs:materialTypes>
-                # <cs:classifications>
-                #     <cs:classification classificationURI="http://www.altova.com"/>
-                # </cs:classifications>
-                # <cs:purpose>a</cs:purpose>
-                # <cs:sampledFeatures>
-                #     <cs:sampledFeature sampledFeatureURI="http://www.altova.com">token</cs:sampledFeature>
-                # </cs:sampledFeatures>
                 em.resourceTypes(
-                    em.resourceType('http://pid.geoscience.gov.au/def/voc/igsn-codelists/core')
+                    em.resourceType(self.sample_type)
                 ),
                 em.materialTypes(
-                    em.materialType('http://pid.geoscience.gov.au/def/voc/igsn-codelists/regolith')
+                    em.materialType(self.material_type)
                 ),
-                em.classifications(
-                    em.classification(classificationURI='http://www.altova.com')
-                ),
-                em.purpose('a'),
-                em.sampledFeatures(
-                    em.sampledFeature('token', sampledFeatureURI='http://www.altova.com')
-                ),
-                # <cs:location>
-                #     <cs:locality localityURI="http://www.altova.com">token</cs:locality>
-                #     <cs:geometry
-                #           srid="https://epsg.io/5712" verticalDatum="https://epsg.io/5711"
-                #           geometryURI="http://www.altova.com">
-                #       token
-                #     </cs:geometry>
-                # </cs:location>
-                # <cs:date>
-                #     <cs:timeInstant>2001</cs:timeInstant>
-                # </cs:date>
-                # <cs:collectors>
-                #     <cs:collector>
-                #         <cs:collectorName>a</cs:collectorName>
-                #         <cs:collectorIdentifier
-                #               collectorIdentifierType="http://pid.geoscience.gov.au/def/voc/igsn-codelists/URL">
-                #           token
-                #         </cs:collectorIdentifier>
-                #     </cs:collector>
-                # </cs:collectors>
+                # em.classifications(
+                #     em.classification('')
+                # ),
+                # em.purpose('a'),
+                # em.sampledFeatures(
+                #     em.sampledFeature('token', sampledFeatureURI='http://www.altova.com')
+                # ),
                 em.location(
-                    em.locality('token', localityURI='http://www.altova.com'),
                     em.geometry(
-                        'token',
-                        srid='https://epsg.io/5712',
-                        verticalDatum='https://epsg.io/5711',
-                        geometryURI='http://www.altova.com'
+                        sample_wkt,
+                        srid='<http://www.opengis.net/def/crs/EPSG/0/' + self.srid,
+                        verticalDatum='http://spatialreference.org/ref/epsg/4283/',
+                        #geometryURI='http://www.altova.com'
                     ),
                 ),
                 em.date(
-                    em.timeInstant('2001')
+                    em.timeInstant(self.date_acquired)
                 ),
-                em.collectors(
-                    em.collector(
-                        em.collectorName('a'),
-                        em.collectorIdentifier(
-                            'token',
-                            collectorIdentifierType='http://pid.geoscience.gov.au/def/voc/igsn-codelists/URL'
-                        )
-                    )
-                ),
-                # <cs:method>token</cs:method>
-                # <cs:campaign>a</cs:campaign>
-                # <cs:curationDetails>
-                #     <cs:curation>
-                #         <cs:curator>token</cs:curator>
-                #         <cs:curationDate>2001</cs:curationDate>
-                #         <cs:curationLocation>token</cs:curationLocation>
-                #         <cs:curatingInstitution institutionURI="http://www.altova.com"/>
-                #     </cs:curation>
-                # </cs:curationDetails>
-                # <cs:contributors>
-                #     <cs:contributor contributorType="http://pid.geoscience.gov.au/def/voc/igsn-codelists/Other">
-                #           <cs:contributorName>a</cs:contributorName>
-                #           <cs:contributorIdentifier
-                #                   contributorIdentifierType="http://pid.geoscience.gov.au/def/voc/igsn-codelists/Handle">
-                #               token
-                #           </cs:contributorIdentifier>
-                #     </cs:contributor>
-                # </cs:contributors>
-                em.method('token'),
-                em.campaign('a'),
+                # em.collectors(
+                #     em.collector(
+                #         em.collectorName('a'),
+                #         em.collectorIdentifier(
+                #             'token',
+                #             collectorIdentifierType='http://pid.geoscience.gov.au/def/voc/igsn-codelists/URL'
+                #         )
+                #     )
+                # ),
+                em.method(self.method_type),
+                # em.campaign('a'),
                 em.curationDetails(
                     em.curation(
-                        em.curator('token'),
-                        em.curationDate('2001'),
-                        em.curationLocation('token'),
-                        em.curatingInstitution(institutionURI='http://www.altova.com')
+                        em.curator('Geoscience Australia'),
+                        em.curationDate(datetime.now().strftime('%Y')),
+                        em.curationLocation('Geoscience Australia, Jerrabomberra Ave, Symonston, ACT, Australia'),
+                        em.curatingInstitution(institutionURI='http://pid.geoscience.gov.au/org/ga')
                     )
                 ),
-                em.contributors(
-                    em.contributor(
-                        em.contributorName('a'),
-                        em.contributorIdentifier(
-                            'token',
-                            contributorIdentifierType='http://pid.geoscience.gov.au/def/voc/igsn-codelists/Handle'
-                        ),
-                        contributorType='http://pid.geoscience.gov.au/def/voc/igsn-codelists/Other'
-                    )
-                ),
-                # <cs:relatedResourceIdentifiers>
-                #     <cs:relatedResourceIdentifier
-                #       relatedIdentifierType="http://pid.geoscience.gov.au/def/voc/igsn-codelists/bibcode"
-                #       relationType="http://pid.geoscience.gov.au/def/voc/igsn-codelists/IsSourceOf">String</cs:relatedResourceIdentifier>
-                # </cs:relatedResourceIdentifiers>
-                # <cs:comments>token</cs:comments>
-                # <cs:logDate eventType="registered">2001</cs:logDate>
-                em.relatedResourceIdentifiers(
-                    em.relatedResourceIdentifier(
-                        'String',
-                        relatedIdentifierType='http://pid.geoscience.gov.au/def/voc/igsn-codelists/bibcode',
-                        relationType='http://pid.geoscience.gov.au/def/voc/igsn-codelists/IsSourceOf'
-                    ),
-                ),
-                em.comments('token'),
-                em.logDate('2001', eventType='registered')
+                # em.contributors(
+                #     em.contributor(
+                #         em.contributorName('a'),
+                #         em.contributorIdentifier(
+                #             'token',
+                #             contributorIdentifierType='http://pid.geoscience.gov.au/def/voc/igsn-codelists/Handle'
+                #         ),
+                #         contributorType='http://pid.geoscience.gov.au/def/voc/igsn-codelists/Other'
+                #     )
+                # ),
+                # em.relatedResourceIdentifiers(
+                #     em.relatedResourceIdentifier(
+                #         'String',
+                #         relatedIdentifierType='http://pid.geoscience.gov.au/def/voc/igsn-codelists/bibcode',
+                #         relationType='http://pid.geoscience.gov.au/def/voc/igsn-codelists/IsSourceOf'
+                #     ),
+                # ),
+                em.comments(self.remark),
+                # em.logDate('2001', eventType='registered')
             )
         )
         doc.attrib['{{{pre}}}schemaLocation'.format(pre=xsi)] = 'https://igsn.csiro.au/schemas/3.0 igsn-csiro-v3.0.xsd'
@@ -1666,8 +1598,8 @@ class Sample:
         elif model_view == 'dc':
             html += '   <tr><th>IGSN</th><td>' + self.igsn + '</td></tr>'
             html += '   <tr><th>Coverage</th><td>' + self.generate_sample_wkt() + '</td></tr>'
-            if self.date_aquired is not None:
-                html += '   <tr><th>Date</th><td>' + self.date_aquired.isoformat() + '</td></tr>'
+            if self.date_acquired is not None:
+                html += '   <tr><th>Date</th><td>' + self.date_acquired.isoformat() + '</td></tr>'
             if self.remark is not None:
                 html += '   <tr><th>Description</th><td>' + self.remark + '</td></tr>'
             if self.material_type is not None:
