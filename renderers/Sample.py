@@ -1058,21 +1058,21 @@ class Sample:
     def generate_sample_wkt(self):
         if self.z is not None:
             # wkt = "SRID=" + self.srid + ";POINTZ(" + self.x + " " + self.y + " " + self.z + ")"
-            wkt = "<http://www.opengis.net/def/crs/EPSG/0/" + \
-                  self.srid + "> POINTZ(" + self.x + " " + self.y + " " + self.z + ")"
+            wkt = "https://epsg.io/" + self.srid + "> " \
+                  "POINTZ(" + self.x + " " + self.y + " " + self.z + ")"
         else:
             # wkt = "SRID=" + self.srid + ";POINT(" + self.x + " " + self.y + ")"
-            wkt = "<http://www.opengis.net/def/crs/EPSG/0/" + self.srid + "> POINT(" + self.x + " " + self.y + ")"
+            wkt = "<https://epsg.io/" + self.srid + "> POINT(" + self.x + " " + self.y + ")"
 
         return wkt
 
     def generate_sample_gml(self):
         if self.z is not None:
-            gml = '<gml:Point srsDimension="3" srsName="http://www.opengis.net/def/crs/EPSG/0/' + self.srid + '">' \
+            gml = '<gml:Point srsDimension="3" srsName="https://epsg.io/' + self.srid + '">' \
                   '<gml:pos>' + self.x + ' ' + self.y + ' ' + self.z + '</gml:pos>' \
-                   '</gml:Point>'
+                  '</gml:Point>'
         else:
-            gml = '<gml:Point srsDimension="2" srsName="http://www.opengis.net/def/crs/EPSG/0/' + self.srid + '">' \
+            gml = '<gml:Point srsDimension="2" srsName="https://epsg.io/' + self.srid + '">' \
                   '<gml:pos>' + self.x + ' ' + self.y + '</gml:pos>' \
                   '</gml:Point>'
 
@@ -1080,14 +1080,13 @@ class Sample:
 
     def generate_parent_wkt(self):
         # TODO: add support for geometries other than Point
-        wkt = "<http://www.opengis.net/def/crs/EPSG/0/" + \
-              self.srid + ">POINT(" + self.hole_long_min + " " + self.hole_lat_min + ")"
+        wkt = "<https://epsg.io/" + self.srid + ">POINT(" + self.hole_long_min + " " + self.hole_lat_min + ")"
 
         return wkt
 
     def generate_parent_gml(self):
         # TODO: add support for geometries other than Point
-        gml = '<gml:Point srsDimension="2" srsName="http://www.opengis.net/def/crs/EPSG/0/' + \
+        gml = '<gml:Point srsDimension="2" srsName="https://epsg.io/' + \
               self.srid + '"><gml:pos>' + self.hole_long_min + ' ' + self.hole_lat_min + '</gml:pos>' \
               '</gml:Point>'
         return gml
@@ -1446,8 +1445,8 @@ class Sample:
         l = etree.SubElement(r, '{%s}location' % cs)
         g = etree.SubElement(l, '{%s}geometry' % cs)
         g.text = sample_wkt
-        g.attrib['srid'] = 'http://www.opengis.net/def/crs/EPSG/0/' + self.srid
-        g.attrib['verticalDatum'] = 'http://spatialreference.org/ref/epsg/4283/'
+        g.attrib['srid'] = 'https://epsg.io/' + self.srid
+        g.attrib['verticalDatum'] = 'https://epsg.io/4283'
         # g.attrib['geometryURI'] = 'http://www.altova.com'
         cd = etree.SubElement(r, '{%s}curationDetails' % cs)
         c = etree.SubElement(cd, '{%s}curation' % cs)
