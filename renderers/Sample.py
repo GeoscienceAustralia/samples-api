@@ -869,8 +869,8 @@ class Sample:
         :return: None
         """
 
-        os.environ['NO_PROXY'] = 'ga.gov.au'
         # internal URI
+        #os.environ['NO_PROXY'] = 'ga.gov.au'
         # target_url = 'http://biotite.ga.gov.au:7777/wwwstaff_distd/a.igsn_api.get_igsnSample?pIGSN=' + igsn
         # external URI
         target_url = 'http://dbforms.ga.gov.au/www_distp/a.igsn_api.get_igsnSample?pIGSN=' + igsn
@@ -1048,7 +1048,7 @@ class Sample:
                     self.hole_lat_max = elem.text
             elif elem.tag == "LOADEDDATE":
                 if elem.text is not None:
-                    self.date_load = elem.text
+                    self.date_load = datetime.strptime(elem.text, '%d-%b-%y')
             elif elem.tag == "SAMPLENO":
                 if elem.text is not None:
                     self.sample_no = elem.text
@@ -1277,11 +1277,22 @@ class Sample:
         </oai_dc:dc></metadata></record>
 
       '''
-        if isinstance(self.date_aquired, datetime):
-            sampling_time = self.date_aquired.isoformat()
+        print self.date_load
+
+        if isinstance(self.date_acquired, datetime):
+            sampling_time = self.date_acquired.isoformat()
+        elif isinstance(self.date_load, datetime):
+            sampling_time = self.date_load.isoformat()
         else:
             sampling_time = Sample.URI_MISSSING
 
+         # URI for this sample
+        base_uri = 'http://pid.geoscience.gov.au/sample/'
+        this_sample = URIRef(base_uri + self.igsn)
+
+        # define GA
+        ga = URIRef(Sample.URI_GA)
+        ga
         # TODO:   add is site uri
         xml = 'xml = <record>\
         <header>\
@@ -1294,7 +1305,7 @@ class Sample:
            xmlns:oai_dc="http://www.openarchives.org/OAI/2.0/oai_dc/"\
            xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"\
            xsi:schemaLocation="http://www.openarchives.org/OAI/2.0/oai_dc/ http://www.openarchives.org/OAI/2.0/oai_dc.xsd">\
-        <dc:creator>' + URI_GA + '</dc:creator>\
+        <dc:creator>' + ga + '</dc:creator>\
         <dc:identifier>' + self.entity_uri + '</dc:identifier>\
         <dc:type>' + self.sample_type  + '</dc:type>\
         <dc:coverage>self.site_uri </dc:coverage>\
@@ -1598,9 +1609,9 @@ class Sample:
 
 if __name__ == '__main__':
     print "hello"
-    #s = Sample()
+    s = Sample()
     #s.populate_from_xml_file('../test/sample_eg1.xml')
-    # s.populate_from_oracle_api('AU100')
+    s.populate_from_oracle_api('AU100')
     print s.export_dc_xml()
 
     # print s.is_xml_export_valid(open('../test/sample_eg3_IGSN_schema.xml').read())
