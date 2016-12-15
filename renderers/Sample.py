@@ -1251,6 +1251,59 @@ class Sample:
         xml = etree.parse(StringIO(xml_string))
 
         return xsd.validate(xml)
+    def export_dc_xml(self):
+        """
+        Exports this Sample instance in XML that validates against the OAI Dublin Core Metadata from
+        https://www.openarchives.org/OAI/openarchivesprotocol.html
+
+        using the IGSN to Dublin Core mappings from
+        https://github.com/IGSN/metadata/wiki/IGSN-Registration-Metadata-Version-1.0
+
+        :return: XML string
+        """
+        '''
+        <record>
+        <header><identifier>oai:registry.igsn.org:18211</identifier>
+        <datestamp>2013-06-19T15:28:23Z</datestamp>
+        <setSpec>IEDA</setSpec><setSpec>IEDA.SESAR</setSpec>
+        </header>
+        <metadata><oai_dc:dc xmlns:dc="http://purl.org/dc/elements/1.1/"
+           xmlns:oai_dc="http://www.openarchives.org/OAI/2.0/oai_dc/"
+           xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+           xsi:schemaLocation="http://www.openarchives.org/OAI/2.0/oai_dc/ http://www.openarchives.org/OAI/2.0/oai_dc.xsd">
+        <dc:creator>IEDA</dc:creator>
+        <dc:identifier>http://hdl.handle.net/10273/847000108</dc:identifier>
+        <dc:identifier>igsn:10273/847000108</dc:identifier>
+        </oai_dc:dc></metadata></record>
+
+      '''
+        if isinstance(self.date_aquired, datetime):
+            sampling_time = self.date_aquired.isoformat()
+        else:
+            sampling_time = Sample.URI_MISSSING
+
+        # TODO:   add is site uri
+        xml = 'xml = <record>\
+        <header>\
+        <identifier>oai:registry.igsn.org:' + self.igsn + '</identifier>\
+        <datestamp>' + sampling_time + '</datestamp>\
+        <setSpec>IEDA</setSpec>\
+        <setSpec>IEDA.SESAR</setSpec>\
+        </header>\
+        <metadata><oai_dc:dc xmlns:dc="http://purl.org/dc/elements/1.1/"\
+           xmlns:oai_dc="http://www.openarchives.org/OAI/2.0/oai_dc/"\
+           xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"\
+           xsi:schemaLocation="http://www.openarchives.org/OAI/2.0/oai_dc/ http://www.openarchives.org/OAI/2.0/oai_dc.xsd">\
+        <dc:creator>' + URI_GA + '</dc:creator>\
+        <dc:identifier>' + self.entity_uri + '</dc:identifier>\
+        <dc:type>' + self.sample_type  + '</dc:type>\
+        <dc:coverage>self.site_uri </dc:coverage>\
+        </oai_dc:dc> \
+        </metadata> \
+        </record>'
+
+        return xml
+
 
     def export_as_igsn_xml(self):
         """
@@ -1527,10 +1580,10 @@ class Sample:
 
 if __name__ == '__main__':
     print "hello"
-    # s = Sample()
-    # s.populate_from_xml_file('../test/sample_eg1.xml')
+    #s = Sample()
+    #s.populate_from_xml_file('../test/sample_eg1.xml')
     # s.populate_from_oracle_api('AU100')
-    # print s.export_as_rdf(model_view='igsn', rdf_mime='text/turtle')
+    print s.export_dc_xml()
 
     # print s.is_xml_export_valid(open('../test/sample_eg3_IGSN_schema.xml').read())
     # print s.export_as_igsn_xml()
