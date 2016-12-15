@@ -2,6 +2,7 @@ from lxml import etree
 from rdflib import Graph, URIRef, RDF, XSD, Namespace, Literal, BNode
 from StringIO import StringIO
 from lxml.builder import ElementMaker
+from lxml.builder import E
 import os
 import requests
 from datetime import datetime
@@ -10,7 +11,7 @@ from ldapi import LDAPI
 
 class Sample:
     """
-    This class represents a Sample and methods in this class allow a renderers to be loaded from GA's internal Oracle
+    This class represents a Sample and methods in this class allow a sample to be loaded from GA's internal Oracle
     Samples database and to be exported in a number of formats including RDF, according to the 'IGSN Ontology' and an
     expression of the Dublin Core ontology, HTML, XML in the form given by the GA Oracle DB's API and also XML according
     to CSIRO's IGSN schema (v2).
@@ -838,7 +839,7 @@ class Sample:
         self.age = None
         self.remark = None
         self.lith = None
-        self.date_aquired = None
+        self.date_acquired = None
         self.entity_uri = None
         self.entity_name = None
         self.entity_type = None
@@ -864,7 +865,7 @@ class Sample:
         """
         Populates this instance with data from the Oracle Samples table API
 
-        :param igsn: the IGSN of the renderers desired
+        :param igsn: the IGSN of the sample desired
         :return: None
         """
 
@@ -1023,7 +1024,7 @@ class Sample:
                         self.lith = Sample.URI_MISSSING
             elif elem.tag == "ACQUIREDATE":
                 if elem.text is not None:
-                    self.date_aquired = datetime.strptime(elem.text, '%d-%b-%y')
+                    self.date_acquired = datetime.strptime(elem.text, '%d-%b-%y')
             elif elem.tag == "ENO":
                 if elem.text is not None:
                     self.entity_uri = 'http://pid.geoscience.gov.au/site/' + elem.text
@@ -1057,21 +1058,21 @@ class Sample:
     def generate_sample_wkt(self):
         if self.z is not None:
             # wkt = "SRID=" + self.srid + ";POINTZ(" + self.x + " " + self.y + " " + self.z + ")"
-            wkt = "<http://www.opengis.net/def/crs/EPSG/0/" + \
-                  self.srid + "> POINTZ(" + self.x + " " + self.y + " " + self.z + ")"
+            wkt = "<https://epsg.io/" + self.srid + "> " \
+                  "POINTZ(" + self.x + " " + self.y + " " + self.z + ")"
         else:
             # wkt = "SRID=" + self.srid + ";POINT(" + self.x + " " + self.y + ")"
-            wkt = "<http://www.opengis.net/def/crs/EPSG/0/" + self.srid + "> POINT(" + self.x + " " + self.y + ")"
+            wkt = "<https://epsg.io/" + self.srid + "> POINT(" + self.x + " " + self.y + ")"
 
         return wkt
 
     def generate_sample_gml(self):
         if self.z is not None:
-            gml = '<gml:Point srsDimension="3" srsName="http://www.opengis.net/def/crs/EPSG/0/' + self.srid + '">' \
+            gml = '<gml:Point srsDimension="3" srsName="https://epsg.io/' + self.srid + '">' \
                   '<gml:pos>' + self.x + ' ' + self.y + ' ' + self.z + '</gml:pos>' \
-                   '</gml:Point>'
+                  '</gml:Point>'
         else:
-            gml = '<gml:Point srsDimension="2" srsName="http://www.opengis.net/def/crs/EPSG/0/' + self.srid + '">' \
+            gml = '<gml:Point srsDimension="2" srsName="https://epsg.io/' + self.srid + '">' \
                   '<gml:pos>' + self.x + ' ' + self.y + '</gml:pos>' \
                   '</gml:Point>'
 
@@ -1079,14 +1080,13 @@ class Sample:
 
     def generate_parent_wkt(self):
         # TODO: add support for geometries other than Point
-        wkt = "<http://www.opengis.net/def/crs/EPSG/0/" + \
-              self.srid + ">POINT(" + self.hole_long_min + " " + self.hole_lat_min + ")"
+        wkt = "<https://epsg.io/" + self.srid + ">POINT(" + self.hole_long_min + " " + self.hole_lat_min + ")"
 
         return wkt
 
     def generate_parent_gml(self):
         # TODO: add support for geometries other than Point
-        gml = '<gml:Point srsDimension="2" srsName="http://www.opengis.net/def/crs/EPSG/0/' + \
+        gml = '<gml:Point srsDimension="2" srsName="https://epsg.io/' + \
               self.srid + '"><gml:pos>' + self.hole_long_min + ' ' + self.hole_lat_min + '</gml:pos>' \
               '</gml:Point>'
         return gml
@@ -1121,14 +1121,14 @@ class Sample:
         PROV = Namespace('http://www.w3.org/ns/prov#')
         g.bind('prov', PROV)
 
-        # URI for this renderers
-        base_uri = 'http://pid.geoscience.gov.au/renderers/'
+        # URI for this sample
+        base_uri = 'http://pid.geoscience.gov.au/sample/'
         this_sample = URIRef(base_uri + self.igsn)
 
         # define GA
         ga = URIRef(Sample.URI_GA)
 
-        # renderers location in GML & WKT, formulation from GeoSPARQL
+        # sample location in GML & WKT, formulation from GeoSPARQL
         wkt = Literal(self.generate_sample_wkt(), datatype=GEOSP.wktLiteral)
         gml = Literal(self.generate_sample_gml(), datatype=GEOSP.gmlLiteral)
 
@@ -1139,7 +1139,7 @@ class Sample:
             IGSN = Namespace('http://pid.geoscience.gov.au/def/ont/igsn#')
             g.bind('igsn', IGSN)
 
-            # classing the renderers
+            # classing the sample
             g.add((this_sample, RDF.type, SAMFL.Specimen))
 
             # AlternateIdentifier
@@ -1161,7 +1161,7 @@ class Sample:
             g.add((elevation, RDF.type, SAMFL.Elevation))
             g.add((elevation, SAMFL.elevation, Literal(self.z, datatype=XSD.float)))
             g.add((elevation, SAMFL.verticalDatum, Literal(
-                "http://spatialreference.org/ref/epsg/4283/",
+                'http://spatialreference.org/ref/epsg/4283/',
                 datatype=XSD.anyUri)))
 
             # properties
@@ -1170,8 +1170,8 @@ class Sample:
                 g.add((this_sample, SAMFL.materialClass, URIRef(self.material_type)))
             if self.method_type is not None:
                 g.add((this_sample, SAMFL.samplingMethod, URIRef(self.method_type)))
-            if self.date_aquired is not None:
-                g.add((this_sample, SAMFL.samplingTime, Literal(self.date_aquired.isoformat(), datatype=XSD.datetime)))
+            if self.date_acquired is not None:
+                g.add((this_sample, SAMFL.samplingTime, Literal(self.date_acquired.isoformat(), datatype=XSD.datetime)))
             # TODO: represent Public/Private (and other?) access methods in DB, add to terms in vocab?
             g.add((this_sample, DCT.accessRights, URIRef(Sample.TERM_LOOKUP['access']['Public'])))
             # TODO: make a register of Entities
@@ -1207,8 +1207,8 @@ class Sample:
             g.add((this_sample, RDF.type, DCT.PhysicalResource))
             g.add((this_sample, DCT.coverage, wkt))
             # g.add((this_sample, DCT.creator, Literal('Unknown', datatype=XSD.string)))
-            if self.date_aquired is not None:
-                g.add((this_sample, DCT.date, Literal(self.date_aquired.isoformat(), datatype=XSD.date)))
+            if self.date_acquired is not None:
+                g.add((this_sample, DCT.date, Literal(self.date_acquired.isoformat(), datatype=XSD.date)))
             if self.remark is not None:
                 g.add((this_sample, DCT.description, Literal(self.remark, datatype=XSD.string)))
             if self.material_type is not None:
@@ -1305,7 +1305,7 @@ class Sample:
         return xml
 
 
-    def export_as_igsn_xml(self):
+    def export_as_csirov3_xml(self):
         """
         Exports this Sample instance in XML that validates against the IGSN Descriptive Metadata schema from
         https://github.com/IGSN/metadata/tree/dev/description
@@ -1357,12 +1357,12 @@ class Sample:
         http://www.iedadata.org/services/sesar_examplexml
 
     <samples>
-        <renderers>
+        <sample>
             <sample_type>Dredge</sample_type>
             <igsn>R05333444</igsn>
             <user_code>R05</user_code>
-            <name>Primary name of renderers</name>
-            <sample_other_name>Another name by which the renderers is known</sample_other_name>
+            <name>Primary name of sample</name>
+            <sample_other_name>Another name by which the sample is known</sample_other_name>
             <parent_igsn>R05000001</parent_igsn>
             <parent_sample_type>Core</parent_sample_type>
             <parent_name>Rebeccas Original Core</parent_name>
@@ -1371,7 +1371,7 @@ class Sample:
             <material>Rock</material>
             <classification>Igneous>Plutonic>Exotic</classification>
             <field_name>Name of field, ie. Basalt</field_name>
-            <description>description of renderers</description>
+            <description>description of sample</description>
             <age_min>10.02</age_min>
             <age_max>10.02</age_max>
             <age_unit>Million Years (Ma)</age_unit>
@@ -1415,10 +1415,10 @@ class Sample:
             <depth_min>10.2</depth_min>
             <depth_max>10.2</depth_max>
             <depth_scale>cm</depth_scale>
-            <other_names>Another name by which this renderers may be known</other_names>
-            <other_names>Yet another name by which this renderers may be known</other_names>
-            <other_names>And yet another name by which this renderers may be known</other_names>
-        </renderers>
+            <other_names>Another name by which this sample may be known</other_names>
+            <other_names>Yet another name by which this sample may be known</other_names>
+            <other_names>And yet another name by which this sample may be known</other_names>
+        </sample>
     </samples>
         '''
         # CSIRO
@@ -1430,7 +1430,7 @@ class Sample:
                 xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
             <!-- from https://github.com/kitchenprinzessin3880/csiro-igsn-schema/blob/master/example-capricon.xml -->
             <!--igsn:subNamespace>CAP</igsn:subNamespace -->
-            <igsn:renderers>
+            <igsn:sample>
                 <igsn:sampleNumber identifierType="igsn">CSCAP0001</igsn:sampleNumber>
                 <igsn:sampleName>Cap0001-JHP8</igsn:sampleName>
                 <igsn:isPublic>1</igsn:isPublic>
@@ -1469,67 +1469,85 @@ class Sample:
                     <igsn:relatedResourceIdentifier>abcd1234</igsn:relatedResourceIdentifier>
                 </igsn:relatedResources>
                 <igsn:logElement event="submitted" timeStamp="2015-09-10T18:20:30" />
-            </igsn:renderers>
+            </igsn:sample>
         </igsn:samples>
         '''
 
-        if isinstance(self.date_aquired, datetime):
-            sampling_time = self.date_aquired.isoformat()
-        else:
-            sampling_time = Sample.URI_MISSSING
+        # CSIRO v3
+        sample_wkt = self.generate_sample_wkt()
+        xsi = 'http://www.w3.org/2001/XMLSchema-instance'
+        cs = 'https://igsn.csiro.au/schemas/3.0'
+        root = etree.Element(
+            '{%s}resources' % cs,
+            # namespace='https://igsn.csiro.au/schemas/3.0',
+            nsmap={'xsi': xsi, 'cs': cs})
+        root.attrib['{%s}schemaLocation' % xsi] = \
+            'https://igsn.csiro.au/schemas/3.0 igsn-csiro-v3.0.xsd'
+        r = etree.SubElement(root, '{%s}resource' % cs)
+        r.attrib['registrationType'] = 'http://pid.geoscience.gov.au/def/voc/igsn-codelists/SampleResource'
+        etree.SubElement(r, '{%s}resourceIdentifier' % cs).text = self.igsn
+        etree.SubElement(r, '{%s}landingPage' % cs).text = 'https://pid.geoscience.gov.au/sample/' + self.igsn
+        # etree.SubElement(r, '{%s}isPublic' % cs).text = 'true'
+        etree.SubElement(r, '{%s}resourceTitle' % cs).text = 'Sample igsn:' + self.igsn
+        rt = etree.SubElement(r, '{%s}resourceTypes' % cs)
+        etree.SubElement(rt, '{%s}resourceType' % cs).text = self.sample_type
+        mt = etree.SubElement(r, '{%s}materialTypes' % cs)
+        etree.SubElement(mt, '{%s}materialType' % cs).text = self.material_type
+        etree.SubElement(r, '{%s}method' % cs).text = self.method_type
+        # etree.SubElement(r, '{%s}campaign' % cs).text = ''
+        l = etree.SubElement(r, '{%s}location' % cs)
+        g = etree.SubElement(l, '{%s}geometry' % cs)
+        g.text = sample_wkt
+        g.attrib['srid'] = 'https://epsg.io/' + self.srid
+        g.attrib['verticalDatum'] = 'https://epsg.io/4283'
+        # g.attrib['geometryURI'] = 'http://www.altova.com'
+        cd = etree.SubElement(r, '{%s}curationDetails' % cs)
+        c = etree.SubElement(cd, '{%s}curation' % cs)
+        etree.SubElement(c, '{%s}curator' % cs).text = 'Geoscience Australia'
+        etree.SubElement(c, '{%s}curationDate' % cs).text = datetime.now().strftime('%Y')
+        etree.SubElement(c, '{%s}curationLocation' % cs).text = \
+            'Geoscience Australia, Jerrabomberra Ave, Symonston, ACT, Australia'
+        etree.SubElement(c, '{%s}curatingInstitution' % cs).attrib['institutionURI'] = \
+            'http://pid.geoscience.gov.au/org/ga'
 
-        em = ElementMaker(namespace="http://igsn.org/schema/kernel-v.1.0",
-                          nsmap={'igsn': "http://igsn.org/schema/kernel-v.1.0"})
+        if self.sample_no is not None:
+            ai = etree.SubElement(r, '{%s}alternateIdentifiers' % cs)
+            etree.SubElement(ai, '{%s}alternateIdentifiers' % cs).text = self.sample_no
 
-        doc = em.samples(
-            em.sample(
-                em.sampleNumber(self.igsn, identifierType='igsn'),
-                em.sampleName(Sample.URI_INAPPLICABLE),
-                em.isPublic('0'),  # always non-public? TODO: fix access rights
-                em.landingPage('http://pid.geoscience.gov.au/renderers/' + self.igsn),
-                em.sampleTypes(
-                    em.sampleType(self.sample_type)
-                ),
-                em.materialTypes(
-                    em.materialType(self.material_type)
-                ),
-                em.samplingLocation(self.generate_sample_wkt()),
-                em.samplingTime(sampling_time),
-                em.sampleCuration(
-                    em.curation(
-                        em.curator(Sample.URI_GA),
-                        em.curationLocation('Geoscience Australia, Jerrabomberra Ave, Symonston, ACT, Australia')
-                    )
-                ),
-                # we are always missing the classification value in our DB so we can add this URI statically
-                # em.classification(Sample.URI_MISSSING),
-                em.comments(self.remark),
-                # em.otherNames(
-                #     em.otherName()
-                # ),
-                # em.purpose('x'),
-                em.samplingFeatures(
-                    em.samplingFeature(
-                        em.samplingFeatureName(self.entity_name)
-                    )
-                ),
-                # em.sampleCollectors(
-                #     em.sampleCollector(Sample.URI_MISSSING)
-                # ),
-                em.samplingMethod(self.method_type),
-                # em.samplingCampaign('x'),
-                # em.relatedResources(
-                #     em.relatedResource(
-                #         em.relatedResourceIdentifier(
-                #             em.relatedIdentifierType('url'),
-                #             em.relationType('IsCitedBy')
-                #         )
-                #     )
-                # ),
-                em.logEvent(event='submitted', timeStamp='2015-09-10T18:20:30')
-            )
-        )
-        xml = etree.tostring(doc, pretty_print=True, xml_declaration=True, encoding='UTF-8')
+        if self.date_acquired is not None:
+            ti = etree.SubElement(r, '{%s}date' % cs)
+            etree.SubElement(ti, '{%s}timeInstant' % cs).text = self.date_acquired
+
+        if self.remark is not None:
+            etree.SubElement(r, '{%s}comment' % cs).text = self.remark
+
+        # em.classifications(
+        #     em.classification('')),
+        # em.purpose('a'),
+        # em.sampledFeatures(
+        #     em.sampledFeature('token', sampledFeatureURI='http://www.altova.com')),
+        # em.collectors(
+        #     em.collector(
+        #         em.collectorName('a'),
+        #         em.collectorIdentifier(
+        #             'token',
+        #             collectorIdentifierType='http://pid.geoscience.gov.au/def/voc/igsn-codelists/URL'))),
+        # em.contributors(
+        #     em.contributor(
+        #         em.contributorName('a'),
+        #         em.contributorIdentifier(
+        #             'token',
+        #             contributorIdentifierType='http://pid.geoscience.gov.au/def/voc/igsn-codelists/Handle'
+        #         ),
+        #         contributorType='http://pid.geoscience.gov.au/def/voc/igsn-codelists/Other')),
+        # em.relatedResourceIdentifiers(
+        #     em.relatedResourceIdentifier(
+        #         'String',
+        #         relatedIdentifierType='http://pid.geoscience.gov.au/def/voc/igsn-codelists/bibcode',
+        #         relationType='http://pid.geoscience.gov.au/def/voc/igsn-codelists/IsSourceOf')),
+        # em.logDate('2001', eventType='registered')
+
+        xml = etree.tostring(root, pretty_print=True, xml_declaration=True, encoding='UTF-8')
         return xml
 
     def export_as_html(self, model_view='default'):
@@ -1564,8 +1582,8 @@ class Sample:
         elif model_view == 'dc':
             html += '   <tr><th>IGSN</th><td>' + self.igsn + '</td></tr>'
             html += '   <tr><th>Coverage</th><td>' + self.generate_sample_wkt() + '</td></tr>'
-            if self.date_aquired is not None:
-                html += '   <tr><th>Date</th><td>' + self.date_aquired.isoformat() + '</td></tr>'
+            if self.date_acquired is not None:
+                html += '   <tr><th>Date</th><td>' + self.date_acquired.isoformat() + '</td></tr>'
             if self.remark is not None:
                 html += '   <tr><th>Description</th><td>' + self.remark + '</td></tr>'
             if self.material_type is not None:

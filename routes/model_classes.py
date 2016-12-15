@@ -27,7 +27,8 @@ def sample(igsn):
         'alternates': ['text/html'],
         'igsn': ['text/html', 'text/turtle', 'application/rdf+xml', 'application/rdf+json'],
         'dc': ['text/html', 'text/turtle', 'application/rdf+xml', 'application/rdf+json'],
-        'prov': ['text/html', 'text/turtle', 'application/rdf+xml', 'application/rdf+json']
+        'prov': ['text/html', 'text/turtle', 'application/rdf+xml', 'application/rdf+json'],
+        'csirov3': ['application/xml']
     }
 
     try:
@@ -42,7 +43,7 @@ def sample(igsn):
     # select view and format
     if view == 'alternates':
         return routes_functions.render_templates_alternates('page_sample.html', views_formats)
-    elif view in ['igsn', 'dc', 'prov']:
+    elif view in ['igsn', 'dc', 'prov', 'csirov3']:
         # for all these views we will need to populate a renderers
         from renderers.Sample import Sample
         s = Sample()
@@ -58,14 +59,21 @@ def sample(igsn):
                 mimetype=format,
                 headers={'Content-Disposition': 'attachment; filename=' + igsn + LDAPI.get_file_extension(format)}
             )
+        elif view == 'csirov3':
+            return Response(
+                s.export_as_csirov3_xml(),
+                status=200,
+                mimetype='application/xml',
+                #headers={'Content-Disposition': 'attachment; filename=' + igsn + '.xml'}
+            )
         elif format == 'application/xml':
             # TODO: implement IGSN XML format
             pass
         else:  # format == 'text/html'
-            if s.date_aquired is not None:
-                year_acquired = datetime.datetime.strftime(s.date_aquired, '%Y')
+            if s.date_acquired is not None:
+                year_acquired = datetime.datetime.strftime(s.date_acquired, '%Y')
             else:
-                year_acquired = '2016'
+                year_acquired = 'XXXX'
             return render_template(
                 'page_sample.html',
                 base_uri=settings.BASE_URI,
