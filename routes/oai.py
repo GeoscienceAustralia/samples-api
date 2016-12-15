@@ -46,6 +46,22 @@ def oai():
     # TODO: implement using XML template
     if verb == 'GetRecord':
         # render_template
+        try:
+            xml = oai_functions.get_record(request.args)
+            return xml
+        except ValueError:
+            values = {
+                'response_date': datetime.datetime.now().isoformat(),
+                'request_uri': 'http://54.66.133.7/igsn-ld-api/oai',
+                'error_code': 'idDoesNotExist',
+                'error_text': 'No matching identifier in GA Samples Database'
+            }
+            template = render_template('oai_error.xml', values=values), 400
+            response = make_response(template)
+            response.headers['Content-Type'] = 'application/xml'
+
+            return response
+
         pass
     elif verb == 'Identify':
         pass
