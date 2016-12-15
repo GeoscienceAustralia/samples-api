@@ -1,3 +1,4 @@
+from renderers import Sample
 
 OAI_ARGS = {
     'GetRecord': {
@@ -90,7 +91,11 @@ def validate_oai_parameters(qsa_args):
 
     return True
 
-
+def get_record(qsa_args):
+    s = Sample()
+    s.populate_from_oracle_api(qsa_args['identifier'])
+    dc_xml = s.export_dc_xml()
+    return dc_xml
 class ParameterError(ValueError):
     pass
 
