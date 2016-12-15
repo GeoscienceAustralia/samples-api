@@ -21,13 +21,24 @@ class TestSample(unittest.TestCase):
         Tests loading the Sample class instance
         """
         # load
-        s.populate_from_xml_file('sample_eg1.xml')
+        s.populate_from_xml_file('test/sample_eg1.xml')
 
         # compare instance variables
         assert s.igsn == 'AU2648696', 'IGSN instance varable not correct'
         assert s.entity_uri == 'http://pid.geoscience.gov.au/site/15846', 'entity_uri instance variable not correct'
         assert s.lith == 'http://resource.geosciml.org/classifier/cgi/lithology/clastic_sediment', \
             'lith instance variable not correct, expecting "http://resource.geosciml.org/classifier/cgi/lithology/clastic_sediment", got ' + s.lith
+
+    def test_populate_from_api(self):
+        """
+        Tests loading the Sample class instance
+        """
+        # load
+        s.populate_from_oracle_api('AU100')
+
+        # compare instance variables
+        assert s.igsn == 'AU100', 'IGSN instance variable not correct'
+
 
     def run_all_tests(self):
         self.test_populate_from_xml_file()
