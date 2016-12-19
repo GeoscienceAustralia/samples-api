@@ -1303,7 +1303,7 @@ class Sample:
         # TODO:   add is site uri
         xml = 'xml = <record>\
         <header>\
-        <identifier>oai:registry.igsn.org:' + self.igsn + '</identifier>\
+        <identifier>' + self.entity_uri + '</identifier>\
         <datestamp>' + sampling_time + '</datestamp>\
         <setSpec>IEDA</setSpec>\
         <setSpec>IEDA.SESAR</setSpec>\
@@ -1313,7 +1313,7 @@ class Sample:
            xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"\
            xsi:schemaLocation="http://www.openarchives.org/OAI/2.0/oai_dc/ http://www.openarchives.org/OAI/2.0/oai_dc.xsd">\
         <dc:creator>' + ga + '</dc:creator>\
-        <dc:identifier>' + self.entity_uri + '</dc:identifier>\
+        <dc:identifier>' + self.igsn + '</dc:identifier>\
         <dc:type>' + self.sample_type  + '</dc:type>\
         <dc:coverage>' + wkt + '</dc:coverage>\
         </oai_dc:dc> \
