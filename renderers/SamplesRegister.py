@@ -38,7 +38,7 @@ class SampleRegister:
         :return: None
         """
 
-        os.environ['NO_PROXY'] = 'ga.gov.au'
+        #os.environ['NO_PROXY'] = 'ga.gov.au'
         # internal URI
         # target_url = 'http://biotite.ga.gov.au:7777/wwwstaff_distd/a.igsn_api.get_igsnSample?pIGSN=' + igsn
         # external URI
