@@ -1292,7 +1292,14 @@ class Sample:
 
         # define GA
         ga = URIRef(Sample.URI_GA)
-        ga
+
+        GEOSP = Namespace('http://www.opengis.net/ont/geosparql#')
+
+
+        # sample location in GML & WKT, formulation from GeoSPARQL
+        wkt = Literal(self.generate_sample_wkt(), datatype=GEOSP.wktLiteral)
+        gml = Literal(self.generate_sample_gml(), datatype=GEOSP.gmlLiteral)
+
         # TODO:   add is site uri
         xml = 'xml = <record>\
         <header>\
@@ -1308,7 +1315,7 @@ class Sample:
         <dc:creator>' + ga + '</dc:creator>\
         <dc:identifier>' + self.entity_uri + '</dc:identifier>\
         <dc:type>' + self.sample_type  + '</dc:type>\
-        <dc:coverage>self.site_uri </dc:coverage>\
+        <dc:coverage>' + wkt + '</dc:coverage>\
         </oai_dc:dc> \
         </metadata> \
         </record>'
