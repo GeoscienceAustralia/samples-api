@@ -848,6 +848,7 @@ class Sample:
         self.hole_lat_min = None
         self.hole_lat_max = None
         self.date_load = None
+        self.date_modified = None
         self.sample_no = None
 
     def validate_xml(self, xml):
@@ -1024,7 +1025,7 @@ class Sample:
                         self.lith = Sample.URI_MISSSING
             elif elem.tag == "ACQUIREDATE":
                 if elem.text is not None:
-                    self.date_acquired = datetime.strptime(elem.text, '%d-%b-%y')
+                    self.date_acquired = datetime.strptime(elem.text, '%Y-%m-%d %H:%M:%S')
             elif elem.tag == "ENO":
                 if elem.text is not None:
                     self.entity_uri = 'http://pid.geoscience.gov.au/site/' + elem.text
@@ -1048,7 +1049,10 @@ class Sample:
                     self.hole_lat_max = elem.text
             elif elem.tag == "LOADEDDATE":
                 if elem.text is not None:
-                    self.date_load = datetime.strptime(elem.text, '%d-%b-%y')
+                    self.date_load = datetime.strptime(elem.text, '%Y-%m-%d %H:%M:%S')
+            elif elem.tag == "MODIFIED_DATE":
+                if elem.text is not None:
+                    self.date_modified = datetime.strptime(elem.text, '%Y-%m-%d %H:%M:%S')
             elif elem.tag == "SAMPLENO":
                 if elem.text is not None:
                     self.sample_no = elem.text
@@ -1277,15 +1281,19 @@ class Sample:
         </oai_dc:dc></metadata></record>
 
       '''
-        print self.date_load
 
         if isinstance(self.date_acquired, datetime):
             sampling_time = self.date_acquired.isoformat()
         elif isinstance(self.date_load, datetime):
             sampling_time = self.date_load.isoformat()
+        elif isinstance(self.date_modified, datetime):
+            sampling_time = self.date_modified.isoformat()
         else:
             sampling_time = Sample.URI_MISSSING
-
+        if isinstance(self.date_modified, datetime):
+            modified_time = self.date_modified.isoformat()
+        elif isinstance(self.date_load, datetime):
+            modified_time = self.date_load.isoformat()
          # URI for this sample
         base_uri = 'http://pid.geoscience.gov.au/sample/'
         this_sample = URIRef(base_uri + self.igsn)
@@ -1304,7 +1312,7 @@ class Sample:
         xml = 'xml = <record>\
         <header>\
         <identifier>' + self.entity_uri + '</identifier>\
-        <datestamp>' + sampling_time + '</datestamp>\
+        <datestamp>' + modified_time + '</datestamp>\
         <setSpec>IEDA</setSpec>\
         <setSpec>IEDA.SESAR</setSpec>\
         </header>\
