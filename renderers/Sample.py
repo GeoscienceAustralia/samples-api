@@ -5,6 +5,7 @@ from lxml.builder import ElementMaker
 from lxml.builder import E
 import os
 import requests
+from renderers.datestamp import datetime_to_datestamp
 from datetime import datetime
 from ldapi import LDAPI
 
@@ -1265,6 +1266,8 @@ class Sample:
 
         :return: XML string
         """
+
+
         '''
         <record>
         <header><identifier>oai:registry.igsn.org:18211</identifier>
@@ -1308,11 +1311,16 @@ class Sample:
         wkt = Literal(self.generate_sample_wkt(), datatype=GEOSP.wktLiteral)
         gml = Literal(self.generate_sample_gml(), datatype=GEOSP.gmlLiteral)
 
+        dt = datetime.now()
+        date_stamp = datetime_to_datestamp(dt)
+
+        format = URIRef(self.material_type)
+
         # TODO:   add is site uri
         xml = 'xml = <record>\
         <header>\
         <identifier>' + self.entity_uri + '</identifier>\
-        <datestamp>' + modified_time + '</datestamp>\
+        <datestamp>' + date_stamp + '</datestamp>\
         <setSpec>IEDA</setSpec>\
         <setSpec>IEDA.SESAR</setSpec>\
         </header>\
@@ -1322,7 +1330,7 @@ class Sample:
            xsi:schemaLocation="http://www.openarchives.org/OAI/2.0/oai_dc/ http://www.openarchives.org/OAI/2.0/oai_dc.xsd">\
         <dc:creator>' + ga + '</dc:creator>\
         <dc:identifier>' + self.igsn + '</dc:identifier>\
-        <dc:type>' + self.sample_type  + '</dc:type>\
+        <dc:type>' + self.sample_type + '</dc:type>\
         <dc:coverage>' + wkt + '</dc:coverage>\
         </oai_dc:dc> \
         </metadata> \
