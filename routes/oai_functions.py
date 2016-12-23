@@ -93,9 +93,13 @@ def validate_oai_parameters(qsa_args):
 
 def get_record(qsa_args):
     s = Sample()
-    s.populate_from_oracle_api(qsa_args['identifier'])
+    try:
+        s.populate_from_oracle_api(qsa_args['identifier'])
+    except ValueError:
+        raise ValueError
     dc_xml = s.export_dc_xml()
     return dc_xml
+
 class ParameterError(ValueError):
     pass
 
@@ -106,6 +110,9 @@ if __name__ == '__main__':
         'identifier': 'AU100',
         'metadataPrefix': 'oai_dc'
     }
+    s = Sample()
+    s.populate_from_oracle_api(args['identifier'])
+    dc_xml = s.export_dc_xml()
 
     print 'valid_oai_args(args[\'verb\'])', valid_oai_args(args['verb'])
     print 'validate_oai_parameters(args)', validate_oai_parameters(args)
