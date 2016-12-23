@@ -879,6 +879,9 @@ class Sample:
         # call API
         r = requests.get(target_url)
         # deal with missing XML declaration
+        if "No data" in r.content:
+            raise ParameterError('No Data')
+            return False
         if not r.content.startswith('<?xml version="1.0" ?>'):
             xml = '<?xml version="1.0" ?>\n' + r.content
         else:
@@ -1628,7 +1631,8 @@ class Sample:
         html += '</table>'
 
         return html
-
+class ParameterError(ValueError):
+    pass
 
 if __name__ == '__main__':
     print "hello"
