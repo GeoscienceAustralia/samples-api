@@ -17,7 +17,7 @@
                         xmlns:dc="http://purl.org/dc/elements/1.1/"
                         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
                         xsi:schemaLocation="http://www.openarchives.org/OAI/2.0/oai_dc/ http://www.openarchives.org/OAI/2.0/oai_dc.xsd">
-                    <dc:title>New railroad map of the state of Maryland, Delaware, and the District of Columbia. Compiled and drawn by Frank Arnold Gray.</dc:title>
+                    <dc:title>{{s.title}}</dc:title>
                     <dc:creator>Gray, Frank Arnold.</dc:creator>
                     <dc:subject>Railroads--Middle Atlantic States--Maps.</dc:subject>
                     <dc:description>Shows drainage, canals, stations, cities and towns, counties, canals, roads completed, narrow gauge and proposed railroads with names of lines. Includes list of railroads.</dc:description>
