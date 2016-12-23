@@ -48,7 +48,11 @@ def sample(igsn):
         from renderers.Sample import Sample
         s = Sample()
         #s.populate_from_xml_file('test/sample_eg2.xml')
-        s.populate_from_oracle_api(igsn)
+        try:
+            s.populate_from_oracle_api(igsn)
+        except ValueError:
+            return render_template(
+                'no_record_sample.html')
 
         if format in ['text/turtle', 'application/rdf+xml', 'application/rdf+json']:
             return Response(
@@ -122,8 +126,23 @@ def samples():
         # only create and populate a SamplesRegister for views that need it
         from renderers.SamplesRegister import SampleRegister
         sr = SampleRegister()
-        sr.populate_from_oracle_api(page_no)
 
+
+        try:
+            sr.populate_from_oracle_api(page_no)
+        except ValueError:
+            values = {
+                'response_date': date_stamp,
+                'request_uri': 'http://54.66.133.7/igsn-ld-api/oai',
+                'error_code': 'badArgument',
+                'error_text': 'The request includes illegal arguments, is missing required arguments,\
+                               includes a repeated argument, or values for arguments have an illegal syntax.'
+            }
+            template = render_template('oai_error.xml', values=values), 400
+            response = make_response(template)
+            response.headers['Content-Type'] = 'application/xml'
+
+            return response
         if format == 'text/html':
             return render_template(
                 'page_samples.html',
