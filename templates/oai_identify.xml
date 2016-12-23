@@ -11,7 +11,7 @@
         <baseURL>http://pid.geoscience.gov.au/oai</baseURL>
         <protocolVersion>2.0</protocolVersion>
         <adminEmail>fakeEmail@ga.gov.au</adminEmail>
-        <earliestDatestamp>2011-01-01T00:00:00Z</earliestDatestamp>
+        <earliestDatestamp>2015-08-07T02:19:24Z</earliestDatestamp>
         <deletedRecord>no</deletedRecord>
         <granularity>YYYY-MM-DDThh:mm:ssZ</granularity>
         <compression>gzip</compression>
