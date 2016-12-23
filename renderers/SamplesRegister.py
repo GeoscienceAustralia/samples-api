@@ -196,6 +196,18 @@ class SampleRegister:
 
         return html
 
+def export_ListRecords(self, model_view='default'):
+        if model_view == 'default' or model_view == 'oai_dc' or model_view is None:
+            # export dc xml compliant with OAI-PMH
+            root = etree.XML('''\
+            <?xml version="1.0" encoding="UTF-8" ?>
+            <?xml-stylesheet type="text/xsl" href="xsl/oaitohtml.xsl"?><OAI-PMH xmlns="http://www.openarchives.org/OAI/2.0/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.openarchives.org/OAI/2.0/ http://www.openarchives.org/OAI/2.0/OAI-PMH.xsd"><responseDate>2016-12-21T08:04:45Z</responseDate><request verb="ListRecords" from="2011-06-01T00:00:00Z" metadataPrefix="oai_dc">http://doidb.wdc-terra.org/igsnoaip/oai</request><ListRecords>
+            ''')
+        elif model_view == 'dc':
+            pass
+        elif model_view == 'prov':
+            pass
+
 
 if __name__ == '__main__':
     sr = SampleRegister()
