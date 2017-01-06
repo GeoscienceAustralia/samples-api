@@ -34,7 +34,7 @@ class TestSample(unittest.TestCase):
         Tests loading the Sample class instance
         """
         # load
-        s.populate_from_oracle_api('AU100')
+        s.populate_from_oracle_api('AU100', "http://localhost:8080/oai" )
 
         # compare instance variables
         assert s.igsn == 'AU100', 'IGSN instance variable not correct'

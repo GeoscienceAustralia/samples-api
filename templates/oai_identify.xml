@@ -1,5 +1,4 @@
 <?xml version="1.0" encoding="UTF-8" ?>
-<?xml-stylesheet type="text/xsl" href="xsl/oaitohtml.xsl"?>
 <OAI-PMH xmlns="http://www.openarchives.org/OAI/2.0/"
          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:schemaLocation="http://www.openarchives.org/OAI/2.0/
@@ -22,9 +21,9 @@
                             xsi:schemaLocation="http://www.openarchives.org/OAI/2.0/oai-identifier
                             http://www.openarchives.org/OAI/2.0/oai-identifier.xsd">
                 <scheme>oai</scheme>
-                <repositoryIdentifier>registry.igsn.org</repositoryIdentifier>
+                <repositoryIdentifier>registry.igsn.org??</repositoryIdentifier>
                 <delimiter>:</delimiter>
-                <sampleIdentifier>oai:registry.igsn.org:12425</sampleIdentifier>
+                <sampleIdentifier>oai:registry.igsn.org:12425??</sampleIdentifier>
             </oai-identifier>
         </description>
     </Identify>
