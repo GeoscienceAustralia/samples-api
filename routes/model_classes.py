@@ -49,7 +49,7 @@ def sample(igsn):
         s = Sample()
         #s.populate_from_xml_file('test/sample_eg2.xml')
         try:
-            s.populate_from_oracle_api(igsn)
+            s.populate_from_oracle_api(igsn, request.base_url)
         except ValueError:
             return render_template(
                 'no_record_sample.html')
@@ -129,11 +129,11 @@ def samples():
 
 
         try:
-            sr.populate_from_oracle_api(page_no)
+            sr.populate_from_oracle_api(page_no, request.base_url)
         except ValueError:
             values = {
                 'response_date': date_stamp,
-                'request_uri': 'http://54.66.133.7/igsn-ld-api/oai',
+                'request_uri': request.base_url,
                 'error_code': 'badArgument',
                 'error_text': 'The request includes illegal arguments, is missing required arguments,\
                                includes a repeated argument, or values for arguments have an illegal syntax.'

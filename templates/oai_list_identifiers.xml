@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<OAI-PMH xmlns="http://www.openarchives.org/OAI/2.0/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.openarchives.org/OAI/2.0/ http://www.openarchives.org/OAI/2.0/OAI-PMH.xsd"><responseDate>2017-01-06T00:42:02Z</responseDate>
+    <request verb="ListIdentifiers" metadataPrefix="oai_dc">http://doidb.wdc-terra.org/igsnoaip/oai</request>
+    <ListIdentifiers>
+    {% for sample in samples %}
+        <header>
+            <identifier>sample.IGSN</identifier>
+            <datestamp>sample.datestamp</datestamp>
+            <setSpec>IEDA</setSpec>
+        </header>
+    {% endfor %}
+    {% if samples.resumptiontoken %}
+
+    <resumptionToken expirationDate="2017-01-06T01:42:02Z" completeListSize="6262929" cursor="0">1483663322386,0001-01-01T00:00:00Z,9999-12-31T23:59:59Z,50,null,oai_dc</resumptionToken>
+    </ListIdentifiers>
+</OAI-PMH>

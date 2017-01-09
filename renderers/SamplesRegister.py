@@ -18,6 +18,7 @@ class SampleRegister:
 
     def __init__(self):
         self.samples = []
+        self.base_url = None
 
     def validate_xml(self, xml):
 
@@ -30,14 +31,14 @@ class SampleRegister:
             print 'not valid xml'
             return False
 
-    def populate_from_oracle_api(self, page_no):
+    def populate_from_oracle_api(self, page_no, base_url):
         """
         Populates this instance with data from the Oracle Samples table API
 
         :param page_no: the page number of the total resultset from the Samples Set API
         :return: None
         """
-
+        self.base_url = base_url
         #os.environ['NO_PROXY'] = 'ga.gov.au'
         # internal URI
         # target_url = 'http://biotite.ga.gov.au:7777/wwwstaff_distd/a.igsn_api.get_igsnSample?pIGSN=' + igsn
@@ -68,6 +69,7 @@ class SampleRegister:
         for event, elem in etree.iterparse(xml):
             if elem.tag == "IGSN":
                 self.samples.append(elem.text)
+
 
     def export_as_text(self):
         return '"' + '", "'.join(self.samples) + '"'
@@ -201,8 +203,16 @@ def export_ListRecords(self, model_view='default'):
             # export dc xml compliant with OAI-PMH
             root = etree.XML('''\
             <?xml version="1.0" encoding="UTF-8" ?>
-            <?xml-stylesheet type="text/xsl" href="xsl/oaitohtml.xsl"?><OAI-PMH xmlns="http://www.openarchives.org/OAI/2.0/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.openarchives.org/OAI/2.0/ http://www.openarchives.org/OAI/2.0/OAI-PMH.xsd"><responseDate>2016-12-21T08:04:45Z</responseDate><request verb="ListRecords" from="2011-06-01T00:00:00Z" metadataPrefix="oai_dc">http://doidb.wdc-terra.org/igsnoaip/oai</request><ListRecords>
+            <?xml-stylesheet type="text/xsl" href="xsl/oaitohtml.xsl"?>
+            <OAI-PMH xmlns="http://www.openarchives.org/OAI/2.0/"
+                xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                xsi:schemaLocation="http://www.openarchives.org/OAI/2.0/ http://www.openarchives.org/OAI/2.0/OAI-PMH.xsd">
+                <responseDate>2016-12-21T08:04:45Z</responseDate>
+                <request verb="ListRecords" from="2011-06-01T00:00:00Z" metadataPrefix="oai_dc">
+                    http://doidb.wdc-terra.org/igsnoaip/oai</request>
+                <ListRecords>
             ''')
+
         elif model_view == 'dc':
             pass
         elif model_view == 'prov':
@@ -212,7 +222,7 @@ def export_ListRecords(self, model_view='default'):
 if __name__ == '__main__':
     sr = SampleRegister()
     # sr.populate_from_xml_file('../test/samples_register_eg1.xml')
-    sr.populate_from_oracle_api(1)
+    sr.populate_from_oracle_api(1, "http://localhost:8080/oai")
     # print sr.export_as_text()
     # print sr.export_as_html()
     print sr.export_as_rdf(model_view='dpr', rdf_mime='text/turtle')

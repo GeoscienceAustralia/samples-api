@@ -1,20 +1,22 @@
 import datetime
-from flask import Blueprint, Response, render_template, request, make_response
+from flask import Blueprint, render_template, request, make_response
 import oai_functions
-oai_ = Blueprint('oai', __name__)
 from renderers.datestamp import datetime_to_datestamp
+oai_ = Blueprint('oai', __name__)
+
 
 @oai_.route('/oai')
 def oai():
     # TODO: validate args using functions_oai
     dt = datetime.datetime.now()
     date_stamp = datetime_to_datestamp(dt)
+    base_url = request.base_url
     if request.args.get('verb'):
         verb = request.args.get('verb')
     else:
         values = {
             'response_date': date_stamp,
-            'request_uri': 'http://54.66.133.7/igsn-ld-api/oai',
+            'request_uri': base_url,
             'error_code': 'badVerb',
             'error_text': 'Illegal OAI verb'
         }
@@ -29,11 +31,11 @@ def oai():
     except ValueError:
         values = {
             'response_date': date_stamp,
-            'request_uri': 'http://54.66.133.7/igsn-ld-api/oai',
+            'request_uri': base_url,
             'error_code': 'badArgument',
             'error_text': 'The request includes illegal arguments, is missing required arguments,\
                            includes a repeated argument, or values for arguments have an illegal syntax.'
-        }
+            }
         template = render_template('oai_error.xml', values=values), 400
         response = make_response(template)
         response.headers['Content-Type'] = 'application/xml'
@@ -49,15 +51,15 @@ def oai():
     if verb == 'GetRecord':
         # render_template
         try:
-            xml = oai_functions.get_record(request.args)
+            xml = oai_functions.get_record(request)
             return xml
         except ValueError:
             values = {
                 'response_date': date_stamp,
-                'request_uri': 'http://54.66.133.7/igsn-ld-api/oai',
+                'request_uri': base_url,
                 'error_code': 'idDoesNotExist',
                 'error_text': 'No matching identifier in GA Samples Database'
-            }
+                }
             template = render_template('oai_error.xml', values=values), 400
             response = make_response(template)
             response.headers['Content-Type'] = 'application/xml'
@@ -68,12 +70,10 @@ def oai():
 
     elif verb == 'Identify':
         values = {
-                'response_date': date_stamp
+            'response_date': date_stamp
             }
         template = render_template('oai_identify.xml', values=values), 400
         response = make_response(template)
         response.headers['Content-Type'] = 'application/xml'
 
         return response
-
-

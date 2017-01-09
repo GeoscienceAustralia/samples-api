@@ -91,10 +91,11 @@ def validate_oai_parameters(qsa_args):
 
     return True
 
-def get_record(qsa_args):
+def get_record(request):
+    qsa_args =request.args
     s = Sample()
     try:
-        s.populate_from_oracle_api(qsa_args['identifier'])
+        s.populate_from_oracle_api(qsa_args['identifier'], request.base_url)
     except ValueError:
         raise ValueError
     dc_xml = s.export_dc_xml()

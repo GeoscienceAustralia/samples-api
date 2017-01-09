@@ -2,14 +2,14 @@
     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
     xsi:schemaLocation="http://www.openarchives.org/OAI/2.0/
     http://www.openarchives.org/OAI/2.0/OAI-PMH.xsd">
-    <responseDate>2016-12-01T05:32:43Z</responseDate>
-    <request verb="GetRecord" identifier="oai:lcoa1.loc.gov:loc.gmd/g3791p.rr002300" metadataPrefix="oai_dc">http://memory.loc.gov/cgi-bin/oai2_0</request>
+    <responseDate>{{s.timestamp}}</responseDate>
+    <request verb="GetRecord" identifier="{{s.IGSN}}" metadataPrefix="oai_dc">{{s.base_url}}</request>
     <GetRecord>
         <record>
             <header>
                 <identifier>oai:lcoa1.loc.gov:loc.gmd/g3791p.rr002300</identifier>
-                <datestamp>2005-11-21T17:08:59Z</datestamp>
-                <setSpec>gmd</setSpec>
+                <datestamp>s.datestamp</datestamp>
+                <setSpec>ga</setSpec>
             </header>
             <metadata>
                 <oai_dc:dc
@@ -18,15 +18,14 @@
                         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
                         xsi:schemaLocation="http://www.openarchives.org/OAI/2.0/oai_dc/ http://www.openarchives.org/OAI/2.0/oai_dc.xsd">
                     <dc:title>{{s.title}}</dc:title>
-                    <dc:creator>Gray, Frank Arnold.</dc:creator>
-                    <dc:subject>Railroads--Middle Atlantic States--Maps.</dc:subject>
+                    <dc:creator>http://pid.geoscience.gov.au/org/ga</dc:creator>
                     <dc:description>Shows drainage, canals, stations, cities and towns, counties, canals, roads completed, narrow gauge and proposed railroads with names of lines. Includes list of railroads.</dc:description>
                     <dc:publisher>Philadelphia</dc:publisher>
                     <dc:date>1876</dc:date>
                     <dc:type>image</dc:type>
                     <dc:type>map</dc:type>
                     <dc:type>cartographic</dc:type>
-                    <dc:identifier>http://hdl.loc.gov/loc.gmd/g3791p.rr002300</dc:identifier>
+                    <dc:identifier>{{s.IGSN}}</dc:identifier>
                     <dc:language>eng</dc:language>
                     <dc:coverage>United States--Middle Atlantic States</dc:coverage>
                 </oai_dc:dc>

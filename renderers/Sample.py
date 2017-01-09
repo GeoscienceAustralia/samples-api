@@ -169,11 +169,9 @@ class Sample:
            'pyroxene spinifex-textured basalt': 'http://resource.geosciml.org/classifier/cgi/lithology/basalt',
            'olivine hornblendite': 'http://resource.geosciml.org/classifier/cgi/lithology/hornblendite',
            'saprolite, highly weathered': 'http://resource.geosciml.org/classifier/cgi/lithology/residual_material',
-           'fragmental igneous material':
-               'http://resource.geosciml.org/classifier/cgi/lithology/fragmental_igneous_material',
+           'fragmental igneous material': 'http://resource.geosciml.org/classifier/cgi/lithology/fragmental_igneous_material',
            'silty mud': 'http://resource.geosciml.org/classifier/cgi/lithology/mud',
-           'kalsilitic and melilitic rocks':
-               'http://resource.geosciml.org/classifier/cgi/lithology/kalsilitic_and_melilitic_rock',
+           'kalsilitic and melilitic rocks': 'http://resource.geosciml.org/classifier/cgi/lithology/kalsilitic_and_melilitic_rock',
            'muddy silt': 'http://resource.geosciml.org/classifier/cgi/lithology/silt',
            'tephra': 'http://resource.geosciml.org/classifier/cgi/lithology/tephra',
            'intrusive rock': 'http://resource.geosciml.org/classifier/cgi/lithology/phaneritic_igneous_rock',
@@ -851,6 +849,7 @@ class Sample:
         self.date_load = None
         self.date_modified = None
         self.sample_no = None
+        self.base_url = None
 
     def validate_xml(self, xml):
 
@@ -863,7 +862,7 @@ class Sample:
             print 'not valid xml'
             return False
 
-    def populate_from_oracle_api(self, igsn):
+    def populate_from_oracle_api(self, igsn, base_url):
         """
         Populates this instance with data from the Oracle Samples table API
 
@@ -871,6 +870,7 @@ class Sample:
         :return: None
         """
 
+        self.base_url = base_url
         # internal URI
         #os.environ['NO_PROXY'] = 'ga.gov.au'
         # target_url = 'http://biotite.ga.gov.au:7777/wwwstaff_distd/a.igsn_api.get_igsnSample?pIGSN=' + igsn
