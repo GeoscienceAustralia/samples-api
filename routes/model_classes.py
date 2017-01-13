@@ -68,7 +68,7 @@ def samples():
     :return: HTTP Response
     """
     views_formats = model_classes_functions.get_classes_views_formats()\
-        .get('http://pid.geoscience.gov.au/def/ont/igsn#SampleRegister')
+        .get('http://purl.org/linked-data/registry#Register')
 
     try:
         view, format = LDAPI.get_valid_view_and_format(
@@ -87,11 +87,19 @@ def samples():
 
     # select view and format
     if view == 'alternates':
-        return routes_functions.render_templates_alternates('page_samples.html', views_formats)
-    elif view in ['dpr']:
+        class_uri = 'http://purl.org/linked-data/registry#Register'
+        del views_formats['renderer']
+        return routes_functions.render_alternates_view(
+            class_uri,
+            urllib.quote_plus(class_uri),
+            None,
+            None,
+            views_formats,
+            request.args.get('_format')
+        )
+    else:
         # only create and populate a SamplesRegister for views that need it
         from model.SamplesRegister import SampleRegister
-
 
         dt = datetime.datetime.now()
         date_stamp = datetime_to_datestamp(dt)
@@ -111,6 +119,7 @@ def samples():
             response.headers['Content-Type'] = 'application/xml'
 
             return response
+
         if format == 'text/html':
             return render_template(
                 'page_samples.html',
