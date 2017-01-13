@@ -2,12 +2,11 @@
 This file contains all the HTTP routes for classes from the IGSN model, such as Samples and the Sample Register
 """
 import datetime
-
 from flask import Blueprint, Response, render_template, request, make_response
-
 import routes_functions
 import settings
 from ldapi import LDAPI, LdapiParameterError
+from model.datestamp import datetime_to_datestamp
 
 # from oaipmh.datestamp import datestamp_to_datetime, datetime_to_datestamp
 
@@ -44,12 +43,12 @@ def sample(igsn):
     if view == 'alternates':
         return routes_functions.render_templates_alternates('page_sample.html', views_formats)
     elif view in ['igsn', 'dc', 'prov', 'csirov3']:
-        # for all these views we will need to populate a renderers
-        from renderers.Sample import Sample
+        # for all these views we will need to populate a model
+        from model.Sample import Sample
         s = Sample()
-        #s.populate_from_xml_file('test/sample_eg2.xml')
+        # s.populate_from_xml_file('test/sample_eg2.xml')
         try:
-            s.populate_from_oracle_api(igsn, request.base_url)
+            s.populate_from_oracle_api(settings.XML_API_URL_SAMPLE, igsn)
         except ValueError:
             return render_template(
                 'no_record_sample.html')
@@ -68,7 +67,7 @@ def sample(igsn):
                 s.export_as_csirov3_xml(),
                 status=200,
                 mimetype='application/xml',
-                #headers={'Content-Disposition': 'attachment; filename=' + igsn + '.xml'}
+                # headers={'Content-Disposition': 'attachment; filename=' + igsn + '.xml'}
             )
         elif format == 'application/xml':
             # TODO: implement IGSN XML format
@@ -80,8 +79,6 @@ def sample(igsn):
                 year_acquired = 'XXXX'
             return render_template(
                 'page_sample.html',
-                base_uri=settings.BASE_URI,
-                web_subfolder=settings.WEB_SUBFOLDER,
                 view=view,
                 placed_html=s.export_as_html(model_view=view),
                 igsn=s.igsn,
@@ -124,11 +121,14 @@ def samples():
         return routes_functions.render_templates_alternates('page_samples.html', views_formats)
     elif view in ['dpr']:
         # only create and populate a SamplesRegister for views that need it
-        from renderers.SamplesRegister import SampleRegister
+        from model.SamplesRegister import SampleRegister
         sr = SampleRegister()
 
+        dt = datetime.datetime.now()
+        date_stamp = datetime_to_datestamp(dt)
+
         try:
-            sr.populate_from_oracle_api(settings.XML_API_URL, page_no, request.base_url)
+            sr.populate_from_oracle_api(settings.XML_API_URL, page_no)
         except ValueError:
             values = {
                 'response_date': date_stamp,
@@ -145,8 +145,6 @@ def samples():
         if format == 'text/html':
             return render_template(
                 'page_samples.html',
-                base_uri=settings.BASE_URI,
-                web_subfolder=settings.WEB_SUBFOLDER,
                 placed_html=sr.export_as_html(model_view='dpr')
             )
         elif format in views_formats['dpr']:

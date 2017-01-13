@@ -33,8 +33,6 @@ def client_error_Response(error_message):
 def render_templates_alternates(parent_template, views_formats):
     return render_template(
         parent_template,
-        base_uri=settings.BASE_URI,
-        web_subfolder=settings.WEB_SUBFOLDER,
         view='alternates',
         placed_html=render_template('view_alternates.html', views_formats=views_formats)
     )

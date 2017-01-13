@@ -1,7 +1,7 @@
 import datetime
 from flask import Blueprint, render_template, request, make_response
 import oai_functions
-from renderers.datestamp import datetime_to_datestamp
+from model.datestamp import datetime_to_datestamp
 oai_ = Blueprint('oai', __name__)
 
 

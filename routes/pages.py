@@ -42,8 +42,6 @@ def index():
         if format == 'text/html':
             return render_template(
                 'page_index.html',
-                base_uri=settings.BASE_URI,
-                web_subfolder=settings.WEB_SUBFOLDER,
             )
         else:
             return Response(
@@ -70,7 +68,7 @@ def index():
                 em.Name('Linked Data API'),
                 em.Title('Geoscience Australia\'s Physical Samples'),
                 em.KeywordList(
-                    em.Keyword('renderers'),
+                    em.Keyword('model'),
                     em.Keyword('IGSN'),
                     em.Keyword('Linked Data'),
                     em.Keyword('XML'),

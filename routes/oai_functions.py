@@ -1,4 +1,6 @@
-from renderers import Sample
+from model import Sample
+import settings
+
 
 OAI_ARGS = {
     'GetRecord': {
@@ -39,11 +41,11 @@ OAI_ARGS = {
     },
 }
 
+
 # https://www.openarchives.org/OAI/openarchivesprotocol.html, 3.6 Error and Exception Conditions
 OAI_ERRORS = {
     'badArgument': 'Value of the verb argument is not a legal OAI-PMH verb, the verb argument is missing, or the verb '
                    'argument is repeated.',
-
 }
 
 
@@ -91,6 +93,7 @@ def validate_oai_parameters(qsa_args):
 
     return True
 
+
 def get_record(request):
     qsa_args =request.args
     s = Sample()
@@ -100,6 +103,7 @@ def get_record(request):
         raise ValueError
     dc_xml = s.export_dc_xml()
     return dc_xml
+
 
 class ParameterError(ValueError):
     pass
@@ -112,7 +116,7 @@ if __name__ == '__main__':
         'metadataPrefix': 'oai_dc'
     }
     s = Sample()
-    s.populate_from_oracle_api(args['identifier'])
+    s.populate_from_oracle_api(settings.XML_API_URL_SAMPLE, args['identifier'])
     dc_xml = s.export_dc_xml()
 
     print 'valid_oai_args(args[\'verb\'])', valid_oai_args(args['verb'])

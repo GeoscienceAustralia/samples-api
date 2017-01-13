@@ -9,9 +9,10 @@
     {% elif view == 'dc' %}
         <h2>Dublin Core view</h2>
     {% endif %}
+    <p><a href="{{ request.url }}">html</a> | <a href="{{ request.url }}&_format=text/turtle">rdf/turtle</a></p>
     {{ placed_html|safe }}
     {% if view != 'alternates' %}
-    <p>Other views of this Sample are listed in the <a href="?_view=alternates">Alternates View</a>.</p>
+    <p>Other views of this Sample are listed in the <a href="{{ request.url }}?_view=alternates">Alternates View</a>.</p>
     {% endif %}
     <h2>Citation</h2>
     <p>If you wish to cite this sample as you would a publication, please use the following format:</p>

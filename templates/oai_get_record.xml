@@ -3,7 +3,7 @@
     xsi:schemaLocation="http://www.openarchives.org/OAI/2.0/
     http://www.openarchives.org/OAI/2.0/OAI-PMH.xsd">
     <responseDate>{{s.timestamp}}</responseDate>
-    <request verb="GetRecord" identifier="{{s.IGSN}}" metadataPrefix="oai_dc">{{s.base_url}}</request>
+    <request verb="GetRecord" identifier="{{s.IGSN}}" metadataPrefix="oai_dc">{{ url_for('routes.index') }}</request>
     <GetRecord>
         <record>
             <header>

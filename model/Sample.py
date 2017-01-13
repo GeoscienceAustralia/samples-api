@@ -1,11 +1,8 @@
 from lxml import etree
 from rdflib import Graph, URIRef, RDF, XSD, Namespace, Literal, BNode
 from StringIO import StringIO
-from lxml.builder import ElementMaker
-from lxml.builder import E
-import os
 import requests
-from renderers.datestamp import datetime_to_datestamp
+from model.datestamp import datetime_to_datestamp
 from datetime import datetime
 from ldapi import LDAPI
 
@@ -169,9 +166,11 @@ class Sample:
            'pyroxene spinifex-textured basalt': 'http://resource.geosciml.org/classifier/cgi/lithology/basalt',
            'olivine hornblendite': 'http://resource.geosciml.org/classifier/cgi/lithology/hornblendite',
            'saprolite, highly weathered': 'http://resource.geosciml.org/classifier/cgi/lithology/residual_material',
-           'fragmental igneous material': 'http://resource.geosciml.org/classifier/cgi/lithology/fragmental_igneous_material',
+           'fragmental igneous material':
+               'http://resource.geosciml.org/classifier/cgi/lithology/fragmental_igneous_material',
            'silty mud': 'http://resource.geosciml.org/classifier/cgi/lithology/mud',
-           'kalsilitic and melilitic rocks': 'http://resource.geosciml.org/classifier/cgi/lithology/kalsilitic_and_melilitic_rock',
+           'kalsilitic and melilitic rocks':
+               'http://resource.geosciml.org/classifier/cgi/lithology/kalsilitic_and_melilitic_rock',
            'muddy silt': 'http://resource.geosciml.org/classifier/cgi/lithology/silt',
            'tephra': 'http://resource.geosciml.org/classifier/cgi/lithology/tephra',
            'intrusive rock': 'http://resource.geosciml.org/classifier/cgi/lithology/phaneritic_igneous_rock',
@@ -849,10 +848,8 @@ class Sample:
         self.date_load = None
         self.date_modified = None
         self.sample_no = None
-        self.base_url = None
 
     def validate_xml(self, xml):
-
         parser = etree.XMLParser(dtd_validation=False)
 
         try:
@@ -862,26 +859,21 @@ class Sample:
             print 'not valid xml'
             return False
 
-    def populate_from_oracle_api(self, igsn, base_url):
+    def populate_from_oracle_api(self, oracle_api_samples_url, igsn):
         """
         Populates this instance with data from the Oracle Samples table API
 
+        :param oracle_api_samples_url: the Oracle XML API URL string for a single sample
         :param igsn: the IGSN of the sample desired
         :return: None
         """
-
-        self.base_url = base_url
         # internal URI
-        #os.environ['NO_PROXY'] = 'ga.gov.au'
-        # target_url = 'http://biotite.ga.gov.au:7777/wwwstaff_distd/a.igsn_api.get_igsnSample?pIGSN=' + igsn
-        # external URI
-        target_url = 'http://dbforms.ga.gov.au/www_distp/a.igsn_api.get_igsnSample?pIGSN=' + igsn
+        # os.environ['NO_PROXY'] = 'ga.gov.au'
         # call API
-        r = requests.get(target_url)
+        r = requests.get(oracle_api_samples_url % igsn)
         # deal with missing XML declaration
         if "No data" in r.content:
             raise ParameterError('No Data')
-            return False
         if not r.content.startswith('<?xml version="1.0" ?>'):
             xml = '<?xml version="1.0" ?>\n' + r.content
         else:
@@ -1239,7 +1231,7 @@ class Sample:
             g.add((qualified_attribution, PROV.hadRole, AUROLE.Publisher))
             g.add((this_sample, PROV.qualifiedAttribution, qualified_attribution))
 
-        return g.serialize(format=LDAPI.get_file_extension(rdf_mime))
+        return g.serialize(format=LDAPI.get_rdf_parser_for_mimetype(rdf_mime))
 
     def is_xml_export_valid(self, xml_string):
         """
@@ -1259,6 +1251,7 @@ class Sample:
         xml = etree.parse(StringIO(xml_string))
 
         return xsd.validate(xml)
+
     def export_dc_xml(self):
         """
         Exports this Sample instance in XML that validates against the OAI Dublin Core Metadata from
@@ -1269,7 +1262,6 @@ class Sample:
 
         :return: XML string
         """
-
 
         '''
         <record>
@@ -1285,8 +1277,7 @@ class Sample:
         <dc:identifier>http://hdl.handle.net/10273/847000108</dc:identifier>
         <dc:identifier>igsn:10273/847000108</dc:identifier>
         </oai_dc:dc></metadata></record>
-
-      '''
+        '''
 
         if isinstance(self.date_acquired, datetime):
             sampling_time = self.date_acquired.isoformat()
@@ -1309,21 +1300,19 @@ class Sample:
 
         GEOSP = Namespace('http://www.opengis.net/ont/geosparql#')
 
-
         # sample location in GML & WKT, formulation from GeoSPARQL
         wkt = Literal(self.generate_sample_wkt(), datatype=GEOSP.wktLiteral)
         gml = Literal(self.generate_sample_gml(), datatype=GEOSP.gmlLiteral)
 
         dt = datetime.now()
-        date_stamp = datetime_to_datestamp(dt)
 
         format = URIRef(self.material_type)
 
         # TODO:   add is site uri
-        xml = 'xml = <record>\
-        <header>\
-        <identifier>' + self.entity_uri + '</identifier>\
-        <datestamp>' + date_stamp + '</datestamp>\
+        xml = '''xml = <record>
+        <header>
+        <identifier>%(entity_uri)s</identifier>
+        <datestamp>%(date_stamp)s'</datestamp>\
         <setSpec>IEDA</setSpec>\
         <setSpec>IEDA.SESAR</setSpec>\
         </header>\
@@ -1337,10 +1326,12 @@ class Sample:
         <dc:coverage>' + wkt + '</dc:coverage>\
         </oai_dc:dc> \
         </metadata> \
-        </record>'
+        </record>''' % {
+            'entity_uri': self.entity_uri,
+            'date_stamp': datetime_to_datestamp(dt),
+        }
 
         return xml
-
 
     def export_as_csirov3_xml(self):
         """
@@ -1631,13 +1622,14 @@ class Sample:
         html += '</table>'
 
         return html
+
+
 class ParameterError(ValueError):
     pass
 
 if __name__ == '__main__':
-    print "hello"
     s = Sample()
-    #s.populate_from_xml_file('../test/sample_eg1.xml')
+    # s.populate_from_xml_file('../test/sample_eg1.xml')
     s.populate_from_oracle_api('AU100')
     print s.export_dc_xml()
 

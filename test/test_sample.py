@@ -1,5 +1,5 @@
 import unittest
-from renderers import Sample
+from model import Sample
 
 
 # global Sample for testing
