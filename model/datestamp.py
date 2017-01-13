@@ -1,6 +1,6 @@
 
 import datetime
-from oaipmh.error import DatestampError
+
 
 
 # taken from https://github.com/infrae/pyoai/blob/master/src/oaipmh/datestamp.py
@@ -88,3 +88,32 @@ def tolerant_datestamp_to_datetime(datestamp):
         raise DatestampError(datestamp)
     return datetime.datetime(
         int(YYYY), int(MM), int(DD), int(hh), int(mm), int(ss))
+
+
+# errors not defined by OAI-PMH but which can occur in a client when
+# the server is somehow misbehaving
+class ClientError(Exception):
+    def details(self):
+        """Error details in human readable text.
+        """
+        raise NotImplementedError
+
+
+class XMLSyntaxError(ClientError):
+    """The OAI-PMH XML can not be parsed as it is not well-formed.
+    """
+
+    def details(self):
+        return ("The data delivered by the server could not be parsed, as it "
+                "is not well-formed XML.")
+
+
+class DatestampError(ClientError):
+    """The OAI-PMH datestamps were not proper UTC datestamps as by spec.
+    """
+
+    def __init__(self, datestamp):
+        self.datestamp = datestamp
+
+    def details(self):
+        return ("An illegal datestamp was encountered: %s" % self.datestamp)
