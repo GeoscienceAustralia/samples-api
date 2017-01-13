@@ -2,10 +2,12 @@
 import datetime
 from oaipmh.error import DatestampError
 
-#taken from https://github.com/infrae/pyoai/blob/master/src/oaipmh/datestamp.py
+
+# taken from https://github.com/infrae/pyoai/blob/master/src/oaipmh/datestamp.py
+
 
 def datetime_to_datestamp(dt, day_granularity=False):
-    assert dt.tzinfo is None # only accept timezone naive datetimes
+    assert dt.tzinfo is None  # only accept timezone naive datetimes
     # ignore microseconds
     dt = dt.replace(microsecond=0)
     result = dt.isoformat() + 'Z'
@@ -13,17 +15,20 @@ def datetime_to_datestamp(dt, day_granularity=False):
         result = result[:-10]
     return result
 
+
 # handy utility function not used by pyoai itself yet
 def date_to_datestamp(d, day_granularity=False): 	 
     return datetime_to_datestamp( 	 
         datetime.datetime.combine(d, datetime.time(0)), day_granularity)
+
 
 def datestamp_to_datetime(datestamp, inclusive=False):
     try:
         return _datestamp_to_datetime(datestamp, inclusive)
     except ValueError:
         raise DatestampError(datestamp)
-    
+
+
 def _datestamp_to_datetime(datestamp, inclusive=False):
     splitted = datestamp.split('T')
     if len(splitted) == 2:
@@ -40,9 +45,10 @@ def _datestamp_to_datetime(datestamp, inclusive=False):
         else:
             t = '00:00:00'
     YYYY, MM, DD = d.split('-')
-    hh, mm, ss = t.split(':') # this assumes there's no timezone info
+    hh, mm, ss = t.split(':')  # this assumes there's no timezone info
     return datetime.datetime(
         int(YYYY), int(MM), int(DD), int(hh), int(mm), int(ss))
+
 
 def tolerant_datestamp_to_datetime(datestamp):
     """A datestamp to datetime that's more tolerant of diverse inputs.

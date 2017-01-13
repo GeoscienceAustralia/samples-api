@@ -31,7 +31,7 @@ class SampleRegister:
             print 'not valid xml'
             return False
 
-    def populate_from_oracle_api(self, page_no, base_url):
+    def populate_from_oracle_api(self, xml_api_url, page_no, base_url):
         """
         Populates this instance with data from the Oracle Samples table API
 
@@ -40,18 +40,9 @@ class SampleRegister:
         """
         self.base_url = base_url
         #os.environ['NO_PROXY'] = 'ga.gov.au'
-        # internal URI
-        # target_url = 'http://biotite.ga.gov.au:7777/wwwstaff_distd/a.igsn_api.get_igsnSample?pIGSN=' + igsn
-        # external URI
-        target_url = 'http://dbforms.ga.gov.au/www_distp/a.igsn_api.get_igsnSampleSet?pOrder=IGSN&pPageNo={0}' \
-                     '&pNoOfLinesPerPage=25'.format(page_no)
-        # call API
-        r = requests.get(target_url)
-        # deal with missing XML declaration
-        if not r.content.startswith('<?xml version="1.0" ?>'):
-            xml = '<?xml version="1.0" ?>\n' + r.content
-        else:
-            xml = r.content
+        print xml_api_url.format(page_no)
+        r = requests.get(xml_api_url.format(page_no))
+        xml = r.content
 
         if self.validate_xml(xml):
             self.populate_from_xml_file(StringIO(xml))
@@ -69,7 +60,6 @@ class SampleRegister:
         for event, elem in etree.iterparse(xml):
             if elem.tag == "IGSN":
                 self.samples.append(elem.text)
-
 
     def export_as_text(self):
         return '"' + '", "'.join(self.samples) + '"'
@@ -198,31 +188,32 @@ class SampleRegister:
 
         return html
 
-def export_ListRecords(self, model_view='default'):
-        if model_view == 'default' or model_view == 'oai_dc' or model_view is None:
-            # export dc xml compliant with OAI-PMH
-            root = etree.XML('''\
-            <?xml version="1.0" encoding="UTF-8" ?>
-            <?xml-stylesheet type="text/xsl" href="xsl/oaitohtml.xsl"?>
-            <OAI-PMH xmlns="http://www.openarchives.org/OAI/2.0/"
-                xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-                xsi:schemaLocation="http://www.openarchives.org/OAI/2.0/ http://www.openarchives.org/OAI/2.0/OAI-PMH.xsd">
-                <responseDate>2016-12-21T08:04:45Z</responseDate>
-                <request verb="ListRecords" from="2011-06-01T00:00:00Z" metadataPrefix="oai_dc">
-                    http://doidb.wdc-terra.org/igsnoaip/oai</request>
-                <ListRecords>
-            ''')
+    def export_ListRecords(self, model_view='default'):
+            if model_view == 'default' or model_view == 'oai_dc' or model_view is None:
+                # export dc xml compliant with OAI-PMH
+                root = etree.XML('''\
+                <?xml version="1.0" encoding="UTF-8" ?>
+                <?xml-stylesheet type="text/xsl" href="xsl/oaitohtml.xsl"?>
+                <OAI-PMH xmlns="http://www.openarchives.org/OAI/2.0/"
+                    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                    xsi:schemaLocation="http://www.openarchives.org/OAI/2.0/ http://www.openarchives.org/OAI/2.0/OAI-PMH.xsd">
+                    <responseDate>2016-12-21T08:04:45Z</responseDate>
+                    <request verb="ListRecords" from="2011-06-01T00:00:00Z" metadataPrefix="oai_dc">
+                        http://doidb.wdc-terra.org/igsnoaip/oai</request>
+                    <ListRecords>
+                ''')
 
-        elif model_view == 'dc':
-            pass
-        elif model_view == 'prov':
-            pass
+            elif model_view == 'dc':
+                pass
+            elif model_view == 'prov':
+                pass
 
 
 if __name__ == '__main__':
     sr = SampleRegister()
     # sr.populate_from_xml_file('../test/samples_register_eg1.xml')
-    sr.populate_from_oracle_api(1, "http://localhost:8080/oai")
+    import settings
+    sr.populate_from_oracle_api(settings.XML_API_URL, 1, settings.OAI_BASE_URL)
     # print sr.export_as_text()
     # print sr.export_as_html()
     print sr.export_as_rdf(model_view='dpr', rdf_mime='text/turtle')
