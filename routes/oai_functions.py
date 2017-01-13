@@ -98,7 +98,7 @@ def get_record(request):
     qsa_args =request.args
     s = Sample()
     try:
-        s.populate_from_oracle_api(qsa_args['identifier'], request.base_url)
+        s._populate_from_oracle_api(qsa_args['identifier'], request.base_url)
     except ValueError:
         raise ValueError
     dc_xml = s.export_dc_xml()
@@ -115,8 +115,7 @@ if __name__ == '__main__':
         'identifier': 'AU100',
         'metadataPrefix': 'oai_dc'
     }
-    s = Sample()
-    s.populate_from_oracle_api(settings.XML_API_URL_SAMPLE, args['identifier'])
+    s = Sample(settings.XML_API_URL_SAMPLE, args['identifier'])
     dc_xml = s.export_dc_xml()
 
     print 'valid_oai_args(args[\'verb\'])', valid_oai_args(args['verb'])

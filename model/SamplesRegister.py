@@ -16,8 +16,12 @@ class SampleRegister:
     URI_GA = URIRef('http://pid.geoscience.gov.au/org/ga')
     URI_DS_REG = URIRef('http://pid.geoscience.gov.au/dataset/')
 
-    def __init__(self):
+    def __init__(self, xml_api_url, page_no):
         self.samples = []
+        self.xml_api_url = xml_api_url
+
+        if xml_api_url is not None:
+            self.populate_from_oracle_api(page_no)
 
     def validate_xml(self, xml):
 
@@ -30,7 +34,7 @@ class SampleRegister:
             print 'not valid xml'
             return False
 
-    def populate_from_oracle_api(self, xml_api_url, page_no):
+    def populate_from_oracle_api(self, page_no):
         """
         Populates this instance with data from the Oracle Samples table API
 
@@ -38,8 +42,7 @@ class SampleRegister:
         :return: None
         """
         #os.environ['NO_PROXY'] = 'ga.gov.au'
-        print xml_api_url.format(page_no)
-        r = requests.get(xml_api_url.format(page_no))
+        r = requests.get(self.xml_api_url.format(page_no))
         xml = r.content
 
         if self.validate_xml(xml):
@@ -208,10 +211,9 @@ class SampleRegister:
 
 
 if __name__ == '__main__':
-    sr = SampleRegister()
-    # sr.populate_from_xml_file('../test/samples_register_eg1.xml')
     import settings
-    sr.populate_from_oracle_api(settings.XML_API_URL, 1)
+    sr = SampleRegister(settings.XML_API_URL, 1)
+    # sr.populate_from_xml_file('../test/samples_register_eg1.xml')
     # print sr.export_as_text()
     # print sr.export_as_html()
     print sr.export_as_rdf(model_view='dpr', rdf_mime='text/turtle')

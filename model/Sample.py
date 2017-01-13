@@ -5,6 +5,7 @@ import requests
 from model.datestamp import datetime_to_datestamp
 from datetime import datetime
 from ldapi import LDAPI
+from flask import Response, render_template
 
 
 class Sample:
@@ -812,8 +813,9 @@ class Sample:
     WILDCAT LOCATION
     '''
 
-    def __init__(self):
-        self.igsn = None
+    def __init__(self, oracle_api_samples_url, igsn):
+        self.oracle_api_samples_url = oracle_api_samples_url
+        self.igsn = igsn
         self.sampleid = None
         self.sample_type = None
         self.method_type = None
@@ -849,6 +851,34 @@ class Sample:
         self.date_modified = None
         self.sample_no = None
 
+    def render(self, view, mimetype):
+        if mimetype in LDAPI.get_rdf_mimetypes_list():
+            return Response(self.export_as_rdf(view, mimetype), mimetype=mimetype)
+
+        if view == 'igsn':
+            # RDF formats handled by general case
+            # HTML is othe only other enabled format for igsn view
+            return self.export_as_html(model_view=view)
+        elif view == 'dc':
+            # RDF formats handled by general case
+            if mimetype == 'application/xml':
+                return self.export_dc_xml()
+            else:
+                return self.export_as_html(model_view=view)
+        elif view == 'prov':
+            # RDF formats handled by general case
+            # only RDF for this view
+            print 'format: ' + mimetype
+            return Response(self.export_as_rdf('prov', mimetype), mimetype=mimetype)
+        elif view == 'csirov3':
+            # only XML for this view
+            return Response(
+                self.export_as_csirov3_xml(),
+                status=200,
+                mimetype='application/xml',
+                # headers={'Content-Disposition': 'attachment; filename=' + igsn + '.xml'}
+            )
+
     def validate_xml(self, xml):
         parser = etree.XMLParser(dtd_validation=False)
 
@@ -859,7 +889,7 @@ class Sample:
             print 'not valid xml'
             return False
 
-    def populate_from_oracle_api(self, oracle_api_samples_url, igsn):
+    def _populate_from_oracle_api(self):
         """
         Populates this instance with data from the Oracle Samples table API
 
@@ -870,7 +900,7 @@ class Sample:
         # internal URI
         # os.environ['NO_PROXY'] = 'ga.gov.au'
         # call API
-        r = requests.get(oracle_api_samples_url % igsn)
+        r = requests.get(self.oracle_api_samples_url % self.igsn)
         # deal with missing XML declaration
         if "No data" in r.content:
             raise ParameterError('No Data')
@@ -879,12 +909,12 @@ class Sample:
         else:
             xml = r.content
         if self.validate_xml(xml):
-            self.populate_from_xml_file(StringIO(xml))
+            self._populate_from_xml_file(StringIO(xml))
             return True
         else:
             return False
 
-    def populate_from_xml_file(self, xml):
+    def _populate_from_xml_file(self, xml):
         """
         Populates this instance with data from an XML file.
 
@@ -1055,40 +1085,53 @@ class Sample:
 
         return True
 
-    def generate_sample_wkt(self):
+    def _generate_sample_wkt(self):
         if self.z is not None:
             # wkt = "SRID=" + self.srid + ";POINTZ(" + self.x + " " + self.y + " " + self.z + ")"
             wkt = "<https://epsg.io/" + self.srid + "> " \
                   "POINTZ(" + self.x + " " + self.y + " " + self.z + ")"
         else:
             # wkt = "SRID=" + self.srid + ";POINT(" + self.x + " " + self.y + ")"
-            wkt = "<https://epsg.io/" + self.srid + "> POINT(" + self.x + " " + self.y + ")"
+            if self.srid is not None and self.x is not None and self.y is not None:
+                wkt = "<https://epsg.io/" + self.srid + "> POINT(" + self.x + " " + self.y + ")"
+            else:
+                wkt = ''
 
         return wkt
 
-    def generate_sample_gml(self):
+    def _generate_sample_gml(self):
         if self.z is not None:
             gml = '<gml:Point srsDimension="3" srsName="https://epsg.io/' + self.srid + '">' \
                   '<gml:pos>' + self.x + ' ' + self.y + ' ' + self.z + '</gml:pos>' \
                   '</gml:Point>'
         else:
-            gml = '<gml:Point srsDimension="2" srsName="https://epsg.io/' + self.srid + '">' \
-                  '<gml:pos>' + self.x + ' ' + self.y + '</gml:pos>' \
-                  '</gml:Point>'
+            if self.srid is not None and self.x is not None and self.y is not None:
+                gml = '<gml:Point srsDimension="2" srsName="https://epsg.io/' + self.srid + '">' \
+                      '<gml:pos>' + self.x + ' ' + self.y + '</gml:pos>' \
+                      '</gml:Point>'
+            else:
+                gml = ''
 
         return gml
 
-    def generate_parent_wkt(self):
+    def _generate_parent_wkt(self):
         # TODO: add support for geometries other than Point
-        wkt = "<https://epsg.io/" + self.srid + ">POINT(" + self.hole_long_min + " " + self.hole_lat_min + ")"
+        if self.srid is not None and self.x is not None and self.y is not None:
+            wkt = "<https://epsg.io/" + self.srid + ">POINT(" + self.hole_long_min + " " + self.hole_lat_min + ")"
+        else:
+            wkt = ''
 
         return wkt
 
-    def generate_parent_gml(self):
+    def _generate_parent_gml(self):
         # TODO: add support for geometries other than Point
-        gml = '<gml:Point srsDimension="2" srsName="https://epsg.io/' + \
-              self.srid + '"><gml:pos>' + self.hole_long_min + ' ' + self.hole_lat_min + '</gml:pos>' \
-              '</gml:Point>'
+        if self.srid is not None and self.x is not None and self.y is not None:
+            gml = '<gml:Point srsDimension="2" srsName="https://epsg.io/' + \
+                  self.srid + '"><gml:pos>' + self.hole_long_min + ' ' + self.hole_lat_min + '</gml:pos>' \
+                  '</gml:Point>'
+        else:
+            gml = ''
+
         return gml
 
     def export_as_rdf(self, model_view='default', rdf_mime='text/turtle'):
@@ -1129,11 +1172,11 @@ class Sample:
         ga = URIRef(Sample.URI_GA)
 
         # sample location in GML & WKT, formulation from GeoSPARQL
-        wkt = Literal(self.generate_sample_wkt(), datatype=GEOSP.wktLiteral)
-        gml = Literal(self.generate_sample_gml(), datatype=GEOSP.gmlLiteral)
+        wkt = Literal(self._generate_sample_wkt(), datatype=GEOSP.wktLiteral)
+        gml = Literal(self._generate_sample_gml(), datatype=GEOSP.gmlLiteral)
 
         # select model view
-        if model_view == 'default' or model_view == 'igsn' or model_view is None:
+        if model_view == 'igsn':
             # default model is the IGSN model
             # IGSN model required namespaces
             IGSN = Namespace('http://pid.geoscience.gov.au/def/ont/igsn#')
@@ -1175,17 +1218,29 @@ class Sample:
             # TODO: represent Public/Private (and other?) access methods in DB, add to terms in vocab?
             g.add((this_sample, DCT.accessRights, URIRef(Sample.TERM_LOOKUP['access']['Public'])))
             # TODO: make a register of Entities
-            this_parent = URIRef(self.entity_uri)
+            if self.entity_uri is not None:
+                this_parent = URIRef(self.entity_uri)
+            else:
+                # TODO: get a real parent URL
+                this_parent = URIRef('http://fake.com')
+
             g.add((this_sample, SAMFL.relatedSamplingFeature, this_parent))  # could be OM.featureOfInterest
 
             # parent
-            g.add((this_parent, RDF.type, URIRef(Sample.TERM_LOOKUP['entity_type'][self.entity_type])))
+            if self.entity_type is not None:
+                g.add((this_parent, RDF.type, URIRef(Sample.TERM_LOOKUP['entity_type'][self.entity_type])))
+            else:
+                g.add((
+                    this_parent,
+                    RDF.type,
+                    URIRef('http://pid.geoscience.gov.au/def/voc/featureofinteresttype/borehole')
+                ))
 
             parent_geometry = BNode()
             g.add((this_parent, GEOSP.hasGeometry, parent_geometry))
             g.add((parent_geometry, RDF.type, SAMFL.Point))  # TODO: extend this for other geometry types
-            g.add((parent_geometry, GEOSP.asWKT, Literal(self.generate_parent_wkt(), datatype=GEOSP.wktLiteral)))
-            g.add((parent_geometry, GEOSP.asGML, Literal(self.generate_parent_gml(), datatype=GEOSP.wktLiteral)))
+            g.add((parent_geometry, GEOSP.asWKT, Literal(self._generate_parent_wkt(), datatype=GEOSP.wktLiteral)))
+            g.add((parent_geometry, GEOSP.asGML, Literal(self._generate_parent_gml(), datatype=GEOSP.wktLiteral)))
 
             parent_elevation = BNode()
             g.add((this_parent, SAMFL.samplingElevation, parent_elevation))
@@ -1233,7 +1288,7 @@ class Sample:
 
         return g.serialize(format=LDAPI.get_rdf_parser_for_mimetype(rdf_mime))
 
-    def is_xml_export_valid(self, xml_string):
+    def _is_xml_export_valid(self, xml_string):
         """
         Validate and export of this Sample instance in XML using the XSD files from the dev branch
         of the IGSN repo: https://github.com/IGSN/metadata/tree/dev/description. The actual XSD
@@ -1301,8 +1356,8 @@ class Sample:
         GEOSP = Namespace('http://www.opengis.net/ont/geosparql#')
 
         # sample location in GML & WKT, formulation from GeoSPARQL
-        wkt = Literal(self.generate_sample_wkt(), datatype=GEOSP.wktLiteral)
-        gml = Literal(self.generate_sample_gml(), datatype=GEOSP.gmlLiteral)
+        wkt = Literal(self._generate_sample_wkt(), datatype=GEOSP.wktLiteral)
+        gml = Literal(self._generate_sample_gml(), datatype=GEOSP.gmlLiteral)
 
         dt = datetime.now()
 
@@ -1502,7 +1557,7 @@ class Sample:
         '''
 
         # CSIRO v3
-        sample_wkt = self.generate_sample_wkt()
+        sample_wkt = self._generate_sample_wkt()
         xsi = 'http://www.w3.org/2001/XMLSchema-instance'
         cs = 'https://igsn.csiro.au/schemas/3.0'
         root = etree.Element(
@@ -1525,9 +1580,10 @@ class Sample:
         # etree.SubElement(r, '{%s}campaign' % cs).text = ''
         l = etree.SubElement(r, '{%s}location' % cs)
         g = etree.SubElement(l, '{%s}geometry' % cs)
-        g.text = sample_wkt
-        g.attrib['srid'] = 'https://epsg.io/' + self.srid
-        g.attrib['verticalDatum'] = 'https://epsg.io/4283'
+        if self.srid is not None:
+            g.text = sample_wkt
+            g.attrib['srid'] = 'https://epsg.io/' + self.srid
+            g.attrib['verticalDatum'] = 'https://epsg.io/4283'
         # g.attrib['geometryURI'] = 'http://www.altova.com'
         cd = etree.SubElement(r, '{%s}curationDetails' % cs)
         c = etree.SubElement(cd, '{%s}curation' % cs)
@@ -1609,7 +1665,7 @@ class Sample:
 
         elif model_view == 'dc':
             html += '   <tr><th>IGSN</th><td>' + self.igsn + '</td></tr>'
-            html += '   <tr><th>Coverage</th><td>' + self.generate_sample_wkt() + '</td></tr>'
+            html += '   <tr><th>Coverage</th><td>' + self._generate_sample_wkt() + '</td></tr>'
             if self.date_acquired is not None:
                 html += '   <tr><th>Date</th><td>' + self.date_acquired.isoformat() + '</td></tr>'
             if self.remark is not None:
@@ -1621,16 +1677,26 @@ class Sample:
 
         html += '</table>'
 
-        return html
+        if self.date_acquired is not None:
+            year_acquired = datetime.strftime(self.date_acquired, '%Y')
+        else:
+            year_acquired = 'XXXX'
+
+        return render_template(
+            'page_sample.html',
+            view=model_view,
+            igsn=self.igsn,
+            year_acquired=year_acquired,
+            placed_html=html,
+            date_now=datetime.now().strftime('%d %B %Y')
+        )
 
 
 class ParameterError(ValueError):
     pass
 
 if __name__ == '__main__':
-    s = Sample()
-    # s.populate_from_xml_file('../test/sample_eg1.xml')
-    s.populate_from_oracle_api('AU100')
+    s = Sample('http://fake.com', 'AU100')
     print s.export_dc_xml()
 
     # print s.is_xml_export_valid(open('../test/sample_eg3_IGSN_schema.xml').read())

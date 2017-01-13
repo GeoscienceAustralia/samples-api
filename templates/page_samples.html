@@ -10,6 +10,6 @@
     <p><a href="{{ request.url }}">html</a> | <a href="{{ request.url }}&_format=text/turtle">rdf/turtle</a></p>
     {{ placed_html|safe }}
     {% if view != 'alternates' %}
-    <p>Other views of this Sample are listed in the <a href="{{ request.url }}?_view=alternates">Alternates View</a>.</p>
+    <p>Other views of this Sample are listed in the <a href="{{ url_for('model_classes.samples') }}?_view=alternates">Alternates View</a>.</p>
     {% endif %}
 {% endblock %}

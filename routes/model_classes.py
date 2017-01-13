@@ -7,12 +7,15 @@ import routes_functions
 import settings
 from ldapi import LDAPI, LdapiParameterError
 from model.datestamp import datetime_to_datestamp
+from routes import model_classes_functions
+import urllib
 
 # from oaipmh.datestamp import datestamp_to_datetime, datetime_to_datestamp
 
 model_classes = Blueprint('model_classes', __name__)
 
 
+# TODO: compare this with the instance endpoint in PROMS
 @model_classes.route('/sample/<string:igsn>')
 def sample(igsn):
     """
@@ -21,14 +24,8 @@ def sample(igsn):
     :return: HTTP Response
     """
     # lists the views and formats available for a Sample
-    views_formats = {
-        'default': 'igsn',
-        'alternates': ['text/html'],
-        'igsn': ['text/html', 'text/turtle', 'application/rdf+xml', 'application/rdf+json'],
-        'dc': ['text/html', 'text/turtle', 'application/rdf+xml', 'application/rdf+json'],
-        'prov': ['text/html', 'text/turtle', 'application/rdf+xml', 'application/rdf+json'],
-        'csirov3': ['application/xml']
-    }
+    views_formats = model_classes_functions.get_classes_views_formats()\
+        .get('http://pid.geoscience.gov.au/def/ont/igsn#Sample')
 
     try:
         view, format = LDAPI.get_valid_view_and_format(
@@ -36,57 +33,33 @@ def sample(igsn):
             request.args.get('_format'),
             views_formats
         )
+
+        # if alternates model, return this info from file
+        if view == 'alternates':
+            class_uri = 'http://pid.geoscience.gov.au/def/ont/igsn#Sample'
+            instance_uri = 'http://pid.geoscience.gov.au/sample/' + igsn
+            del views_formats['renderer']
+            return routes_functions.render_alternates_view(
+                class_uri,
+                urllib.quote_plus(class_uri),
+                instance_uri,
+                urllib.quote_plus(instance_uri),
+                views_formats,
+                request.args.get('_format')
+            )
+        else:
+            from model.Sample import Sample
+            try:
+                s = Sample(settings.XML_API_URL_SAMPLE, igsn)
+                return s.render(request.args.get('_view'), request.args.get('_format'))
+            except ValueError:
+                return render_template('no_record_sample.html')
+
     except LdapiParameterError, e:
         return routes_functions.client_error_Response(e)
 
-    # select view and format
-    if view == 'alternates':
-        return routes_functions.render_templates_alternates('page_sample.html', views_formats)
-    elif view in ['igsn', 'dc', 'prov', 'csirov3']:
-        # for all these views we will need to populate a model
-        from model.Sample import Sample
-        s = Sample()
-        # s.populate_from_xml_file('test/sample_eg2.xml')
-        try:
-            s.populate_from_oracle_api(settings.XML_API_URL_SAMPLE, igsn)
-        except ValueError:
-            return render_template(
-                'no_record_sample.html')
 
-        if format in ['text/turtle', 'application/rdf+xml', 'application/rdf+json']:
-            return Response(
-                s.export_as_rdf(
-                    model_view=view,
-                    rdf_mime=format),
-                status=200,
-                mimetype=format,
-                headers={'Content-Disposition': 'attachment; filename=' + igsn + LDAPI.get_file_extension(format)}
-            )
-        elif view == 'csirov3':
-            return Response(
-                s.export_as_csirov3_xml(),
-                status=200,
-                mimetype='application/xml',
-                # headers={'Content-Disposition': 'attachment; filename=' + igsn + '.xml'}
-            )
-        elif format == 'application/xml':
-            # TODO: implement IGSN XML format
-            pass
-        else:  # format == 'text/html'
-            if s.date_acquired is not None:
-                year_acquired = datetime.datetime.strftime(s.date_acquired, '%Y')
-            else:
-                year_acquired = 'XXXX'
-            return render_template(
-                'page_sample.html',
-                view=view,
-                placed_html=s.export_as_html(model_view=view),
-                igsn=s.igsn,
-                year_acquired=year_acquired,
-                date_now=datetime.datetime.now().strftime('%d %B %Y')
-            )
-
-
+# TODO: compare this with the register endpoint in PROMS
 @model_classes.route('/sample/')
 def samples():
     """
@@ -94,12 +67,8 @@ def samples():
 
     :return: HTTP Response
     """
-    # TODO: replace this with the same alternates mechanisms that PROMS Server now uses
-    views_formats = {
-        'default': 'dpr',
-        'alternates': ['text/html'],
-        'dpr': ['text/html', 'text/turtle', 'application/rdf+xml', 'application/rdf+json'],
-    }
+    views_formats = model_classes_functions.get_classes_views_formats()\
+        .get('http://pid.geoscience.gov.au/def/ont/igsn#SampleRegister')
 
     try:
         view, format = LDAPI.get_valid_view_and_format(
@@ -122,13 +91,13 @@ def samples():
     elif view in ['dpr']:
         # only create and populate a SamplesRegister for views that need it
         from model.SamplesRegister import SampleRegister
-        sr = SampleRegister()
+
 
         dt = datetime.datetime.now()
         date_stamp = datetime_to_datestamp(dt)
 
         try:
-            sr.populate_from_oracle_api(settings.XML_API_URL, page_no)
+            sr = SampleRegister(settings.XML_API_URL, page_no)
         except ValueError:
             values = {
                 'response_date': date_stamp,
