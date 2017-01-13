@@ -4,12 +4,12 @@
          xsi:schemaLocation="http://www.openarchives.org/OAI/2.0/
          http://www.openarchives.org/OAI/2.0/OAI-PMH.xsd">
     <responseDate>{{values.response_date}}</responseDate>
-    <request verb="Identify">http://pid.geoscience.gov.au/oai</request>
+    <request verb="Identify">{{ request.base_url }}</request>
     <Identify>
         <repositoryName>IGSN Registry Metadata Store</repositoryName>
-        <baseURL>http://pid.geoscience.gov.au/oai</baseURL>
+        <baseURL>{{ request.base_url }}</baseURL>
         <protocolVersion>2.0</protocolVersion>
-        <adminEmail>fakeEmail@ga.gov.au</adminEmail>
+        <adminEmail>{{ values.admin_email }}</adminEmail>
         <earliestDatestamp>2015-08-07T02:19:24Z</earliestDatestamp>
         <deletedRecord>no</deletedRecord>
         <granularity>YYYY-MM-DDThh:mm:ssZ</granularity>

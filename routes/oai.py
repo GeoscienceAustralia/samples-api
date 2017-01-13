@@ -2,6 +2,7 @@ import datetime
 from flask import Blueprint, render_template, request, make_response
 import oai_functions
 from model.datestamp import datetime_to_datestamp
+import settings
 oai_ = Blueprint('oai', __name__)
 
 
@@ -70,7 +71,8 @@ def oai():
 
     elif verb == 'Identify':
         values = {
-            'response_date': date_stamp
+            'response_date': date_stamp,
+            'admin_email': settings.ADMIN_EMAIL
             }
         template = render_template('oai_identify.xml', values=values), 400
         response = make_response(template)

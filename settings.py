@@ -11,3 +11,5 @@ DEBUG = True
 XML_API_URL = 'http://dbforms.ga.gov.au/www_distp/a.igsn_api.get_igsnSampleSet?pOrder=IGSN&pPageNo={0}&pNoOfLinesPerPage=25'
 
 XML_API_URL_SAMPLE = 'http://dbforms.ga.gov.au/www_distp/a.igsn_api.get_igsnSample?pIGSN={0}'
+
+ADMIN_EMAIL = 'data@ga.gov.au'
