@@ -1,2 +1,2 @@
-from Sample import Sample
+from sample import Sample
 from SamplesRegister import SampleRegister

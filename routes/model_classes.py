@@ -48,7 +48,7 @@ def sample(igsn):
                 request.args.get('_format')
             )
         else:
-            from model.Sample import Sample
+            from model.sample import Sample
             try:
                 s = Sample(settings.XML_API_URL_SAMPLE, igsn)
                 return s.render(request.args.get('_view'), request.args.get('_format'))
