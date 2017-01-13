@@ -97,7 +97,7 @@ def samples():
 
     :return: HTTP Response
     """
-
+    # TODO: replace this with the same alternates mechanisms that PROMS Server now uses
     views_formats = {
         'default': 'dpr',
         'alternates': ['text/html'],
@@ -127,9 +127,8 @@ def samples():
         from renderers.SamplesRegister import SampleRegister
         sr = SampleRegister()
 
-
         try:
-            sr.populate_from_oracle_api(page_no, request.base_url)
+            sr.populate_from_oracle_api(settings.XML_API_URL, page_no, request.base_url)
         except ValueError:
             values = {
                 'response_date': date_stamp,
