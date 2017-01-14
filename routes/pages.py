@@ -36,9 +36,8 @@ def index():
         return routes_functions.client_error_Response(e)
 
     # select view and format
-    if view == 'alternates':
-        return routes_functions.render_templates_alternates('page_index.html', views_formats)
-    elif view == 'landingpage':
+
+    if view != 'getcapabilities':
         if format == 'text/html':
             return render_template(
                 'page_index.html',

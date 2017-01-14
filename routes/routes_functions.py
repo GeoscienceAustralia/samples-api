@@ -33,19 +33,10 @@ def client_error_Response(error_message):
     )
 
 
-def render_templates_alternates(parent_template, views_formats):
-    return render_template(
-        parent_template,
-        view='alternates',
-        placed_html=render_template('view_alternates.html', views_formats=views_formats)
-    )
-
-
 def render_alternates_view(class_uri, class_uri_encoded, instance_uri, instance_uri_encoded, views_formats, mimetype):
     """Renders an HTML table, a JSON object string or a serialised RDF representation of the alternate views of an
     object"""
     if mimetype == 'application/json':
-        del views_formats['renderer']  # the renderer used is not for public consumption!
         return Response(json.dumps(views_formats), status=200, mimetype='application/json')
     elif mimetype in LDAPI.get_rdf_mimetypes_list():
         g = Graph()

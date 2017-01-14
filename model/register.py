@@ -9,13 +9,15 @@ import settings
 
 
 class RegisterRenderer(Renderer):
-    def __init__(self, request, uri, endpoints, register):
+    def __init__(self, request, uri, endpoints):
         Renderer.__init__(self, uri, endpoints)
 
         self.request = request
         self.uri = uri
-        self.register = register
+        self.register = []
         self.g = None
+
+        self._get_details_from_oracle_api(1)
 
     def render(self, view, mimetype):
         if view == 'reg':
@@ -32,7 +34,7 @@ class RegisterRenderer(Renderer):
             elif mimetype == 'text/html':
                 return render_template(
                     'class_register.html',
-                    class_name=self.request.args.get('_uri'),
+                    class_name=self.uri,
                     register=self.register
                 )
         else:
@@ -69,7 +71,7 @@ class RegisterRenderer(Renderer):
         :return: None
         """
         #os.environ['NO_PROXY'] = 'ga.gov.au'
-        r = requests.get(settings.XML_API_URL.format(page_no))
+        r = requests.get(settings.XML_API_URL.format(page_no), timeout=3)
         xml = r.content
 
         if self.validate_xml(xml):
@@ -90,6 +92,6 @@ class RegisterRenderer(Renderer):
 
             # add all the items
             for item in self.register:
-                self.g.add((URIRef(item['uri']), RDF.type, URIRef(self.uri)))
-                self.g.add((URIRef(item['uri']), RDFS.label, Literal(item['label'], datatype=XSD.string)))
-                self.g.add((URIRef(item['uri']), REG.register, URIRef(self.request.url)))
+                self.g.add((URIRef(self.request.base_url + item), RDF.type, URIRef(self.uri)))
+                self.g.add((URIRef(self.request.base_url + item), RDFS.label, Literal(item, datatype=XSD.string)))
+                self.g.add((URIRef(self.request.base_url + item), REG.register, URIRef(self.request.base_url)))

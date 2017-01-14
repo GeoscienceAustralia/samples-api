@@ -13,3 +13,5 @@ XML_API_URL = 'http://dbforms.ga.gov.au/www_distp/a.igsn_api.get_igsnSampleSet?p
 XML_API_URL_SAMPLE = 'http://dbforms.ga.gov.au/www_distp/a.igsn_api.get_igsnSample?pIGSN={0}'
 
 ADMIN_EMAIL = 'data@ga.gov.au'
+
+BASE_URI_SAMPLE = 'http://pid.geoscience.gov.au/sample/'

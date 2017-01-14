@@ -857,7 +857,7 @@ class Sample:
 
         if view == 'igsn':
             # RDF formats handled by general case
-            # HTML is othe only other enabled format for igsn view
+            # HTML is the only other enabled format for igsn view
             return self.export_as_html(model_view=view)
         elif view == 'dc':
             # RDF formats handled by general case
@@ -867,8 +867,8 @@ class Sample:
                 return self.export_as_html(model_view=view)
         elif view == 'prov':
             # RDF formats handled by general case
-            # only RDF for this view
-            print 'format: ' + mimetype
+            # only RDF for this view so set the mimetype to our favourite mime format
+            mimetype = 'text/turtle'
             return Response(self.export_as_rdf('prov', mimetype), mimetype=mimetype)
         elif view == 'csirov3':
             # only XML for this view

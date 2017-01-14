@@ -28,7 +28,7 @@ def sample(igsn):
         .get('http://pid.geoscience.gov.au/def/ont/igsn#Sample')
 
     try:
-        view, format = LDAPI.get_valid_view_and_format(
+        view, mimetype = LDAPI.get_valid_view_and_format(
             request.args.get('_view'),
             request.args.get('_format'),
             views_formats
@@ -51,7 +51,7 @@ def sample(igsn):
             from model.sample import Sample
             try:
                 s = Sample(settings.XML_API_URL_SAMPLE, igsn)
-                return s.render(request.args.get('_view'), request.args.get('_format'))
+                return s.render(view, mimetype)
             except ValueError:
                 return render_template('no_record_sample.html')
 
@@ -63,79 +63,38 @@ def sample(igsn):
 @model_classes.route('/sample/')
 def samples():
     """
-    Samples register
+    The Register of Samples
 
     :return: HTTP Response
     """
-    views_formats = model_classes_functions.get_classes_views_formats()\
+    # lists the views and formats available for a Sample
+    views_formats = model_classes_functions.get_classes_views_formats() \
         .get('http://purl.org/linked-data/registry#Register')
 
     try:
-        view, format = LDAPI.get_valid_view_and_format(
+        view, mime_format = LDAPI.get_valid_view_and_format(
             request.args.get('_view'),
             request.args.get('_format'),
             views_formats
         )
+
+        # if alternates model, return this info from file
+        class_uri = 'http://pid.geoscience.gov.au/def/ont/igsn#Sample'
+
+        if view == 'alternates':
+
+            del views_formats['renderer']
+            return routes_functions.render_alternates_view(
+                class_uri,
+                urllib.quote_plus(class_uri),
+                None,
+                None,
+                views_formats,
+                request.args.get('_format')
+            )
+        else:
+            from model import register
+            return register.RegisterRenderer(request, class_uri, None).render(view, mime_format)
+
     except LdapiParameterError, e:
         return routes_functions.client_error_Response(e)
-
-    # validate page_no parameter
-    if routes_functions.an_int(request.args.get('page_no')):
-        page_no = int(request.args.get('page_no'))
-    else:
-        page_no = 1
-
-    # select view and format
-    if view == 'alternates':
-        class_uri = 'http://purl.org/linked-data/registry#Register'
-        del views_formats['renderer']
-        return routes_functions.render_alternates_view(
-            class_uri,
-            urllib.quote_plus(class_uri),
-            None,
-            None,
-            views_formats,
-            request.args.get('_format')
-        )
-    else:
-        # only create and populate a SamplesRegister for views that need it
-        from model.SamplesRegister import SampleRegister
-
-        dt = datetime.datetime.now()
-        date_stamp = datetime_to_datestamp(dt)
-
-        try:
-            sr = SampleRegister(settings.XML_API_URL, page_no)
-        except ValueError:
-            values = {
-                'response_date': date_stamp,
-                'request_uri': request.base_url,
-                'error_code': 'badArgument',
-                'error_text': 'The request includes illegal arguments, is missing required arguments,\
-                               includes a repeated argument, or values for arguments have an illegal syntax.'
-            }
-            template = render_template('oai_error.xml', values=values), 400
-            response = make_response(template)
-            response.headers['Content-Type'] = 'application/xml'
-
-            return response
-
-        if format == 'text/html':
-            return render_template(
-                'page_samples.html',
-                placed_html=sr.export_as_html(model_view='dpr')
-            )
-        elif format in views_formats['dpr']:
-            return Response(
-                sr.export_as_rdf(
-                    model_view=view,
-                    rdf_mime=format),
-                status=200,
-                mimetype=format,
-                headers={
-                    'Content-Disposition': 'attachment; filename=samples_register' + LDAPI.get_file_extension(format)
-                }
-            )
-        # no need for an else since views already validated
-
-
