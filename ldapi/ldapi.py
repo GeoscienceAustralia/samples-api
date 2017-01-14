@@ -1,5 +1,4 @@
-from flask import Response, render_template
-import settings
+from flask import Response
 
 
 class LDAPI:

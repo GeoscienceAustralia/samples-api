@@ -71,7 +71,7 @@ class RegisterRenderer(Renderer):
         :return: None
         """
         #os.environ['NO_PROXY'] = 'ga.gov.au'
-        r = requests.get(settings.XML_API_URL.format(page_no), timeout=3)
+        r = requests.get(settings.XML_API_URL_SAMPLESET.format(page_no), timeout=3)
         xml = r.content
 
         if self.validate_xml(xml):

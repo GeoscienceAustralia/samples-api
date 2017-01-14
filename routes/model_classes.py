@@ -1,12 +1,10 @@
 """
 This file contains all the HTTP routes for classes from the IGSN model, such as Samples and the Sample Register
 """
-import datetime
-from flask import Blueprint, Response, render_template, request, make_response
+from flask import Blueprint, render_template, request
 import routes_functions
 import settings
 from ldapi import LDAPI, LdapiParameterError
-from model.datestamp import datetime_to_datestamp
 from routes import model_classes_functions
 import urllib
 
@@ -15,7 +13,6 @@ import urllib
 model_classes = Blueprint('model_classes', __name__)
 
 
-# TODO: compare this with the instance endpoint in PROMS
 @model_classes.route('/sample/<string:igsn>')
 def sample(igsn):
     """
@@ -59,7 +56,6 @@ def sample(igsn):
         return routes_functions.client_error_Response(e)
 
 
-# TODO: compare this with the register endpoint in PROMS
 @model_classes.route('/sample/')
 def samples():
     """

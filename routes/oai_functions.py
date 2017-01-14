@@ -96,9 +96,9 @@ def validate_oai_parameters(qsa_args):
 
 def get_record(request):
     try:
-        s = Sample(settings.XML_API_URL_SAMPLE, request.args.get('identifier'))
+        sample = Sample(settings.XML_API_URL_SAMPLE, request.args.get('identifier'))
 
-        return s.export_dc_xml()
+        return sample.export_dc_xml()
     except ValueError:
         raise ValueError
 

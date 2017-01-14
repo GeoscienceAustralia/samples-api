@@ -16,7 +16,5 @@ if __name__ == '__main__':
                         datefmt='%Y-%m-%d %H:%M:%S',
                         format='%(asctime)s %(levelname)s %(filename)s:%(lineno)s %(message)s')
 
-    app.run(host=settings.HOST,
-            port=settings.PORT,
-            threaded=settings.THREADED,
+    app.run(port=settings.PORT,
             debug=settings.DEBUG)

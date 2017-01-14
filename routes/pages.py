@@ -4,8 +4,6 @@ This file contains all the HTTP routes for basic pages (usually HTML)
 from flask import Blueprint, Response, request, render_template
 from lxml import etree
 from lxml.builder import ElementMaker
-
-import settings
 from ldapi import LDAPI, LdapiParameterError
 from routes import routes_functions
 
@@ -27,7 +25,7 @@ def index():
     }
 
     try:
-        view, format = LDAPI.get_valid_view_and_format(
+        view, mime_format = LDAPI.get_valid_view_and_format(
             request.args.get('_view'),
             request.args.get('_format'),
             views_formats
@@ -38,7 +36,7 @@ def index():
     # select view and format
 
     if view != 'getcapabilities':
-        if format == 'text/html':
+        if mime_format == 'text/html':
             return render_template(
                 'page_index.html',
             )

@@ -8,23 +8,6 @@ import json
 import urllib
 
 
-def an_int(s):
-    """
-    Safely (no Error throw) tests to see whether a string can be itnerpreted as an int
-
-    :param s: string
-    :return: boolean
-    """
-    if s is not None:
-        try:
-            int(s)
-            return True
-        except ValueError:
-            return False
-    else:
-        return False
-
-
 def client_error_Response(error_message):
     return Response(
         error_message,
@@ -82,7 +65,6 @@ def render_alternates_view(class_uri, class_uri_encoded, instance_uri, instance_
                 g.add((x, DCT.title, Literal(view_name, datatype=XSD.string)))
                 for f in formats:
                     g.add((x, URIRef('http://purl.org/dc/terms/format'), Literal(f, datatype=XSD.string)))
-
 
         # make the static part of the graph
         # REG = Namespace('http://purl.org/linked-data/registry#')
