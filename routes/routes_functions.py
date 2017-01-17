@@ -3,7 +3,7 @@ A list of functions for use anywhere but particularly in routes.py
 """
 from flask import Response, render_template
 from ldapi import LDAPI
-from rdflib import Graph, Namespace, Literal, URIRef, RDF, XSD, BNode
+from rdflib import Graph, Namespace, Literal, URIRef, RDF, XSD, BNode, plugin
 import json
 import urllib
 

@@ -8,7 +8,7 @@
   "http://pid.geoscience.gov.au/def/ont/igsn#Sample": {
     "renderer": "Sample",
     "default": "igsn",
-    "alternates": ["text/html", "text/turtle", "application/rdf+xml", "application/rdf+json"],
+    "alternates": ["text/html", "text/turtle", "application/rdf+xml", "application/rdf+json", "application/json"],
     "igsn": ["text/html", "text/turtle", "application/rdf+xml", "application/rdf+json"],
     "csirov3": ["application/xml"],
     "prov": ["text/turtle", "application/rdf+xml", "application/rdf+json"],
@@ -17,7 +17,7 @@
   "http://pid.geoscience.gov.au/def/ont/igsn#SampleRegister": {
     "renderer": "SamplesRegister",
     "default": "igsn",
-    "alternates": ["text/html", "text/turtle", "application/rdf+xml", "application/rdf+json"],
+    "alternates": ["text/html", "text/turtle", "application/rdf+xml", "application/rdf+json", "application/json"],
     "igsn": ["text/html", "text/turtle", "application/rdf+xml", "application/rdf+json"]
   },
   "http://purl.org/linked-data/registry#Register":{
