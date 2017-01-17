@@ -851,6 +851,10 @@ class Sample:
         self.date_modified = None
         self.sample_no = None
 
+        # populate all instance variables from API
+        # TODO: lazy load this, i.e. only populate if a view that need populating is loaded which is every view except for Alternates
+        self._populate_from_oracle_api()
+
     def render(self, view, mimetype):
         if mimetype in LDAPI.get_rdf_mimetypes_list():
             return Response(self.export_as_rdf(view, mimetype), mimetype=mimetype)
@@ -900,7 +904,7 @@ class Sample:
         # internal URI
         # os.environ['NO_PROXY'] = 'ga.gov.au'
         # call API
-        r = requests.get(self.oracle_api_samples_url % self.igsn)
+        r = requests.get(self.oracle_api_samples_url.format(self.igsn))
         # deal with missing XML declaration
         if "No data" in r.content:
             raise ParameterError('No Data')
@@ -1094,6 +1098,19 @@ class Sample:
             # wkt = "SRID=" + self.srid + ";POINT(" + self.x + " " + self.y + ")"
             if self.srid is not None and self.x is not None and self.y is not None:
                 wkt = "<https://epsg.io/" + self.srid + "> POINT(" + self.x + " " + self.y + ")"
+            else:
+                wkt = ''
+
+        return wkt
+
+    def _generate_sample_wkt_csirov3_xml(self):
+        if self.z is not None:
+            # wkt = "SRID=" + self.srid + ";POINTZ(" + self.x + " " + self.y + " " + self.z + ")"
+            wkt = "POINTZ(" + self.x + " " + self.y + " " + self.z + ")"
+        else:
+            # wkt = "SRID=" + self.srid + ";POINT(" + self.x + " " + self.y + ")"
+            if self.srid is not None and self.x is not None and self.y is not None:
+                wkt = "POINT(" + self.x + " " + self.y + ")"
             else:
                 wkt = ''
 
@@ -1390,120 +1407,10 @@ class Sample:
 
     def export_as_csirov3_xml(self):
         """
-        Exports this Sample instance in XML that validates against the IGSN Descriptive Metadata schema from
-        https://github.com/IGSN/metadata/tree/dev/description
+        Exports this Sample instance in XML that validates against the CSIRO v3 Schema
 
         :return: XML string
         """
-        # SESAR
-        '''
-        SESAR XML example from: https://app.geosamples.org/webservices/display.php?igsn=LCZ7700AK
-
-        <?xml version="1.0" encoding="UTF-8"?>
-        <results>
-            <qrcode_img_src>
-                app.geosamples.org/barcode/image.php?igsn=LCZ7700AK&amp;sample_id=CDR4_100mesh
-            </qrcode_img_src>
-            <user_code>LCZ</user_code>
-            <igsn>LCZ7700AK</igsn>
-            <name>CDR4_100mesh</name>
-            <sample_type>Individual Sample</sample_type>
-            <parent_igsn>LCZ771200</parent_igsn>
-            <publish_date>2015-07-01</publish_date>
-            <material>Rock</material>
-            <classification>Metamorphic</classification>
-            <field_name>hornfels grade metavolcaniclastic</field_name>
-            <description>ground with a mortar and pestle to pass through a 100 mesh (150um) sieve</description>
-            <collection_method>Manual&amp;gt;Hammer</collection_method>
-            <geological_unit>Fajardo Formation</geological_unit>
-            <purpose>weathering study</purpose>
-            <latitude>18.28657</latitude>
-            <longitude>-65.77803</longitude>
-            <country>Puerto Rico</country>
-            <cruise_field_prgrm>Luquillo Critical Zone Observatory (CZO)</cruise_field_prgrm>
-            <collector>Joe Orlando</collector>
-            <collection_start_date>2011-01-13</collection_start_date>
-            <collection_date_precision>day</collection_date_precision>
-            <current_archive>Department of Geosciences, Penn State Unv</current_archive>
-            <current_archive_contact>Susan L. Brantley</current_archive_contact>
-            <parents>
-                <parent>LCZ771200 CDR4</parent>
-            </parents>
-            <siblings>
-                <sibling>LCZ7700AJ CDR4_sawcut</sibling>
-                <sibling>LCZ7700AL CDR4_TS_30um</sibling>
-                <sibling>LCZ7700AM CDR4_TS_150um</sibling>
-            </siblings>
-        </results>
-
-        Example XML from
-        http://www.iedadata.org/services/sesar_examplexml
-
-    <samples>
-        <sample>
-            <sample_type>Dredge</sample_type>
-            <igsn>R05333444</igsn>
-            <user_code>R05</user_code>
-            <name>Primary name of sample</name>
-            <sample_other_name>Another name by which the sample is known</sample_other_name>
-            <parent_igsn>R05000001</parent_igsn>
-            <parent_sample_type>Core</parent_sample_type>
-            <parent_name>Rebeccas Original Core</parent_name>
-            <is_private>1</is_private>
-            <publish_date>05/22/2011</publish_date>
-            <material>Rock</material>
-            <classification>Igneous>Plutonic>Exotic</classification>
-            <field_name>Name of field, ie. Basalt</field_name>
-            <description>description of sample</description>
-            <age_min>10.02</age_min>
-            <age_max>10.02</age_max>
-            <age_unit>Million Years (Ma)</age_unit>
-            <geological_age>10.02</geological_age>
-            <geological_unit></geological_unit>
-            <collection_method></collection_method>
-            <collection_method_descr></collection_method_descr>
-            <size>10.02</size>
-            <size_unit>cm</size_unit>
-            <sample_comment></sample_comment>
-            <latitude>10.02</latitude>
-            <longitude>10.02</longitude>
-            <latitude_end>10.02</latitude_end>
-            <longitude_end>10.02</longitude_end>
-            <elevation>10.02</elevation>
-            <elevation_end>10.02</elevation_end>
-            <primary_location_type>Ocean Ridge</primary_location_type>
-            <primary_location_name>East Pacific Rise</primary_location_name>
-            <location_description>ridge axis</location_description>
-            <locality>21 North study area</locality>
-            <locality_description></locality_description>
-            <country>Name of country</country>
-            <province>Name of province</province>
-            <county>Name of county</county>
-            <city>Name of city</city>
-            <cruise_field_prgrm>Name of cruise field program ie HLY0805</cruise_field_prgrm>
-            <platform_type>Icebreaker</platform_type>
-            <platform_name>Name of platform ie USCGC Healy</platform_name>
-            <platform_descr>Platform Description ie US Coast Guard Cutter</platform_descr>
-            <collector>Collector / Chief Scientist name</collector>
-            <collector_detail>Details of Collector</collector_detail>
-            <collection_start_date></collection_start_date>
-            <collection_start_time></collection_start_time>
-            <collection_end_date></collection_end_date>
-            <collection_end_time></collection_end_time>
-            <collection_date_precision></collection_date_precision>
-            <current_archive></current_archive>
-            <current_archive_contact></current_archive_contact>
-            <original_archive></original_archive>
-            <original_archive_contact></original_archive_contact>
-            <depth_min>10.2</depth_min>
-            <depth_max>10.2</depth_max>
-            <depth_scale>cm</depth_scale>
-            <other_names>Another name by which this sample may be known</other_names>
-            <other_names>Yet another name by which this sample may be known</other_names>
-            <other_names>And yet another name by which this sample may be known</other_names>
-        </sample>
-    </samples>
-        '''
         # CSIRO
         '''
         <?xml version="1.0" encoding="UTF-8"?>
@@ -1557,7 +1464,7 @@ class Sample:
         '''
 
         # CSIRO v3
-        sample_wkt = self._generate_sample_wkt()
+        sample_wkt = self._generate_sample_wkt_csirov3_xml()
         xsi = 'http://www.w3.org/2001/XMLSchema-instance'
         cs = 'https://igsn.csiro.au/schemas/3.0'
         root = etree.Element(
