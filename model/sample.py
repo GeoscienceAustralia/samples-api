@@ -6,7 +6,7 @@ from model.datestamp import datetime_to_datestamp
 from datetime import datetime
 from ldapi import LDAPI
 from flask import Response, render_template
-from term_lookup import TERM_LOOKUP
+from lookups import TERM_LOOKUP
 
 
 class Sample:
@@ -40,43 +40,6 @@ class Sample:
     URI_MISSSING = 'http://www.opengis.net/def/nil/OGC/0/missing'
     URI_INAPPLICABLE = 'http://www.opengis.net/def/nil/OGC/0/inapplicable'
     URI_GA = 'http://pid.geoscience.gov.au/org/ga'
-
-    '''
-    Entity Types not yet in a vocab
-
-    ACREAGE RELEASE
-    COUNTRY
-    DRILLHOLE
-    EMITTER
-    ESSCI
-    ESTUARY
-    EXPLORATION PERMIT
-    FACIES
-    FIELD SITE
-    MAPSHEET
-    MARSEGMENT
-    MINERAL DEPOSIT
-    MINERAL PROJECT
-    MINERALISED ZONE
-    OBSERVATORY
-    PIPELINE
-    PLACE NAME
-    POLITICAL REGION
-    PORT
-    POWER STATION
-    PRODUCTION LICENCE
-    PROJECT
-    PROVINCE
-    RESOURCE PROCESSING PLANT
-    RESOURCE PROJECT
-    RETENTION LEASE
-    SECTION
-    SEISMICLINE
-    STATE
-    SURVEY
-    WELL
-    WILDCAT LOCATION
-    '''
 
     def __init__(self, oracle_api_samples_url, igsn):
         self.oracle_api_samples_url = oracle_api_samples_url

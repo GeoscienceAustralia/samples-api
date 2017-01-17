@@ -1,3 +1,69 @@
+import requests
+from rdflib import Graph
+
+
+def get_feature_of_interest_types():
+    r = requests.get(
+        'http://pid.geoscience.gov.au/def/voc/featureofinteresttype/all-concepts',
+        allow_redirects=True,
+        headers={'Accept': 'text/turtle'}
+    )
+
+    if r.status_code == 200:
+        g = Graph().parse(data=r.content, format='turtle')
+        q = ''' PREFIX skos: <http://www.w3.org/2004/02/skos/core#>
+                SELECT ?o
+                WHERE {
+                    <http://pid.geoscience.gov.au/def/voc/featureofinteresttype/all-concepts> skos:member ?o .
+                }
+            '''
+        terms = []
+        for row in g.query(q):
+            terms.append(str(row['o']))
+        return sorted(terms)
+    else:
+        print r.status_code
+        return False
+
+if __name__ == '__main__':
+    print get_feature_of_interest_types()
+
+FEATURE_OF_INTEREST_TYPES = [
+    'http://pid.geoscience.gov.au/def/voc/featureofinteresttype/aceragerelease',
+    'http://pid.geoscience.gov.au/def/voc/featureofinteresttype/borehole',
+    'http://pid.geoscience.gov.au/def/voc/featureofinteresttype/country',
+    'http://pid.geoscience.gov.au/def/voc/featureofinteresttype/drillhole',
+    'http://pid.geoscience.gov.au/def/voc/featureofinteresttype/emitter',
+    'http://pid.geoscience.gov.au/def/voc/featureofinteresttype/essci',
+    'http://pid.geoscience.gov.au/def/voc/featureofinteresttype/estuary',
+    'http://pid.geoscience.gov.au/def/voc/featureofinteresttype/explorationpermit',
+    'http://pid.geoscience.gov.au/def/voc/featureofinteresttype/facies',
+    'http://pid.geoscience.gov.au/def/voc/featureofinteresttype/fieldsite',
+    'http://pid.geoscience.gov.au/def/voc/featureofinteresttype/mapsheet',
+    'http://pid.geoscience.gov.au/def/voc/featureofinteresttype/marsegment',
+    'http://pid.geoscience.gov.au/def/voc/featureofinteresttype/mineraldeposit',
+    'http://pid.geoscience.gov.au/def/voc/featureofinteresttype/mineralisedzone',
+    'http://pid.geoscience.gov.au/def/voc/featureofinteresttype/mineralproject',
+    'http://pid.geoscience.gov.au/def/voc/featureofinteresttype/observatory',
+    'http://pid.geoscience.gov.au/def/voc/featureofinteresttype/pipeline',
+    'http://pid.geoscience.gov.au/def/voc/featureofinteresttype/placename',
+    'http://pid.geoscience.gov.au/def/voc/featureofinteresttype/politicalregion',
+    'http://pid.geoscience.gov.au/def/voc/featureofinteresttype/port',
+    'http://pid.geoscience.gov.au/def/voc/featureofinteresttype/powerstation',
+    'http://pid.geoscience.gov.au/def/voc/featureofinteresttype/productionlicense',
+    'http://pid.geoscience.gov.au/def/voc/featureofinteresttype/project',
+    'http://pid.geoscience.gov.au/def/voc/featureofinteresttype/province',
+    'http://pid.geoscience.gov.au/def/voc/featureofinteresttype/resourceprocessingplant',
+    'http://pid.geoscience.gov.au/def/voc/featureofinteresttype/resourceproject',
+    'http://pid.geoscience.gov.au/def/voc/featureofinteresttype/retentionlease',
+    'http://pid.geoscience.gov.au/def/voc/featureofinteresttype/section',
+    'http://pid.geoscience.gov.au/def/voc/featureofinteresttype/seismicline',
+    'http://pid.geoscience.gov.au/def/voc/featureofinteresttype/state',
+    'http://pid.geoscience.gov.au/def/voc/featureofinteresttype/survey',
+    'http://pid.geoscience.gov.au/def/voc/featureofinteresttype/well',
+    'http://pid.geoscience.gov.au/def/voc/featureofinteresttype/wildcatlocation'
+]
+
 TERM_LOOKUP = {
     'access': {
         'Public': 'http://pid.geoscience.gov.au/def/voc/igsn-codelists/Public',
@@ -731,6 +797,6 @@ TERM_LOOKUP = {
         'BOREHOLE': 'http://pid.geoscience.gov.au/def/voc/featureofinteresttype/borehole',
         'FIELD SITE': 'http://pid.geoscience.gov.au/def/voc/featureofinteresttype/site',
         'SURVEY': 'http://pid.geoscience.gov.au/def/voc/featureofinteresttype/survey',
-        # see vocab <http://pid.geoscience.gov.au/def/voc/featureofinteresttype>
+        # see vocab <http://pid.geoscience.gov.au/def/voc/featureofinteresttype>, listed above in F_O_I_TYPE list
     }
 }
