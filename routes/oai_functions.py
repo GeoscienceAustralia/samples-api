@@ -1,6 +1,9 @@
 from model import Sample
 import settings
-
+from lxml import etree
+from StringIO import StringIO
+import requests
+from flask import Response, render_template
 
 OAI_ARGS = {
     'GetRecord': {
@@ -102,6 +105,43 @@ def get_record(request):
     except ValueError:
         raise ValueError
 
+def list_records(request):
+    samples =[]
+    #  TODO need to implement from, until, metadataprefix and resumption token
+    oracle_api_samples_url = settings.XML_API_URL_SAMPLESET
+
+    r = requests.get(oracle_api_samples_url)
+    if "No data" in r.content:
+        raise ParameterError('No Data')
+    if not r.content.startswith('<?xml version="1.0" ?>'):
+        xml = '<?xml version="1.0" ?>\n' + r.content
+    else:
+        xml = r.content
+    context = etree.iterparse(xml, tag='ROW')
+    for event, elem in context:
+        samples.append(Sample(None, None, StringIO(etree.tostring(elem))))
+
+    return render_template(
+            'oai_list_records.html',
+            samples)
+
+def list_identifiers(request):
+    samples =[]
+    #  TODO need to implement from, until, metadataprefix and resumption token
+    oracle_api_samples_url = settings.XML_API_URL_SAMPLESET.format(1)
+
+    r = requests.get(oracle_api_samples_url)
+    if "No data" in r.content:
+        raise ParameterError('No Data')
+    if not r.content.startswith('<?xml version="1.0" ?>'):
+        xml = '<?xml version="1.0" ?>\n' + r.content
+    else:
+        xml = r.content
+    context = etree.iterparse(StringIO(xml), tag='ROW')
+    for event, elem in context:
+        samples.append(Sample(None, None, StringIO(etree.tostring(elem))))
+
+    return samples
 
 class ParameterError(ValueError):
     pass

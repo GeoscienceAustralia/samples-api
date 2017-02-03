@@ -8,7 +8,7 @@
         <record>
             <header>
                 <identifier>oai:lcoa1.loc.gov:loc.gmd/g3791p.rr002300</identifier>
-                <datestamp>s.datestamp</datestamp>
+                <datestamp>{{s.datestamp}}</datestamp>
                 <setSpec>ga</setSpec>
             </header>
             <metadata>
@@ -19,12 +19,6 @@
                         xsi:schemaLocation="http://www.openarchives.org/OAI/2.0/oai_dc/ http://www.openarchives.org/OAI/2.0/oai_dc.xsd">
                     <dc:title>{{s.title}}</dc:title>
                     <dc:creator>http://pid.geoscience.gov.au/org/ga</dc:creator>
-                    <dc:description>Shows drainage, canals, stations, cities and towns, counties, canals, roads completed, narrow gauge and proposed railroads with names of lines. Includes list of railroads.</dc:description>
-                    <dc:publisher>Philadelphia</dc:publisher>
-                    <dc:date>1876</dc:date>
-                    <dc:type>image</dc:type>
-                    <dc:type>map</dc:type>
-                    <dc:type>cartographic</dc:type>
                     <dc:identifier>{{s.IGSN}}</dc:identifier>
                     <dc:language>eng</dc:language>
                     <dc:coverage>United States--Middle Atlantic States</dc:coverage>

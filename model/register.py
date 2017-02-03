@@ -17,7 +17,7 @@ class RegisterRenderer(Renderer):
         self.register = []
         self.g = None
 
-        self._get_details_from_oracle_api(1)
+        self._get_details_from_oracle_api(1)  # TODO: replace this magic number with a client-determined page number
 
     def render(self, view, mimetype):
         if view == 'reg':

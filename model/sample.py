@@ -41,7 +41,7 @@ class Sample:
     URI_INAPPLICABLE = 'http://www.opengis.net/def/nil/OGC/0/inapplicable'
     URI_GA = 'http://pid.geoscience.gov.au/org/ga'
 
-    def __init__(self, oracle_api_samples_url, igsn):
+    def __init__(self, oracle_api_samples_url, igsn, xml=None):
         self.oracle_api_samples_url = oracle_api_samples_url
         self.igsn = igsn
         self.sampleid = None
@@ -81,7 +81,11 @@ class Sample:
 
         # populate all instance variables from API
         # TODO: lazy load this, i.e. only populate if a view that need populating is loaded which is every view except for Alternates
-        self._populate_from_oracle_api()
+
+        if oracle_api_samples_url is None:
+            self._populate_from_xml_file(xml)
+        else:
+            self._populate_from_oracle_api()
 
     def render(self, view, mimetype):
         if mimetype in LDAPI.get_rdf_mimetypes_list():
@@ -609,10 +613,10 @@ class Sample:
         format = URIRef(self.material_type)
 
         # TODO:   add is site uri
-        xml = '''xml = <record>
-        <header>
-        <identifier>%(entity_uri)s</identifier>
-        <datestamp>%(date_stamp)s'</datestamp>\
+        xml = 'xml = <record>\
+        <header>\
+        <identifier>' + self.entity_uri + '</identifier>\
+        <datestamp>' + datetime_to_datestamp(dt) + '</datestamp>\
         <setSpec>IEDA</setSpec>\
         <setSpec>IEDA.SESAR</setSpec>\
         </header>\
@@ -626,10 +630,7 @@ class Sample:
         <dc:coverage>' + wkt + '</dc:coverage>\
         </oai_dc:dc> \
         </metadata> \
-        </record>''' % {
-            'entity_uri': self.entity_uri,
-            'date_stamp': datetime_to_datestamp(dt),
-        }
+        </record>'
 
         return xml
 
