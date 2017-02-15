@@ -73,12 +73,12 @@ def oai():
         # render_template
         try:
             samples = oai_functions.list_identifiers(request)
-            request_args =request.args
+            request_args = request.args
 
             template = render_template('oai_list_identifiers.xml',
                                        samples=samples,
-                                       request_args = request_args,
-                                       base_url = base_url)
+                                       request_args=request_args,
+                                       base_url=base_url)
             response = make_response(template)
             return response
         except ValueError:
@@ -99,12 +99,12 @@ def oai():
         # render_template
         try:
             samples = oai_functions.list_records(request)
-            request_args =request.args
+            request_args = request.args
 
             template = render_template('oai_list_records.xml',
                                        samples=samples,
-                                       request_args = request_args,
-                                       base_url = base_url)
+                                       request_args=request_args,
+                                       base_url=base_url)
             response = make_response(template)
             return response
         except ValueError:
@@ -131,4 +131,3 @@ def oai():
         response.headers['Content-Type'] = 'application/xml'
 
         return response
-

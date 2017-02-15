@@ -1,3 +1,5 @@
+
+
 # taken from https://github.com/infrae/pyoai/blob/master/src/oaipmh/datestamp.py
 class ErrorBase(Exception):
     def oainame(self):
@@ -57,6 +59,7 @@ class ClientError(Exception):
 class XMLSyntaxError(ClientError):
     """The OAI-PMH XML can not be parsed as it is not well-formed.
     """
+
     def details(self):
         return ("The data delivered by the server could not be parsed, as it "
                 "is not well-formed XML.")
@@ -65,6 +68,7 @@ class XMLSyntaxError(ClientError):
 class DatestampError(ClientError):
     """The OAI-PMH datestamps were not proper UTC datestamps as by spec.
     """
+
     def __init__(self, datestamp):
         self.datestamp = datestamp
 

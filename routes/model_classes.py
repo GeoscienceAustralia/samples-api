@@ -7,7 +7,6 @@ import settings
 from ldapi import LDAPI, LdapiParameterError
 from routes import model_classes_functions
 import urllib
-
 # from oaipmh.datestamp import datestamp_to_datetime, datetime_to_datestamp
 
 model_classes = Blueprint('model_classes', __name__)
@@ -21,7 +20,7 @@ def sample(igsn):
     :return: HTTP Response
     """
     # lists the views and formats available for a Sample
-    views_formats = model_classes_functions.get_classes_views_formats()\
+    views_formats = model_classes_functions.get_classes_views_formats() \
         .get('http://pid.geoscience.gov.au/def/ont/igsn#Sample')
 
     try:

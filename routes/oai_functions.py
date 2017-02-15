@@ -45,7 +45,6 @@ OAI_ARGS = {
     },
 }
 
-
 # https://www.openarchives.org/OAI/openarchivesprotocol.html, 3.6 Error and Exception Conditions
 OAI_ERRORS = {
     'badArgument': 'Value of the verb argument is not a legal OAI-PMH verb, the verb argument is missing, or the verb '
@@ -83,7 +82,7 @@ def validate_oai_parameters(qsa_args):
             raise ParameterError(msg)
     # first investigate if we have exclusive argument
     if exclusive in other_args:
-        if len(other_args) > 1: 
+        if len(other_args) > 1:
             msg = ("Exclusive argument %s is used but other "
                    "arguments found." % exclusive)
             raise ParameterError(msg)
@@ -106,8 +105,9 @@ def get_record(request):
     except ValueError:
         raise ValueError
 
+
 def list_records(request):
-    samples_dict =[]
+    samples_dict = []
     #  TODO need to implement from, until, metadataprefix and resumption token
     oracle_api_samples_url = settings.XML_API_URL_SAMPLESET.format(1)
 
@@ -123,9 +123,10 @@ def list_records(request):
         samples_dict.append(props(Sample(None, None, StringIO(etree.tostring(elem)))))
 
     return samples_dict
+
 
 def list_identifiers(request):
-    samples_dict =[]
+    samples_dict = []
     #  TODO need to implement from, until, metadataprefix and resumption token
     oracle_api_samples_url = settings.XML_API_URL_SAMPLESET.format(1)
 
@@ -141,16 +142,17 @@ def list_identifiers(request):
         samples_dict.append(props(Sample(None, None, StringIO(etree.tostring(elem)))))
 
     return samples_dict
+
 
 def props(x):
     return dict((key, getattr(x, key)) for key in dir(x) if key not in dir(x.__class__))
+
 
 def calc_expiration_date(request_date):
     '''
     responseDate = 2017-02-08T06:01:12Z
     expirationDate=2017-02-08T07:01:13Z
     '''
-
 
 
 class ParameterError(ValueError):

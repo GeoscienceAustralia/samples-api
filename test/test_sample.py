@@ -1,7 +1,6 @@
 import unittest
 from model import Sample
 
-
 # global Sample for testing
 s = None
 
@@ -34,11 +33,10 @@ class TestSample(unittest.TestCase):
         Tests loading the Sample class instance
         """
         # load
-        s.populate_from_oracle_api('AU100', "http://localhost:8080/oai" )
+        s.populate_from_oracle_api('AU100', "http://localhost:8080/oai")
 
         # compare instance variables
         assert s.igsn == 'AU100', 'IGSN instance variable not correct'
-
 
     def run_all_tests(self):
         self.test_populate_from_xml_file()
@@ -67,6 +65,3 @@ def main():
 
 if __name__ == '__main__':
     main()
-
-
-

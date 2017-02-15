@@ -2,7 +2,6 @@ import datetime
 
 # taken from https://github.com/infrae/pyoai/blob/master/src/oaipmh/datestamp.py
 
-
 def datetime_to_datestamp(dt, day_granularity=False):
     assert dt.tzinfo is None  # only accept timezone naive datetimes
     # ignore microseconds
@@ -14,8 +13,8 @@ def datetime_to_datestamp(dt, day_granularity=False):
 
 
 # handy utility function not used by pyoai itself yet
-def date_to_datestamp(d, day_granularity=False): 	 
-    return datetime_to_datestamp( 	 
+def date_to_datestamp(d, day_granularity=False):
+    return datetime_to_datestamp(
         datetime.datetime.combine(d, datetime.time(0)), day_granularity)
 
 
@@ -74,10 +73,10 @@ def tolerant_datestamp_to_datetime(datestamp):
     elif len(d_splitted) == 1:
         YYYY = d_splitted[0]
         MM = '01'
-        DD = '01'   
+        DD = '01'
     else:
         raise DatestampError(datestamp)
-    
+
     t_splitted = t.split(':')
     if len(t_splitted) == 3:
         hh, mm, ss = t_splitted

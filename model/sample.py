@@ -9,7 +9,6 @@ from flask import Response, render_template
 from lookups import TERM_LOOKUP
 
 
-
 class Sample:
     """
     This class represents a Sample and methods in this class allow a sample to be loaded from GA's internal Oracle
@@ -115,7 +114,7 @@ class Sample:
                 self.export_as_csirov3_xml(),
                 status=200,
                 mimetype='application/xml',
-                # headers={'Content-Disposition': 'attachment; filename=' + igsn + '.xml'}
+            # headers={'Content-Disposition': 'attachment; filename=' + igsn + '.xml'}
             )
 
     def validate_xml(self, xml):
@@ -321,7 +320,6 @@ class Sample:
             elif elem.tag == "SAMPLENO":
                 if elem.text is not None:
                     self.sample_no = elem.text
-
 
 #        self.wkt = Literal(self._generate_sample_wkt(), datatype=GEOSP.wktLiteral)
         return True
@@ -613,8 +611,6 @@ class Sample:
         wkt = Literal(self._generate_sample_wkt(), datatype=GEOSP.wktLiteral)
         gml = Literal(self._generate_sample_gml(), datatype=GEOSP.gmlLiteral)
 
-
-
         format = URIRef(self.material_type)
 
         # TODO:   add is site uri
@@ -743,7 +739,6 @@ class Sample:
 
         if self.remark is not None:
             etree.SubElement(r, '{%s}comment' % cs).text = self.remark
-
         # em.classifications(
         #     em.classification('')),
         # em.purpose('a'),
