@@ -73,7 +73,38 @@ def oai():
         # render_template
         try:
             samples = oai_functions.list_identifiers(request)
-            template = render_template('oai_list_identifiers.xml', samples=samples)
+            request_args =request.args
+
+            template = render_template('oai_list_identifiers.xml',
+                                       samples=samples,
+                                       request_args = request_args,
+                                       base_url = base_url)
+            response = make_response(template)
+            return response
+        except ValueError:
+            values = {
+                'response_date': date_stamp,
+                'request_uri': base_url,
+                'error_code': 'idDoesNotExist',
+                'error_text': 'No matching identifier in GA Samples Database'
+                }
+            template = render_template('oai_error.xml', values=values), 400
+            response = make_response(template)
+            response.headers['Content-Type'] = 'application/xml'
+
+            return response
+
+
+    elif verb == 'ListRecords':
+        # render_template
+        try:
+            samples = oai_functions.list_records(request)
+            request_args =request.args
+
+            template = render_template('oai_list_records.xml',
+                                       samples=samples,
+                                       request_args = request_args,
+                                       base_url = base_url)
             response = make_response(template)
             return response
         except ValueError:

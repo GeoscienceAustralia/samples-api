@@ -4,6 +4,7 @@ from lxml import etree
 from StringIO import StringIO
 import requests
 from flask import Response, render_template
+import datetime as datetime
 
 OAI_ARGS = {
     'GetRecord': {
@@ -106,27 +107,7 @@ def get_record(request):
         raise ValueError
 
 def list_records(request):
-    samples =[]
-    #  TODO need to implement from, until, metadataprefix and resumption token
-    oracle_api_samples_url = settings.XML_API_URL_SAMPLESET
-
-    r = requests.get(oracle_api_samples_url)
-    if "No data" in r.content:
-        raise ParameterError('No Data')
-    if not r.content.startswith('<?xml version="1.0" ?>'):
-        xml = '<?xml version="1.0" ?>\n' + r.content
-    else:
-        xml = r.content
-    context = etree.iterparse(xml, tag='ROW')
-    for event, elem in context:
-        samples.append(Sample(None, None, StringIO(etree.tostring(elem))))
-
-    return render_template(
-            'oai_list_records.html',
-            samples)
-
-def list_identifiers(request):
-    samples =[]
+    samples_dict =[]
     #  TODO need to implement from, until, metadataprefix and resumption token
     oracle_api_samples_url = settings.XML_API_URL_SAMPLESET.format(1)
 
@@ -139,9 +120,38 @@ def list_identifiers(request):
         xml = r.content
     context = etree.iterparse(StringIO(xml), tag='ROW')
     for event, elem in context:
-        samples.append(Sample(None, None, StringIO(etree.tostring(elem))))
+        samples_dict.append(props(Sample(None, None, StringIO(etree.tostring(elem)))))
 
-    return samples
+    return samples_dict
+
+def list_identifiers(request):
+    samples_dict =[]
+    #  TODO need to implement from, until, metadataprefix and resumption token
+    oracle_api_samples_url = settings.XML_API_URL_SAMPLESET.format(1)
+
+    r = requests.get(oracle_api_samples_url)
+    if "No data" in r.content:
+        raise ParameterError('No Data')
+    if not r.content.startswith('<?xml version="1.0" ?>'):
+        xml = '<?xml version="1.0" ?>\n' + r.content
+    else:
+        xml = r.content
+    context = etree.iterparse(StringIO(xml), tag='ROW')
+    for event, elem in context:
+        samples_dict.append(props(Sample(None, None, StringIO(etree.tostring(elem)))))
+
+    return samples_dict
+
+def props(x):
+    return dict((key, getattr(x, key)) for key in dir(x) if key not in dir(x.__class__))
+
+def calc_expiration_date(request_date):
+    '''
+    responseDate = 2017-02-08T06:01:12Z
+    expirationDate=2017-02-08T07:01:13Z
+    '''
+
+
 
 class ParameterError(ValueError):
     pass

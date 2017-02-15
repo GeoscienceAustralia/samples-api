@@ -9,6 +9,7 @@ from flask import Response, render_template
 from lookups import TERM_LOOKUP
 
 
+
 class Sample:
     """
     This class represents a Sample and methods in this class allow a sample to be loaded from GA's internal Oracle
@@ -78,6 +79,8 @@ class Sample:
         self.date_load = None
         self.date_modified = None
         self.sample_no = None
+        self.datestamp = datetime_to_datestamp(datetime.now())
+        self.wkt = None
 
         # populate all instance variables from API
         # TODO: lazy load this, i.e. only populate if a view that need populating is loaded which is every view except for Alternates
@@ -319,6 +322,8 @@ class Sample:
                 if elem.text is not None:
                     self.sample_no = elem.text
 
+
+#        self.wkt = Literal(self._generate_sample_wkt(), datatype=GEOSP.wktLiteral)
         return True
 
     def _generate_sample_wkt(self):
@@ -608,7 +613,7 @@ class Sample:
         wkt = Literal(self._generate_sample_wkt(), datatype=GEOSP.wktLiteral)
         gml = Literal(self._generate_sample_gml(), datatype=GEOSP.gmlLiteral)
 
-        dt = datetime.now()
+
 
         format = URIRef(self.material_type)
 
@@ -616,9 +621,7 @@ class Sample:
         xml = 'xml = <record>\
         <header>\
         <identifier>' + self.entity_uri + '</identifier>\
-        <datestamp>' + datetime_to_datestamp(dt) + '</datestamp>\
-        <setSpec>IEDA</setSpec>\
-        <setSpec>IEDA.SESAR</setSpec>\
+        <datestamp>' + self.datestamp + '</datestamp>\
         </header>\
         <metadata><oai_dc:dc xmlns:dc="http://purl.org/dc/elements/1.1/"\
            xmlns:oai_dc="http://www.openarchives.org/OAI/2.0/oai_dc/"\
