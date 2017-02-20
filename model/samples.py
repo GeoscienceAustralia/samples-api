@@ -1,6 +1,7 @@
 from datestamp import *
 from datetime import datetime, timedelta
 
+
 def calc_expiration_date(request_datestamp):
     '''
     responseDate = 2017-02-08T06:01:12Z

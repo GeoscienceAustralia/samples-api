@@ -4,7 +4,9 @@ from lxml import etree
 from StringIO import StringIO
 import requests
 from flask import Response, render_template
-import datetime as datetime
+from model.datestamp import *
+from datetime import datetime, timedelta
+
 
 OAI_ARGS = {
     'GetRecord': {
@@ -141,11 +143,12 @@ def first_resumption_token(request):
 
 
 def list_identifiers(request):
+    db_query = get_db_query(request)
     samples_dict = []
     #  TODO need to implement from, until, metadataprefix and resumption token
     oracle_api_samples_url = settings.XML_API_URL_SAMPLESET.format(1)
 
-    r = requests.get(oracle_api_samples_url)
+    r = requests.get(db_query)
     if "No data" in r.content:
         raise ParameterError('No Data')
     if not r.content.startswith('<?xml version="1.0" ?>'):
@@ -162,8 +165,22 @@ def list_identifiers(request):
 def props(x):
     return dict((key, getattr(x, key)) for key in dir(x) if key not in dir(x.__class__))
 
+def get_db_query(request):
+
+    return db_query
 
 
+
+def calc_expiration_date(request_datestamp):
+    '''
+    responseDate = 2017-02-08T06:01:12Z
+    expirationDate=2017-02-08T07:01:13Z
+    '''
+    request_date = datestamp_to_datetime(request_datestamp)
+    expiration_date = request_date + timedelta(hours=1)
+    expiration_timestamp = datetime_to_datestamp(expiration_date)
+
+    return expiration_timestamp
 
 class ParameterError(ValueError):
     pass

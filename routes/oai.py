@@ -72,13 +72,15 @@ def oai():
     elif verb == 'ListIdentifiers':
         # render_template
         try:
-            samples = oai_functions.list_identifiers(request)
+
+            samples, resumption_token = oai_functions.list_identifiers(request)
             request_args = request.args
 
             template = render_template('oai_list_identifiers.xml',
                                        samples=samples,
                                        request_args=request_args,
-                                       base_url=base_url)
+                                       base_url=base_url,
+                                       resumption_token=resumption_token)
             response = make_response(template)
             return response
         except ValueError:
