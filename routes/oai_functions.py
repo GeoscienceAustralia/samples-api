@@ -143,12 +143,13 @@ def first_resumption_token(request):
 
 
 def list_identifiers(request):
-    db_query = get_db_query(request)
+    #db_query = get_db_query(request)
     samples_dict = []
     #  TODO need to implement from, until, metadataprefix and resumption token
     oracle_api_samples_url = settings.XML_API_URL_SAMPLESET.format(1)
 
-    r = requests.get(db_query)
+   # r = requests.get(db_query)
+    r = requests.get(oracle_api_samples_url)
     if "No data" in r.content:
         raise ParameterError('No Data')
     if not r.content.startswith('<?xml version="1.0" ?>'):
@@ -159,7 +160,9 @@ def list_identifiers(request):
     for event, elem in context:
         samples_dict.append(props(Sample(None, None, StringIO(etree.tostring(elem)))))
 
-    return samples_dict
+    context = etree.iterparse(StringIO(xml), tag='resumptionToken')
+
+    return samples_dict, None
 
 
 def props(x):
