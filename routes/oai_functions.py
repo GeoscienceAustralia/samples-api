@@ -108,6 +108,7 @@ def get_record(request):
 
 def list_records(request):
     samples_dict = []
+    #if request.args
     #  TODO need to implement from, until, metadataprefix and resumption token
     oracle_api_samples_url = settings.XML_API_URL_SAMPLESET.format(1)
 
@@ -123,6 +124,20 @@ def list_records(request):
         samples_dict.append(props(Sample(None, None, StringIO(etree.tostring(elem)))))
 
     return samples_dict
+
+def first_resumption_token(request):
+
+    new_resumption_token = '''<resumptionToken expirationDate="' + 2017-02-08T07:01:13Z + \
+    '" completeListSize="' + 6262929 + '" cursor="' + 0 + '">' + 1486533673048 + ',' + \
+    2011-06-01T00:00:00Z + ',' + 9999-12-31T23:59:59Z + ',' + 50 + ',' + null + ',' + oai_dc + '</resumptionToken>'''
+
+    return first_resumption_token
+
+#def next_resumption_token(token):
+
+
+
+#def Token(str_token):
 
 
 def list_identifiers(request):
@@ -148,11 +163,6 @@ def props(x):
     return dict((key, getattr(x, key)) for key in dir(x) if key not in dir(x.__class__))
 
 
-def calc_expiration_date(request_date):
-    '''
-    responseDate = 2017-02-08T06:01:12Z
-    expirationDate=2017-02-08T07:01:13Z
-    '''
 
 
 class ParameterError(ValueError):

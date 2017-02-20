@@ -1,26 +1,18 @@
 import unittest
 from model import Sample
 
-# global Sample for testing
-s = None
-
 
 class TestSample(unittest.TestCase):
     """
     Tests for the Sample class
     """
 
-    @classmethod
-    def setUpClass(cls):
-        global s
-        s = Sample()
-
     def test_populate_from_xml_file(self):
         """
         Tests loading the Sample class instance
         """
         # load
-        s.populate_from_xml_file('test/sample_eg1.xml')
+        s = Sample(None, None, 'sample_eg1.xml')
 
         # compare instance variables
         assert s.igsn == 'AU2648696', 'IGSN instance varable not correct'
@@ -33,35 +25,35 @@ class TestSample(unittest.TestCase):
         Tests loading the Sample class instance
         """
         # load
-        s.populate_from_oracle_api('AU100', "http://localhost:8080/oai")
+        s = Sample("http://localhost:8080/oai", 'AU100', None)
 
         # compare instance variables
         assert s.igsn == 'AU100', 'IGSN instance variable not correct'
 
-    def run_all_tests(self):
-        self.test_populate_from_xml_file()
+    # def run_all_tests(self):
+    #     self.test_populate_from_xml_file()
 
 
-# Define test suites
-def test_suite():
-    """
-    Returns a test suite of all the tests in this module.
-    """
-
-    test_classes = [TestSample]
-
-    suite_list = map(unittest.defaultTestLoader.loadTestsFromTestCase,
-                     test_classes)
-
-    suite = unittest.TestSuite(suite_list)
-
-    return suite
-
-
-# Define main function
-def main():
-    unittest.TextTestRunner(verbosity=2).run(test_suite())
-
-
-if __name__ == '__main__':
-    main()
+# # Define test suites
+# def test_suite():
+#     """
+#     Returns a test suite of all the tests in this module.
+#     """
+#
+#     test_classes = [TestSample]
+#
+#     suite_list = map(unittest.defaultTestLoader.loadTestsFromTestCase,
+#                      test_classes)
+#
+#     suite = unittest.TestSuite(suite_list)
+#
+#     return suite
+#
+#
+# # Define main function
+# def main():
+#     unittest.TextTestRunner(verbosity=2).run(test_suite())
+#
+#
+# if __name__ == '__main__':
+#     main()
