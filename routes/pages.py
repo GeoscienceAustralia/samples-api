@@ -39,7 +39,7 @@ def index():
         if mime_format == 'text/html':
             return render_template(
                 'page_index.html',
-                base_url='http://pid.geoscience.gov.au'
+                system_url='http://pid.geoscience.gov.au'
             )
         else:
             return Response(
@@ -156,4 +156,7 @@ def index():
 
 @pages.route('/page/about')
 def about():
-    return render_template('page_about.html', base_url='http://pid.geoscience.gov.au')
+    return render_template(
+        'page_about.html',
+        system_url='http://pid.geoscience.gov.au'
+    )
