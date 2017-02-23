@@ -1,21 +1,15 @@
 {% extends "layout.html" %}
 
 {% block content %}
-    <h1>Samples Linked Data API</h1>
-    {% if view == 'alternates' %}
-        <h2>Alternates view</h2>
-    {% else %}
-        <p>This home page of the GA Samples Linked Data API is intended to provide basic information about this API (or 'Web Service'). It is the human-readable version of an <a href="http://www.opengeospatial.org/">OGC</a> <a href="http://www.opengeospatial.org/standards/wms">WMS web service standard</a>'s <em>GetCapabilities</em> function which:</p>
-        <blockquote>Retrieves metadata about the service, including supported operations and parameters, and a list of the available layers</blockquote>
-        <p>To view the <em>GetCapabilities</em> equivalent for this API, see:</p>
-        <ul>
-            <li><a href="{{ url_for('routes.index') }}?_view=getcapabilities&_format=application/xml">{{ url_for('routes.index') }}?_view=getcapabilities&_format=application/xml</a></li>
-        </ul>
-    {% endif %}
-
-    {{ placed_html|safe }}
-
-    {% if view != 'alternates' %}
-    <p>Other views of this API information are listed in the <a href="?_view=alternates">Alternates View</a>.</p>
-    {% endif %}
+    <h1>Linked Data API of Samples</h1>
+    <p>This is the home page of GA's Linked Data <a href="https://en.wikipedia.org/wiki/Application_programming_interface">API</a> of Samples. This system provides landing pages for GA's samples which are where our <a href="http://www.igsn.org/">International GeoSample Number identifiers</a> resolve to, multiple <a href="https://en.wikipedia.org/wiki/Linked_data">Linked Data</a> <em>views</em> of each sample's metadata according to several relevant models such as the IGSN model, <a href="https://www.w3.org/TR/prov-o/">PROV-O</a> and <a href="http://dublincore.org/">Dublin Core</a>. </p>
+    <h3>Service Description</h3>
+    <p>While this web page describes this system for a human to read, it's not much good for machines so we also provide a machine-readable version. We have implemented as test of the <a href="http://www.opengeospatial.org/">OGC</a>'s <a href="http://www.opengeospatial.org/standards/wms">WMS web service standard</a>'s <em>GetCapabilities</em> function which:</p>
+    <blockquote>Retrieves metadata about the service, including supported operations and parameters</blockquote>
+    <p>To view the <em>GetCapabilities</em> function results for this API, see:</p>
+    <ul>
+        <li><a href="{{ url_for('routes.index') }}?_view=getcapabilities&_format=application/xml">{{ url_for('routes.index') }}?_view=getcapabilities&_format=application/xml</a></li>
+    </ul>
+    <h3>Contact</h3>
+    <p>This API is maintained by GA's Scientific Data section. Contact then on data@ga.gov.au.</p>
 {% endblock %}
