@@ -36,7 +36,7 @@ class RegisterRenderer(Renderer):
                     'class_register.html',
                     class_name=self.uri,
                     register=self.register,
-                    system_url='http://pid.geoscience.gov.au'
+                    system_url='http://54.66.133.7'
                 )
         else:
             return Response('The requested model model is not valid for this class', status=400, mimetype='text/plain')
