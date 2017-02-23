@@ -77,7 +77,6 @@ def samples():
         class_uri = 'http://pid.geoscience.gov.au/def/ont/igsn#Sample'
 
         if view == 'alternates':
-
             del views_formats['renderer']
             return routes_functions.render_alternates_view(
                 class_uri,
