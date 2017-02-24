@@ -44,6 +44,7 @@ def _datestamp_to_datetime(datestamp, inclusive=False):
     hh, mm, ss = t.split(':')  # this assumes there's no timezone info
     return datetime.datetime(
         int(YYYY), int(MM), int(DD), int(hh), int(mm), int(ss))
+
 def add_hour_datestamp_to_datestamp(request_datestamp):
     '''
     responseDate = 2017-02-08T06:01:12Z
