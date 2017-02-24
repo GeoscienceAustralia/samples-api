@@ -39,6 +39,7 @@ def index():
         if mime_format == 'text/html':
             return render_template(
                 'page_index.html',
+                system_url='http://54.66.133.7'
             )
         else:
             return Response(
@@ -155,4 +156,7 @@ def index():
 
 @pages.route('/page/about')
 def about():
-    return render_template('page_about.html')
+    return render_template(
+        'page_about.html',
+        system_url='http://54.66.133.7'
+    )

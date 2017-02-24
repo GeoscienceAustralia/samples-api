@@ -35,7 +35,8 @@ class RegisterRenderer(Renderer):
                 return render_template(
                     'class_register.html',
                     class_name=self.uri,
-                    register=self.register
+                    register=self.register,
+                    system_url='http://54.66.133.7'
                 )
         else:
             return Response('The requested model model is not valid for this class', status=400, mimetype='text/plain')

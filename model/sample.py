@@ -836,7 +836,8 @@ class Sample:
             igsn=self.igsn,
             year_acquired=year_acquired,
             placed_html=html,
-            date_now=datetime.now().strftime('%d %B %Y')
+            date_now=datetime.now().strftime('%d %B %Y'),
+            system_url='http://54.66.133.7'
         )
 
 

@@ -1,4 +1,4 @@
 import sys
-sys.path.insert(0, '/sf_work/igsn-ld-api/')
+sys.path.insert(0, '/var/www/samples/')
 
 from app import app as application
