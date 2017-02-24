@@ -45,6 +45,16 @@ def _datestamp_to_datetime(datestamp, inclusive=False):
     return datetime.datetime(
         int(YYYY), int(MM), int(DD), int(hh), int(mm), int(ss))
 
+def add_hour_datestamp_to_datestamp(request_datestamp):
+    '''
+    responseDate = 2017-02-08T06:01:12Z
+    expirationDate=2017-02-08T07:01:13Z
+    '''
+    request_date = datestamp_to_datetime(request_datestamp)
+    expiration_date = request_date + datetime.timedelta(hours=1)
+    expiration_timestamp = datetime_to_datestamp(expiration_date)
+
+    return expiration_timestamp
 
 def tolerant_datestamp_to_datetime(datestamp):
     """A datestamp to datetime that's more tolerant of diverse inputs.
