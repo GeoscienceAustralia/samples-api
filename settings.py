@@ -1,5 +1,5 @@
-APP_DIR = 'E:/samples-api/'
-LOGFILE = APP_DIR + 'igsn-ld-api.log'
+APP_DIR = '/Users/ness/samples-api/'
+LOGFILE = APP_DIR + 'samples-api.log'
 PORT = 8080
 DEBUG = True
 

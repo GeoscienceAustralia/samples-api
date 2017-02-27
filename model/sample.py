@@ -321,7 +321,33 @@ class Sample:
                 if elem.text is not None:
                     self.sample_no = elem.text
 
-#        self.wkt = Literal(self._generate_sample_wkt(), datatype=GEOSP.wktLiteral)
+        if isinstance(self.date_acquired, datetime):
+            self.sampling_time = self.date_acquired.isoformat()
+        elif isinstance(self.date_load, datetime):
+            self.sampling_time = self.date_load.isoformat()
+        elif isinstance(self.date_modified, datetime):
+            self.sampling_time = self.date_modified.isoformat()
+        else:
+            self.sampling_time = Sample.URI_MISSSING
+        if isinstance(self.date_modified, datetime):
+            self.modified_time = self.date_modified.isoformat()
+        elif isinstance(self.date_load, datetime):
+            self.modified_time = self.date_load.isoformat()
+         # URI for this sample
+        self.base_uri = 'http://pid.geoscience.gov.au/sample/'
+        self.this_sample = URIRef(self.base_uri + self.igsn)
+
+        # define GA
+        self.ga = URIRef(Sample.URI_GA)
+
+        GEOSP = Namespace('http://www.opengis.net/ont/geosparql#')
+
+        # sample location in GML & WKT, formulation from GeoSPARQL
+        self.wkt = Literal(self._generate_sample_wkt(), datatype=GEOSP.wktLiteral)
+        self.gml = Literal(self._generate_sample_gml(), datatype=GEOSP.gmlLiteral)
+
+        format = URIRef(self.material_type)
+        self.wkt = Literal(self._generate_sample_wkt(), datatype=GEOSP.wktLiteral)
         return True
 
     def _generate_sample_wkt(self):

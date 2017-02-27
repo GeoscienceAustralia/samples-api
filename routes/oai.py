@@ -52,8 +52,16 @@ def oai():
     if verb == 'GetRecord':
         # render_template
         try:
-            xml = oai_functions.get_record(request)
-            return xml
+            request_args = request.args
+            sample = oai_functions.get_record(request)
+            template = render_template('oai_get_record.xml',
+                                       sample=sample,
+                                       request_args=request_args,
+                                       base_url=base_url)
+            response = make_response(template)
+            return response
+            #xml = oai_functions.get_record(request)
+            #return xml
         except ValueError:
             values = {
                 'response_date': date_stamp,
