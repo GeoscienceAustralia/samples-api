@@ -9,7 +9,7 @@ import settings
 
 
 class RegisterRenderer(Renderer):
-    def __init__(self, request, uri, endpoints):
+    def __init__(self, request, uri, endpoints, page_no, no_per_page):
         Renderer.__init__(self, uri, endpoints)
 
         self.request = request
@@ -17,7 +17,7 @@ class RegisterRenderer(Renderer):
         self.register = []
         self.g = None
 
-        self._get_details_from_oracle_api(1)  # TODO: replace this magic number with a client-determined page number
+        self._get_details_from_oracle_api(page_no, no_per_page)
 
     def render(self, view, mimetype):
         if view == 'reg':
@@ -42,7 +42,6 @@ class RegisterRenderer(Renderer):
             return Response('The requested model model is not valid for this class', status=400, mimetype='text/plain')
 
     def _get_details_from_file(self, xml):
-        # TODO: use the functions currently in SamplesRegister, e.g. populate_from_oracle_api, then delete that class
         """
         Populates this instance with data from an XML file.
 
@@ -54,7 +53,6 @@ class RegisterRenderer(Renderer):
                 self.register.append(elem.text)
 
     def validate_xml(self, xml):
-
         parser = etree.XMLParser(dtd_validation=False)
 
         try:
@@ -64,7 +62,7 @@ class RegisterRenderer(Renderer):
             print 'not valid xml'
             return False
 
-    def _get_details_from_oracle_api(self, page_no):
+    def _get_details_from_oracle_api(self, page_no, no_per_page):
         """
         Populates this instance with data from the Oracle Samples table API
 
@@ -72,8 +70,9 @@ class RegisterRenderer(Renderer):
         :return: None
         """
         #os.environ['NO_PROXY'] = 'ga.gov.au'
-        r = requests.get(settings.XML_API_URL_SAMPLESET.format(page_no), timeout=3)
+        r = requests.get(settings.XML_API_URL_SAMPLESET.format(page_no, no_per_page), timeout=3)
         xml = r.content
+        print(xml)
 
         if self.validate_xml(xml):
             self._get_details_from_file(StringIO(xml))

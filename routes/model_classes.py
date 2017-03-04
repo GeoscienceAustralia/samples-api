@@ -88,7 +88,9 @@ def samples():
             )
         else:
             from model import register
-            return register.RegisterRenderer(request, class_uri, None).render(view, mime_format)
+            page_no = int(request.args.get('page_no')) if request.args.get('page_no') is not None else 1
+            no_per_page = int(request.args.get('no_per_page')) if request.args.get('no_per_page') is not None else 100
+            return register.RegisterRenderer(request, class_uri, None, page_no, no_per_page).render(view, mime_format)
 
     except LdapiParameterError, e:
         return routes_functions.client_error_Response(e)
