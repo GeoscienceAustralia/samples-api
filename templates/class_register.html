@@ -3,10 +3,17 @@
 {% block content %}
     <h1>Samples Register</h1>
     <h2>Register view of <em><a href="{{ class_name }}">{{ class_name }}</a></em></h2>
+    {% if '?' in request.url %}
+    <p><a href="{{ request.url }}">html</a> | <a href="{{ request.url }}&_format=text/turtle">rdf/turtle</a></p>
+    {% else %}
     <p><a href="{{ request.url }}">html</a> | <a href="{{ request.url }}?_format=text/turtle">rdf/turtle</a></p>
-
+    {% endif %}
     <h3>Alternate views</h3>
+    {% if '?' in request.url %}
+    <p>Different view of this register of objects are listed at its <a href="{{ request.url }}&_view=alternates">Alternate views</a> page.</p>
+    {% else %}
     <p>Different view of this register of objects are listed at its <a href="{{ request.url }}?_view=alternates">Alternate views</a> page.</p>
+    {% endif %}
 
     <h3>Instances</h3>
     <ul>
