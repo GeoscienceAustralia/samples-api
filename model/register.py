@@ -88,7 +88,7 @@ class RegisterRenderer(Renderer):
             REG = Namespace('http://purl.org/linked-data/registry#')
             self.g.bind('reg', REG)
 
-            self.g.add((URIRef(self.request.url), RDF.type, REG.Register))
+            self.g.add((URIRef(self.request.url.split('?')[0]), RDF.type, REG.Register))
 
             # add all the items
             for item in self.register:
