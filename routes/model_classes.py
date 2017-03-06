@@ -1,7 +1,7 @@
 """
 This file contains all the HTTP routes for classes from the IGSN model, such as Samples and the Sample Register
 """
-from flask import Blueprint, render_template, request
+from flask import Blueprint, render_template, request, Response
 import routes_functions
 import settings
 from ldapi import LDAPI, LdapiParameterError
@@ -89,7 +89,14 @@ def samples():
         else:
             from model import register
             page_no = int(request.args.get('page_no')) if request.args.get('page_no') is not None else 1
-            no_per_page = int(request.args.get('no_per_page')) if request.args.get('no_per_page') is not None else 100
+            no_per_page = int(request.args.get('no_per_page')) if request.args.get('no_per_page') is not None else 50
+            if no_per_page > 50:
+                return Response(
+                    'You must enter either no value for no_per_page or an integer <= 50.',
+                    status=400,
+                    mimetype='text/plain'
+                )
+
             return register.RegisterRenderer(request, class_uri, None, page_no, no_per_page).render(view, mime_format)
 
     except LdapiParameterError, e:
