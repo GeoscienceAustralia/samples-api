@@ -802,11 +802,11 @@ class Sample:
             html += '   <tr><th>Sampling Location (WKT)</th><td>' + self._generate_sample_wkt() + '</td></tr>'
             html += '   <tr><th>Current Location</th><td>GA Services building</td></tr>'
             # TODO: make this resolve
-            html += '   <tr><th>Sampling Feature</th><td><a style="text-decoration: line-through;" href="' + TERM_LOOKUP['entity_type'][self.entity_type] + '">' + TERM_LOOKUP['entity_type'][self.entity_type] + '</a></td></tr>'
+            html += '   <tr><th>Sampling Feature</th><td><a href="' + TERM_LOOKUP['entity_type'][self.entity_type] + '">' + TERM_LOOKUP['entity_type'][self.entity_type].split('/')[-1] + '</a></td></tr>'
             if self.method_type is not None:
                 html += '   <tr><th>Method Type</th><td><a href="' + self.method_type + '">' + self.method_type.split('/')[-1] + '</a></td></tr>'
             # TODO: replace with dynamic
-            html += '   <tr><th>Access Rights</th><td><a href="http://pid.geoscience.gov.au/def/voc/igsn-codelists/Public">Public</a></td></tr>'
+            html += '   <tr><th>Access Rights</th><td><a href="http://pid.geoscience.gov.au/def/voc/igsn-codelists/Public">public</a></td></tr>'
             html += '   <tr><th>Publisher</th><td><a href="http://pid.geoscience.gov.au/org/ga">Geoscience Australia</a></td></tr>'
             if self.remark is not None:
                 html += '   <tr><th>Description</th><td>' + self.remark + '</td></tr>'
