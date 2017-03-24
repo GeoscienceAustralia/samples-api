@@ -35,7 +35,7 @@ OAI_ARGS = {
     },
 
     'ListRecords': {
-        'from_': 'optional',
+        'from': 'optional',
         'until': 'optional',
         'set': 'optional',
         'metadataPrefix': 'required',
@@ -110,67 +110,123 @@ def get_record(request):
 
 def list_records(request):
     samples_dict = []
-    #if request.args
+    no_per_page = 1 #settings.OAI_BATCH_SIZE
+    page_no =1
+
     #  TODO need to implement from, until, metadataprefix and resumption token
-    oracle_api_samples_url = settings.XML_API_URL_SAMPLESET.format(1)
+
+    if request.args.get('resumptionToken') is None:
+        oracle_api_samples_url = settings.XML_API_URL_SAMPLESET.format(page_no,no_per_page)
+    else:
+        oracle_api_samples_url = create_url_query_token(request.args.get('resumptionToken'))
+
 
     r = requests.get(oracle_api_samples_url)
+
     if "No data" in r.content:
         raise ParameterError('No Data')
     if not r.content.startswith('<?xml version="1.0" ?>'):
-        xml = '<?xml version="1.0" ?>\n' + r.content
+        xml2 = '<?xml version="1.0" ?>\n' + r.content
     else:
-        xml = r.content
-    context = etree.iterparse(StringIO(xml), tag='ROW')
+        xml2 = r.content
+    context = etree.iterparse(StringIO(xml2), tag='ROW')
     for event, elem in context:
+        print elem.text
+        print etree.tostring(elem)
+        print StringIO(etree.tostring(elem))
         samples_dict.append(props(Sample(None, None, StringIO(etree.tostring(elem)))))
 
     return samples_dict
 
-def first_resumption_token(request):
 
-    new_resumption_token = '''<resumptionToken expirationDate="' + 2017-02-08T07:01:13Z + \
-    '" completeListSize="' + 6262929 + '" cursor="' + 0 + '">' + 1486533673048 + ',' + \
-    2011-06-01T00:00:00Z + ',' + 9999-12-31T23:59:59Z + ',' + 50 + ',' + null + ',' + oai_dc + '</resumptionToken>'''
+#<resumptionToken expirationDate="2017-03-24T05:02:52Z"
+# completeListSize="6267770" cursor="100">
+# 1490328172912,2011-06-01T00:00:00Z,9999-12-31T23:59:59Z,150,null,oai_dc
+# </resumptionToken>
+def get_resumption_token(request):
+    dt = datetime.datetime.now()
+    date_stamp = datetime_to_datestamp(dt)
+    expirationDate = calc_expiration_date(date_stamp)
 
-    return first_resumption_token
-
-#def next_resumption_token(token):
-
+    next_resumption_token = '<resumptionToken expirationDate="{0}" completeListSize="{1}" cursor="{2}">\
+    {3},{4},{5}</resumptionToken>'.format(expirationDate,completeListSize,cursor,from_,until,page_no,metadataPrefix)
 
 
-#def Token(str_token):
+    return next_resumption_token
 
+def get_earliest_date():
+    '''
+    queries GA's ORACLE DB and gets the earliest modified
+    date from the samples table.
+    :return: a date object
+    '''
+    r = requests.get(settings.XML_API_URL_MIN_DATE)
 
-def list_identifiers(request):
-    #db_query = get_db_query(request)
-    samples_dict = []
-    #  TODO need to implement from, until, metadataprefix and resumption token
-    oracle_api_samples_url = settings.XML_API_URL_SAMPLESET.format(1)
-
-   # r = requests.get(db_query)
-    r = requests.get(oracle_api_samples_url)
     if "No data" in r.content:
         raise ParameterError('No Data')
     if not r.content.startswith('<?xml version="1.0" ?>'):
         xml = '<?xml version="1.0" ?>\n' + r.content
     else:
         xml = r.content
+    context = etree.iterparse(StringIO(xml), tag='EARLIEST_MODIFIED_DATE')
+    for event, elem in context:
+        str_min_date = elem.text
+
+    min_date = datetime.strptime(str_min_date, '%Y-%m-%d %H:%M:%S')
+
+    return min_date
+
+def create_url_query_token(token):
+    '''
+    returns the url to query GA's Samples dataset based
+    on a resumption token.
+    :param token: a resumption token
+    :return:
+    '''
+    no_per_page = settings.OAI_BATCH_SIZE
+
+    [from_,until,batch_num,metadataPrefix] =token.split(',')
+    from_date = convert_datestamp_to_oracle(from_)
+    until_date = convert_datestamp_to_oracle(until)
+
+    oracle_api_samples_url = settings.XML_API_URL_SAMPLESET_DATE_RANGE.format(batch_num,no_per_page,from_date,until_date)
+    return oracle_api_samples_url
+
+
+
+def list_identifiers(request):
+    samples_dict = []
+    no_per_page = settings.OAI_BATCH_SIZE
+    page_no =1
+
+    #  TODO need to implement from, until, metadataprefix and resumption token
+
+    if request.args.get('resumptionToken') is None:
+
+        oracle_api_samples_url = settings.XML_API_URL_SAMPLESET.format(page_no,no_per_page)
+    else:
+        oracle_api_samples_url = create_url_query_token(request.args.get('resumptionToken'))
+
+    r = requests.get(oracle_api_samples_url)
+
+    if "No data" in r.content:
+        raise ParameterError('No Data')
+    if not r.content.startswith('<?xml version="1.0" ?>'):
+        xml = '<?xml version="1.0" ?>\n' + r.content
+    else:
+        xml = r.content
+
     context = etree.iterparse(StringIO(xml), tag='ROW')
     for event, elem in context:
         samples_dict.append(props(Sample(None, None, StringIO(etree.tostring(elem)))))
 
-    context = etree.iterparse(StringIO(xml), tag='resumptionToken')
+#    context = etree.iterparse(StringIO(xml), tag='resumptionToken')
 
     return samples_dict, None
 
 
 def props(x):
     return dict((key, getattr(x, key)) for key in dir(x) if key not in dir(x.__class__))
-
-def get_db_query(request):
-
-    return db_query
 
 
 
