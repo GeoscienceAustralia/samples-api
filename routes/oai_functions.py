@@ -100,12 +100,13 @@ def validate_oai_parameters(qsa_args):
 
 
 def get_record(request):
-    try:
-        sample = Sample(settings.XML_API_URL_SAMPLE, request.args.get('identifier'))
+    sample = Sample(settings.XML_API_URL_SAMPLE, request.args.get('identifier'))
 
-        return sample.export_dc_xml()
-    except ValueError:
-        raise ValueError
+    return props(sample)
+    # try:
+    #
+    # except ValueError:
+    #     raise ValueError
 
 
 def list_records(request):
@@ -167,6 +168,10 @@ def get_earliest_date():
     min_date = datetime.strptime(str_min_date, '%Y-%m-%d %H:%M:%S')
 
     return min_date
+
+def get_earliest_datestamp():
+
+    return datetime_to_datestamp(get_earliest_date())
 
 def create_url_query_token(token):
     '''
@@ -244,5 +249,5 @@ if __name__ == '__main__':
     s = Sample(settings.XML_API_URL_SAMPLE, args['identifier'])
     dc_xml = s.export_dc_xml()
 
-    print 'valid_oai_args(args[\'verb\'])', valid_oai_args(args['verb'])
-    print 'validate_oai_parameters(args)', validate_oai_parameters(args)
+#    print 'valid_oai_args(args[\'verb\'])', valid_oai_args(args['verb'])
+#    print 'validate_oai_parameters(args)', validate_oai_parameters(args)

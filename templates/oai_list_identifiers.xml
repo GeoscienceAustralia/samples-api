@@ -1,16 +1,15 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <OAI-PMH xmlns="http://www.openarchives.org/OAI/2.0/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.openarchives.org/OAI/2.0/ http://www.openarchives.org/OAI/2.0/OAI-PMH.xsd">
-    <responseDate>{{samples[0]['datetime']}}</responseDate>
+    <responseDate>{{request_args['date_stamp']}}</responseDate>
     <request verb= "{{request_args['verb']}}" metadataPrefix="{{request_args['metadataPrefix']}}">{{request_args['base_uri_oai']}}</request>
     <ListIdentifiers>
-    {% for sample in samples %}
+        {% for sample in samples %}
         <header>
             <identifier>{{sample['igsn']}}</identifier>
-            <datestamp>{{sample['date_modified']}}</datestamp>
+            <datestamp>{{sample['modified_datestamp']}}</datestamp>
         </header>
-    {% endfor %}
+        {% endfor %}
     {% if resumptiontoken %}
-
         <resumptionToken expirationDate="2017-01-06T01:42:02Z" completeListSize="6262929" cursor="0">1483663322386,0001-01-01T00:00:00Z,9999-12-31T23:59:59Z,50,null,oai_dc</resumptionToken>
     {% endif %}
     </ListIdentifiers>

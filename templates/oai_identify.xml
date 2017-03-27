@@ -10,7 +10,7 @@
         <baseURL>{{ values.base_url }}</baseURL>
         <protocolVersion>2.0</protocolVersion>
         <adminEmail>{{ values.admin_email }}</adminEmail>
-        <earliestDatestamp>2015-08-07T02:19:24Z</earliestDatestamp>
+        <earliestDatestamp>{{values.earliest_date}}</earliestDatestamp>
         <deletedRecord>no</deletedRecord>
         <granularity>YYYY-MM-DDThh:mm:ssZ</granularity>
         <compression>gzip</compression>

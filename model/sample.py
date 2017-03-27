@@ -75,10 +75,9 @@ class Sample:
         self.hole_long_max = None
         self.hole_lat_min = None
         self.hole_lat_max = None
-        self.date_load = None
         self.date_modified = None
+        self.modified_datestamp = None
         self.sample_no = None
-        self.datestamp = datetime_to_datestamp(datetime.now())
         self.wkt = None
 
         # populate all instance variables from API
@@ -312,20 +311,20 @@ class Sample:
             elif elem.tag == "HOLE_MAX_LATITUDE":
                 if elem.text is not None:
                     self.hole_lat_max = elem.text
-            elif elem.tag == "LOADEDDATE":
-                if elem.text is not None:
-                    try:
-                        self.date_load = datetime.strptime(elem.text, '%Y-%m-%dT%H:%M:%S')
-                    except:
-                        self.date_load = datetime.strptime(elem.text, '%d-%b-%y')
             elif elem.tag == "MODIFIED_DATE":
-                if elem.text is not None:
-                    self.date_modified = datetime.strptime(elem.text, '%Y-%m-%dT%H:%M:%S')
+                try:
+                    if elem.text is not None:
+                        self.date_modified = datetime.strptime(elem.text, '%Y-%m-%dT%H:%M:%S')
+                except:
+                    self.date_modified = datetime.strptime(elem.text, '%Y-%m-%d %H:%M:%S')
             elif elem.tag == "SAMPLENO":
                 if elem.text is not None:
                     self.sample_no = elem.text
+        self.modified_datestamp = datetime_to_datestamp(self.date_modified)
 
-#        self.wkt = Literal(self._generate_sample_wkt(), datatype=GEOSP.wktLiteral)
+        GEOSP = Namespace('http://www.opengis.net/ont/geosparql#')
+        self.wkt = Literal(self._generate_sample_wkt(), datatype=GEOSP.wktLiteral)
+
         return True
 
     def _generate_sample_wkt(self):
@@ -592,16 +591,14 @@ class Sample:
 
         if isinstance(self.date_acquired, datetime):
             sampling_time = self.date_acquired.isoformat()
-        elif isinstance(self.date_load, datetime):
-            sampling_time = self.date_load.isoformat()
         elif isinstance(self.date_modified, datetime):
             sampling_time = self.date_modified.isoformat()
         else:
             sampling_time = Sample.URI_MISSSING
         if isinstance(self.date_modified, datetime):
             modified_time = self.date_modified.isoformat()
-        elif isinstance(self.date_load, datetime):
-            modified_time = self.date_load.isoformat()
+        else:
+            modified_time = Sample.URI_MISSSING
          # URI for this sample
         base_uri = 'http://pid.geoscience.gov.au/sample/'
         this_sample = URIRef(base_uri + self.igsn)
@@ -617,11 +614,12 @@ class Sample:
 
         format = URIRef(self.material_type)
 
+        date_stamp = datetime_to_datestamp(datetime.now())
         # TODO:   add is site uri
         xml = 'xml = <record>\
         <header>\
         <identifier>' + self.entity_uri + '</identifier>\
-        <datestamp>' + self.datestamp + '</datestamp>\
+        <datestamp>' + date_stamp + '</datestamp>\
         </header>\
         <metadata><oai_dc:dc xmlns:dc="http://purl.org/dc/elements/1.1/"\
            xmlns:oai_dc="http://www.openarchives.org/OAI/2.0/oai_dc/"\

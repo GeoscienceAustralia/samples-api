@@ -797,6 +797,7 @@ TERM_LOOKUP = {
         'BOREHOLE': 'http://pid.geoscience.gov.au/def/voc/featureofinteresttype/borehole',
         'FIELD SITE': 'http://pid.geoscience.gov.au/def/voc/featureofinteresttype/site',
         'SURVEY': 'http://pid.geoscience.gov.au/def/voc/featureofinteresttype/survey',
+        'SECTION': 'http://pid.geoscience.gov.au/def/voc/featureofinteresttype/section'
         # see vocab <http://pid.geoscience.gov.au/def/voc/featureofinteresttype>, listed above in F_O_I_TYPE list
     }
 }
