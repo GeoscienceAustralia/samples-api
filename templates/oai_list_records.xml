@@ -1,18 +1,33 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <OAI-PMH xmlns="http://www.openarchives.org/OAI/2.0/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.openarchives.org/OAI/2.0/ http://www.openarchives.org/OAI/2.0/OAI-PMH.xsd">
     <responseDate>{{samples[0]['datetime']}}</responseDate>
-    <request verb= {{request_args['verb']}} metadataPrefix={{request_args['metadataPrefix']}}>http://pid.geoscience.gov.au/oai/</request>
-    <ListIdentifiers>
+    <request verb= {{request_args['verb']}} metadataPrefix={{request_args['metadataPrefix']}}>{{request_args['base_uri_oai']}}</request>
+    <ListRecords>
 
     {% for sample in samples %}
-        <header>
-            <identifier>{{sample['igsn']}}</identifier>
-            <datestamp>{{sample['date_modified']}}</datestamp>
-        </header>
+        <record>
+            <header>
+                <identifier>{{sample['entity_uri']}}</identifier>
+                <datestamp>{{sample['datestamp']}}</datestamp>
+            </header>
+            <metadata>
+                <oai_dc:dc
+                        xmlns:oai_dc="http://www.openarchives.org/OAI/2.0/oai_dc/"
+                        xmlns:dc="http://purl.org/dc/elements/1.1/"
+                        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                        xsi:schemaLocation="http://www.openarchives.org/OAI/2.0/oai_dc/ http://www.openarchives.org/OAI/2.0/oai_dc.xsd">
+                    <dc:creator>{{sample['ga']}}</dc:creator>
+                    <dc:identifier>{{sample['igsn']}}</dc:identifier>
+                    <dc:language>eng</dc:language>
+                    <dc:type>{{sample['sample_type']}}</dc:type>
+                    <dc:coverage>{{sample['wkt']}}</dc:coverage>
+                </oai_dc:dc>
+            </metadata>
+        </record>
     {% endfor %}
     {% if request_args['resumptionToken']%}
 
-    <resumptionToken expirationDate="2017-01-06T01:42:02Z" completeListSize="6262929" cursor="0">1483663322386,0001-01-01T00:00:00Z,9999-12-31T23:59:59Z,50,null,oai_dc</resumptionToken>
+        <resumptionToken expirationDate="2017-01-06T01:42:02Z" completeListSize="6262929" cursor="0">1483663322386,0001-01-01T00:00:00Z,9999-12-31T23:59:59Z,50,null,oai_dc</resumptionToken>
     {% endif %}
-    </ListIdentifiers>
+    </ListRecords>
 </OAI-PMH>

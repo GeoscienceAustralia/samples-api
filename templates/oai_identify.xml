@@ -4,10 +4,10 @@
          xsi:schemaLocation="http://www.openarchives.org/OAI/2.0/
          http://www.openarchives.org/OAI/2.0/OAI-PMH.xsd">
     <responseDate>{{values.response_date}}</responseDate>
-    <request verb="Identify">{{ request.base_url }}</request>
+    <request verb="Identify">{{ values.base_url }}</request>
     <Identify>
         <repositoryName>IGSN Registry Metadata Store</repositoryName>
-        <baseURL>{{ request.base_url }}</baseURL>
+        <baseURL>{{ values.base_url }}</baseURL>
         <protocolVersion>2.0</protocolVersion>
         <adminEmail>{{ values.admin_email }}</adminEmail>
         <earliestDatestamp>2015-08-07T02:19:24Z</earliestDatestamp>

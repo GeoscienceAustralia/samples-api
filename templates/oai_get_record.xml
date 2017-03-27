@@ -2,14 +2,13 @@
     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
     xsi:schemaLocation="http://www.openarchives.org/OAI/2.0/
     http://www.openarchives.org/OAI/2.0/OAI-PMH.xsd">
-    <responseDate>{{s.timestamp}}</responseDate>
-    <request verb="GetRecord" identifier="{{s.IGSN}}" metadataPrefix="oai_dc">{{ url_for('routes.index') }}</request>
+    <responseDate>{{sample['datestamp']}}</responseDate>
+    <request verb="GetRecord" identifier="{{sample['igsn']}}" metadataPrefix={{request_args['metadataPrefix']}}>{{request_args['base_uri_oai']}}</request>
     <GetRecord>
         <record>
             <header>
-                <identifier>oai:lcoa1.loc.gov:loc.gmd/g3791p.rr002300</identifier>
-                <datestamp>{{s.datestamp}}</datestamp>
-                <setSpec>ga</setSpec>
+                <identifier>{{sample['entity_uri']}}</identifier>
+                <datestamp>{{sample['datestamp']}}</datestamp>
             </header>
             <metadata>
                 <oai_dc:dc
@@ -17,11 +16,11 @@
                         xmlns:dc="http://purl.org/dc/elements/1.1/"
                         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
                         xsi:schemaLocation="http://www.openarchives.org/OAI/2.0/oai_dc/ http://www.openarchives.org/OAI/2.0/oai_dc.xsd">
-                    <dc:title>{{s.title}}</dc:title>
-                    <dc:creator>http://pid.geoscience.gov.au/org/ga</dc:creator>
-                    <dc:identifier>{{s.IGSN}}</dc:identifier>
+                    <dc:creator>{{sample['ga']}}</dc:creator>
+                    <dc:identifier>{{sample['igsn']}}</dc:identifier>
                     <dc:language>eng</dc:language>
-                    <dc:coverage>United States--Middle Atlantic States</dc:coverage>
+                    <dc:type>{{sample['sample_type']}}</dc:type>
+                    <dc:coverage>{{sample['wkt']}}</dc:coverage>
                 </oai_dc:dc>
             </metadata>
         </record>

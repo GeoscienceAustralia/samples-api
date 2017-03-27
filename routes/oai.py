@@ -51,9 +51,17 @@ def oai():
     # TODO: implement using lxml etree or XML template?
     if verb == 'GetRecord':
         # render_template
+
         try:
-            xml = oai_functions.get_record(request)
-            return xml
+            request_args = request.args.copy()
+            request_args['base_uri_oai'] = settings.BASE_URI_OAI
+            sample = oai_functions.get_record(request)
+            template = render_template('oai_get_record.xml',
+                                       sample=sample,
+                                       request_args=request_args)
+            response = make_response(template)
+            return response
+
         except ValueError:
             values = {
                 'response_date': date_stamp,
@@ -74,12 +82,12 @@ def oai():
         try:
 
             samples, resumption_token = oai_functions.list_identifiers(request)
-            request_args = request.args
+            request_args = request.args.copy()
+            request_args['base_uri_oai'] = settings.BASE_URI_OAI
 
             template = render_template('oai_list_identifiers.xml',
                                        samples=samples,
                                        request_args=request_args,
-                                       base_url=base_url,
                                        resumption_token=resumption_token)
             response = make_response(template)
             return response
@@ -101,8 +109,8 @@ def oai():
         # render_template
         try:
             samples = oai_functions.list_records(request)
-            request_args = request.args
-
+            request_args = request.args.copy()
+            request_args['base_uri_oai'] = settings.BASE_URI_OAI
             template = render_template('oai_list_records.xml',
                                        samples=samples,
                                        request_args=request_args,
@@ -126,7 +134,8 @@ def oai():
     elif verb == 'Identify':
         values = {
             'response_date': date_stamp,
-            'admin_email': settings.ADMIN_EMAIL
+            'admin_email': settings.ADMIN_EMAIL,
+            'base_url': settings.BASE_URI_OAI
             }
         template = render_template('oai_identify.xml', values=values), 400
         response = make_response(template)
