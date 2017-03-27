@@ -110,7 +110,7 @@ def get_record(request):
 
 def list_records(request):
     samples_dict = []
-    no_per_page = 1 #settings.OAI_BATCH_SIZE
+    no_per_page = 10 #settings.OAI_BATCH_SIZE
     page_no =1
 
     #  TODO need to implement from, until, metadataprefix and resumption token
@@ -120,20 +120,14 @@ def list_records(request):
     else:
         oracle_api_samples_url = create_url_query_token(request.args.get('resumptionToken'))
 
-
     r = requests.get(oracle_api_samples_url)
 
     if "No data" in r.content:
         raise ParameterError('No Data')
-    if not r.content.startswith('<?xml version="1.0" ?>'):
-        xml2 = '<?xml version="1.0" ?>\n' + r.content
-    else:
-        xml2 = r.content
-    context = etree.iterparse(StringIO(xml2), tag='ROW')
+
+    xml = r.content
+    context = etree.iterparse(StringIO(xml), tag='ROW')
     for event, elem in context:
-        print elem.text
-        print etree.tostring(elem)
-        print StringIO(etree.tostring(elem))
         samples_dict.append(props(Sample(None, None, StringIO(etree.tostring(elem)))))
 
     return samples_dict
@@ -164,10 +158,8 @@ def get_earliest_date():
 
     if "No data" in r.content:
         raise ParameterError('No Data')
-    if not r.content.startswith('<?xml version="1.0" ?>'):
-        xml = '<?xml version="1.0" ?>\n' + r.content
-    else:
-        xml = r.content
+
+    xml = r.content
     context = etree.iterparse(StringIO(xml), tag='EARLIEST_MODIFIED_DATE')
     for event, elem in context:
         str_min_date = elem.text
@@ -211,10 +203,8 @@ def list_identifiers(request):
 
     if "No data" in r.content:
         raise ParameterError('No Data')
-    if not r.content.startswith('<?xml version="1.0" ?>'):
-        xml = '<?xml version="1.0" ?>\n' + r.content
-    else:
-        xml = r.content
+
+    xml = r.content
 
     context = etree.iterparse(StringIO(xml), tag='ROW')
     for event, elem in context:

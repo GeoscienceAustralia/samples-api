@@ -146,6 +146,7 @@ class Sample:
             xml = '<?xml version="1.0" ?>\n' + r.content
         else:
             xml = r.content
+        print xml
         if self.validate_xml(xml):
             self._populate_from_xml_file(StringIO(xml))
             return True
@@ -313,10 +314,13 @@ class Sample:
                     self.hole_lat_max = elem.text
             elif elem.tag == "LOADEDDATE":
                 if elem.text is not None:
-                    self.date_load = datetime.strptime(elem.text, '%Y-%m-%d %H:%M:%S')
+                    try:
+                        self.date_load = datetime.strptime(elem.text, '%Y-%m-%dT%H:%M:%S')
+                    except:
+                        self.date_load = datetime.strptime(elem.text, '%d-%b-%y')
             elif elem.tag == "MODIFIED_DATE":
                 if elem.text is not None:
-                    self.date_modified = datetime.strptime(elem.text, '%Y-%m-%d %H:%M:%S')
+                    self.date_modified = datetime.strptime(elem.text, '%Y-%m-%dT%H:%M:%S')
             elif elem.tag == "SAMPLENO":
                 if elem.text is not None:
                     self.sample_no = elem.text
