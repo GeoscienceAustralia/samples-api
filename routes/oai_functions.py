@@ -111,7 +111,7 @@ def get_record(request):
 
 def list_records(request):
     samples_dict = []
-    no_per_page = 10 #settings.OAI_BATCH_SIZE
+    no_per_page = settings.OAI_BATCH_SIZE
     page_no =1
 
     #  TODO need to implement from, until, metadataprefix and resumption token
@@ -131,21 +131,53 @@ def list_records(request):
     for event, elem in context:
         samples_dict.append(props(Sample(None, None, StringIO(etree.tostring(elem)))))
 
-    return samples_dict
+    resumption_token = get_resumption_token(request)
+
+    return samples_dict, resumption_token
 
 
-#<resumptionToken expirationDate="2017-03-24T05:02:52Z"
-# completeListSize="6267770" cursor="100">
-# 1490328172912,2011-06-01T00:00:00Z,9999-12-31T23:59:59Z,150,null,oai_dc
-# </resumptionToken>
+
 def get_resumption_token(request):
-    dt = datetime.datetime.now()
-    date_stamp = datetime_to_datestamp(dt)
-    expirationDate = calc_expiration_date(date_stamp)
+    '''
+    <resumptionToken expirationDate="2017-03-24T05:02:52Z"
+    completeListSize="6267770" cursor="100">
+    1490328172912,2011-06-01T00:00:00Z,9999-12-31T23:59:59Z,150,null,oai_dc
+    </resumptionToken>
+    :param request:
+    :return:
+    '''
 
-    next_resumption_token = '<resumptionToken expirationDate="{0}" completeListSize="{1}" cursor="{2}">\
-    {3},{4},{5}</resumptionToken>'.format(expirationDate,completeListSize,cursor,from_,until,page_no,metadataPrefix)
+    expiration_date = calc_expiration_datestamp()
 
+    if request.args.has_key('resumptionToken'):
+        [from_,
+         until,
+         cursor,
+         metadataPrefix] =request.args['resumptionToken'].split(',')
+    else:
+        if request.args.has_key('from'):
+            from_ = request.args['from']
+        else:
+            from_ = '2011-06-01T00:00:00Z'
+
+        if request.args.has_key('until'):
+            until = request.args['until']
+        else:
+            until = '9999-12-31T23:59:59Z'
+        metadataPrefix = request.args['metadataPrefix']
+        cursor =0
+    complete_list_size = get_complete_list_size(from_,until)
+    cursor_next = cursor + settings.OAI_BATCH_SIZE
+    if cursor_next >= complete_list_size:
+        next_resumption_token = None
+    else:
+        next_resumption_token = {'expiration_date':expiration_date,
+                                 'complete_list_size': complete_list_size,
+                                 'cursor': cursor,
+                                 'from_':from_,
+                                 'until' : until,
+                                 'cursor_next' : cursor_next,
+                                 'metadataPrefix': metadataPrefix}
 
     return next_resumption_token
 
@@ -170,12 +202,47 @@ def get_earliest_date():
     return min_date
 
 def get_earliest_datestamp():
-
+    '''
+    returns an OAI-PMH format datestamp of the earliest modified_date in GA's
+    Samples database eg 2017-03-27T19:20:53Z
+    :param :
+    :return: an OAI-PMH format datestamp
+    '''
     return datetime_to_datestamp(get_earliest_date())
+
+def get_complete_list_size(str_from_date=None,str_until_date=None):
+    '''
+    queries GA's ORACLE DB and gets the number of records the query
+    matches from the samples table.
+    :return: an integer
+    '''
+
+    if str_from_date is None:
+        str_from_date = convert_datestamp_to_oracle('2011-06-01T00:00:00Z')
+    else:
+        str_from_date = convert_datestamp_to_oracle(str_from_date)
+    if str_until_date is None:
+        str_until_date = convert_datestamp_to_oracle('2099-12-31T23:59:59Z')
+    else:
+        str_until_date = convert_datestamp_to_oracle(str_until_date)
+
+    r = requests.get(settings.XML_API_URL_TOTAL_COUNT_DATE_RANGE.format(str_from_date, str_until_date))
+
+    if "No data" in r.content:
+        raise ParameterError('No Data')
+
+    xml = r.content
+
+    context = etree.iterparse(StringIO(xml), tag='RECORD_COUNT')
+    for event, elem in context:
+        str_record_count = elem.text
+
+
+    return str_record_count
 
 def create_url_query_token(token):
     '''
-    returns the url to query GA's Samples dataset based
+    returns the url to query GA's Samples database based
     on a resumption token.
     :param token: a resumption token
     :return:
@@ -192,6 +259,11 @@ def create_url_query_token(token):
 
 
 def list_identifiers(request):
+    '''
+    Part of the
+    :param request:
+    :return:
+    '''
     samples_dict = []
     no_per_page = settings.OAI_BATCH_SIZE
     page_no =1
@@ -216,8 +288,10 @@ def list_identifiers(request):
         samples_dict.append(props(Sample(None, None, StringIO(etree.tostring(elem)))))
 
 #    context = etree.iterparse(StringIO(xml), tag='resumptionToken')
+    resumption_token = get_resumption_token(request)
 
-    return samples_dict, None
+    return samples_dict, resumption_token
+
 
 
 def props(x):
@@ -225,11 +299,13 @@ def props(x):
 
 
 
-def calc_expiration_date(request_datestamp):
+def calc_expiration_datestamp():
     '''
     responseDate = 2017-02-08T06:01:12Z
     expirationDate=2017-02-08T07:01:13Z
     '''
+    dt = datetime.now()
+    request_datestamp = datetime_to_datestamp(dt)
     request_date = datestamp_to_datetime(request_datestamp)
     expiration_date = request_date + timedelta(hours=1)
     expiration_timestamp = datetime_to_datestamp(expiration_date)

@@ -15,6 +15,8 @@ XML_API_URL_SAMPLESET_DATE_RANGE = 'http://dbforms.ga.gov.au/www_distp/a.igsn_ap
 
 XML_API_URL_MIN_DATE = 'http://dbforms.ga.gov.au/www_distp/a.igsn_api.get_Earliest_Date_Modified'
 XML_API_URL_TOTAL_COUNT = 'http://dbforms.ga.gov.au/www_distp/a.igsn_api.get_Number_Modified'
+XML_API_URL_TOTAL_COUNT_DATE_RANGE = 'http://dbforms.ga.gov.au/www_distp/a.igsn_api.get_Number_Modified'\
+                                        '?pModifiedFromDate={0}&pModifiedToDate={1}'
 
 ADMIN_EMAIL = 'data@ga.gov.au'
 

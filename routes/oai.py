@@ -90,7 +90,7 @@ def oai():
             template = render_template('oai_list_identifiers.xml',
                                        samples=samples,
                                        request_args=request_args,
-                                       resumption_token=resumption_token)
+                                       resumptiontoken=resumption_token)
             response = make_response(template)
             return response
         except ValueError:
@@ -109,17 +109,21 @@ def oai():
 
     elif verb == 'ListRecords':
         # render_template
+#        try:
+        samples, token = oai_functions.list_records(request)
+
+        request_args = request.args.copy()
+        request_args['date_stamp'] = date_stamp
+        request_args['base_uri_oai'] = settings.BASE_URI_OAI
+        template = render_template('oai_list_records.xml',
+                                   samples=samples,
+                                   resumptiontoken =token,
+                                   request_args=request_args,
+                                   base_url=base_url)
+        response = make_response(template)
+        return response
         try:
-            samples = oai_functions.list_records(request)
-            request_args = request.args.copy()
-            request_args['date_stamp'] = date_stamp
-            request_args['base_uri_oai'] = settings.BASE_URI_OAI
-            template = render_template('oai_list_records.xml',
-                                       samples=samples,
-                                       request_args=request_args,
-                                       base_url=base_url)
-            response = make_response(template)
-            return response
+            a=5
         except ValueError:
             values = {
                 'response_date': date_stamp,

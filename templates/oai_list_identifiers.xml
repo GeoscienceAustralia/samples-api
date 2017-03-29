@@ -2,15 +2,12 @@
 <OAI-PMH xmlns="http://www.openarchives.org/OAI/2.0/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.openarchives.org/OAI/2.0/ http://www.openarchives.org/OAI/2.0/OAI-PMH.xsd">
     <responseDate>{{request_args['date_stamp']}}</responseDate>
     <request verb= "{{request_args['verb']}}" metadataPrefix="{{request_args['metadataPrefix']}}">{{request_args['base_uri_oai']}}</request>
-    <ListIdentifiers>
-        {% for sample in samples %}
+    <ListIdentifiers>{% for sample in samples %}
         <header>
             <identifier>{{sample['igsn']}}</identifier>
             <datestamp>{{sample['modified_datestamp']}}</datestamp>
-        </header>
-        {% endfor %}
-    {% if resumptiontoken %}
-        <resumptionToken expirationDate="2017-01-06T01:42:02Z" completeListSize="6262929" cursor="0">1483663322386,0001-01-01T00:00:00Z,9999-12-31T23:59:59Z,50,null,oai_dc</resumptionToken>
-    {% endif %}
+        </header>{% endfor %}{% if resumptiontoken %}
+        <resumptionToken expirationDate="{{resumptiontoken['expiration_date']}}" completeListSize="{{resumptiontoken['complete_list_size']}}" cursor="{{resumptiontoken['cursor']}}">
+        {{resumptiontoken['from_']}},{{resumptiontoken['until']}},{{resumptiontoken['cursor_next']}},{{resumptiontoken['metadataPrefix']}}</resumptionToken>{% endif %}
     </ListIdentifiers>
 </OAI-PMH>

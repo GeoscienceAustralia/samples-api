@@ -88,13 +88,13 @@ def tolerant_datestamp_to_datetime(datestamp):
 
 def convert_datestamp_to_oracle(datestamp):
     """
-    convert an OAI-PH format datestamp into the date format
+    convert an OAI-PMH format datestamp into the date format
     required by GA's oracle web API.
     2016-12-20%2001:00:00
     """
     try:
         date = tolerant_datestamp_to_datetime(datestamp)
-        oracle_api_date = date.strftime('%Y-%m-%d%%%H:%M:%S')
+        oracle_api_date = date.strftime('%Y-%m-%dT%H:%M:%S')
         return oracle_api_date
     except ValueError:
         raise DatestampError(datestamp)
