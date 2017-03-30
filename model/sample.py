@@ -145,7 +145,6 @@ class Sample:
             xml = '<?xml version="1.0" ?>\n' + r.content
         else:
             xml = r.content
-        print xml
         if self.validate_xml(xml):
             self._populate_from_xml_file(StringIO(xml))
             return True
