@@ -7,7 +7,7 @@
     <responseDate>{{values.response_date}}</responseDate>
     <request verb="Identify">{{ values.base_url }}</request>
     <Identify>
-        <repositoryName>IGSN Registry Metadata Store</repositoryName>
+        <repositoryName>Geoscience Australia's Sample Catalogue</repositoryName>
         <baseURL>{{ values.base_url }}</baseURL>
         <protocolVersion>2.0</protocolVersion>
         <adminEmail>{{ values.admin_email }}</adminEmail>
@@ -22,9 +22,9 @@
                             xsi:schemaLocation="http://www.openarchives.org/OAI/2.0/oai-identifier
                             http://www.openarchives.org/OAI/2.0/oai-identifier.xsd">
                 <scheme>oai</scheme>
-                <repositoryIdentifier>registry.igsn.org??</repositoryIdentifier>
+                <repositoryIdentifier>http://pid.geoscience.gov.au/org/ga</repositoryIdentifier>
                 <delimiter>:</delimiter>
-                <sampleIdentifier>oai:registry.igsn.org:12425??</sampleIdentifier>
+                <sampleIdentifier>http://pid.geoscience.gov.au/sample/AU239</sampleIdentifier>
             </oai-identifier>
         </description>
     </Identify>

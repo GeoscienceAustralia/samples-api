@@ -8,7 +8,7 @@
     <ListRecords>{% for sample in samples %}
         <record>
             <header>
-                <identifier>{{sample['entity_uri']}}</identifier>
+                <identifier>{{sample['igsn']}}</identifier>
                 <datestamp>{{sample['modified_datestamp']}}</datestamp>
             </header>
             <metadata>

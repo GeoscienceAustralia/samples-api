@@ -1,0 +1,28 @@
+<OAI-PMH xmlns="http://www.openarchives.org/OAI/2.0/"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://www.openarchives.org/OAI/2.0/
+    http://www.openarchives.org/OAI/2.0/OAI-PMH.xsd">
+    <responseDate>2017-03-30T17:14:16Z</responseDate>
+    <request verb="GetRecord" identifier="AU239" metadataPrefix="oai_dc">http://pid.geoscience.gov.au/oai</request>
+    <GetRecord>
+        <record>
+            <header>
+                <identifier>AU240</identifier>
+                <datestamp>2000-01-01T10:00Z</datestamp>
+            </header>
+            <metadata>
+                <oai_dc:dc
+                        xmlns:oai_dc="http://www.openarchives.org/OAI/2.0/oai_dc/"
+                        xmlns:dc="http://purl.org/dc/elements/1.1/"
+                        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                        xsi:schemaLocation="http://www.openarchives.org/OAI/2.0/oai_dc/ http://www.openarchives.org/OAI/2.0/oai_dc.xsd">
+                    <dc:creator></dc:creator>
+                    <dc:identifier>AU239</dc:identifier>
+                    <dc:language>eng</dc:language>
+                    <dc:type>http://vocabulary.odm2.org/specimentype/core</dc:type>
+                    <dc:coverage>&lt;https://epsg.io/8311&gt; POINTZ(137.8563726 -33.7108293 51)</dc:coverage>
+                </oai_dc:dc>
+            </metadata>
+        </record>
+    </GetRecord>
+</OAI-PMH>
