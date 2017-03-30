@@ -3,7 +3,7 @@
     xsi:schemaLocation="http://www.openarchives.org/OAI/2.0/
     http://www.openarchives.org/OAI/2.0/OAI-PMH.xsd">
     <responseDate>{{request_args['date_stamp']}}</responseDate>
-    <request verb="GetRecord" identifier="{{sample['igsn']}}" metadataPrefix={{request_args['metadataPrefix']}}>{{request_args['base_uri_oai']}}</request>
+    <request verb="GetRecord" identifier="{{sample['igsn']}}" metadataPrefix="{{request_args['metadataPrefix']}}">{{request_args['base_uri_oai']}}</request>
     <GetRecord>
         <record>
             <header>
