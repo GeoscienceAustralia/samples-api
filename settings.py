@@ -1,4 +1,4 @@
-APP_DIR = 'E:/samples-api/'
+APP_DIR = 'c:/work/samples-api/'
 LOGFILE = APP_DIR + 'samples-api.log'
 PORT = 8080
 DEBUG = True

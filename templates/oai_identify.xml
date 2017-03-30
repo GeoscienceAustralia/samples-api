@@ -1,12 +1,13 @@
 <?xml version="1.0" encoding="UTF-8" ?>
-<OAI-PMH xmlns="http://www.openarchives.org/OAI/2.0/"
-         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-         xsi:schemaLocation="http://www.openarchives.org/OAI/2.0/
-         http://www.openarchives.org/OAI/2.0/OAI-PMH.xsd">
+<OAI-PMH
+        xmlns="http://www.openarchives.org/OAI/2.0/"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://www.openarchives.org/OAI/2.0/
+        http://www.openarchives.org/OAI/2.0/OAI-PMH.xsd">
     <responseDate>{{values.response_date}}</responseDate>
     <request verb="Identify">{{ values.base_url }}</request>
     <Identify>
-        <repositoryName>IGSN Registry Metadata Store</repositoryName>
+        <repositoryName>Geoscience Australia's Sample Catalogue</repositoryName>
         <baseURL>{{ values.base_url }}</baseURL>
         <protocolVersion>2.0</protocolVersion>
         <adminEmail>{{ values.admin_email }}</adminEmail>
@@ -21,9 +22,9 @@
                             xsi:schemaLocation="http://www.openarchives.org/OAI/2.0/oai-identifier
                             http://www.openarchives.org/OAI/2.0/oai-identifier.xsd">
                 <scheme>oai</scheme>
-                <repositoryIdentifier>registry.igsn.org??</repositoryIdentifier>
+                <repositoryIdentifier>http://pid.geoscience.gov.au/org/ga</repositoryIdentifier>
                 <delimiter>:</delimiter>
-                <sampleIdentifier>oai:registry.igsn.org:12425??</sampleIdentifier>
+                <sampleIdentifier>http://pid.geoscience.gov.au/sample/AU239</sampleIdentifier>
             </oai-identifier>
         </description>
     </Identify>

@@ -1,0 +1,202 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<OAI-PMH
+        xmlns="http://www.openarchives.org/OAI/2.0/"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://www.openarchives.org/OAI/2.0/ http://www.openarchives.org/OAI/2.0/OAI-PMH.xsd">
+    <responseDate>2017-03-30T22:08:42Z</responseDate>
+    <request verb="ListRecords" metadataPrefix="oai_dc">http://pid.geoscience.gov.au/oai</request>
+    <ListRecords>
+        <record>
+            <header>
+                <identifier>AU1</identifier>
+                <datestamp>2017-03-09T16:14:52Z</datestamp>
+            </header>
+            <metadata>
+                <oai_dc:dc
+                        xmlns:oai_dc="http://www.openarchives.org/OAI/2.0/oai_dc/"
+                        xmlns:dc="http://purl.org/dc/elements/1.1/"
+                        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                        xsi:schemaLocation="http://www.openarchives.org/OAI/2.0/oai_dc/ http://www.openarchives.org/OAI/2.0/oai_dc.xsd">
+                    <dc:creator></dc:creator>
+                    <dc:identifier>AU1</dc:identifier>
+                    <dc:language>eng</dc:language>
+                    <dc:type>http://vocabulary.odm2.org/specimentype/core</dc:type>
+                    <dc:coverage>&lt;https://epsg.io/8311&gt; POINTZ(137.545818 -34.213763 26)</dc:coverage>
+                </oai_dc:dc>
+            </metadata>
+        </record>
+        <record>
+            <header>
+                <identifier>AU10</identifier>
+                <datestamp>2017-03-09T16:14:53Z</datestamp>
+            </header>
+            <metadata>
+                <oai_dc:dc
+                        xmlns:oai_dc="http://www.openarchives.org/OAI/2.0/oai_dc/"
+                        xmlns:dc="http://purl.org/dc/elements/1.1/"
+                        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                        xsi:schemaLocation="http://www.openarchives.org/OAI/2.0/oai_dc/ http://www.openarchives.org/OAI/2.0/oai_dc.xsd">
+                    <dc:creator></dc:creator>
+                    <dc:identifier>AU10</dc:identifier>
+                    <dc:language>eng</dc:language>
+                    <dc:type>http://vocabulary.odm2.org/specimentype/core</dc:type>
+                    <dc:coverage>&lt;https://epsg.io/8311&gt; POINTZ(137.7624998 -33.9673915 45)</dc:coverage>
+                </oai_dc:dc>
+            </metadata>
+        </record>
+        <record>
+            <header>
+                <identifier>AU100</identifier>
+                <datestamp>2017-03-09T16:14:52Z</datestamp>
+            </header>
+            <metadata>
+                <oai_dc:dc
+                        xmlns:oai_dc="http://www.openarchives.org/OAI/2.0/oai_dc/"
+                        xmlns:dc="http://purl.org/dc/elements/1.1/"
+                        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                        xsi:schemaLocation="http://www.openarchives.org/OAI/2.0/oai_dc/ http://www.openarchives.org/OAI/2.0/oai_dc.xsd">
+                    <dc:creator></dc:creator>
+                    <dc:identifier>AU100</dc:identifier>
+                    <dc:language>eng</dc:language>
+                    <dc:type>http://vocabulary.odm2.org/specimentype/core</dc:type>
+                    <dc:coverage>&lt;https://epsg.io/8311&gt; POINTZ(137.4940775 -34.3490473 7)</dc:coverage>
+                </oai_dc:dc>
+            </metadata>
+        </record>
+        <record>
+            <header>
+                <identifier>AU1000</identifier>
+                <datestamp>2017-03-09T16:14:50Z</datestamp>
+            </header>
+            <metadata>
+                <oai_dc:dc
+                        xmlns:oai_dc="http://www.openarchives.org/OAI/2.0/oai_dc/"
+                        xmlns:dc="http://purl.org/dc/elements/1.1/"
+                        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                        xsi:schemaLocation="http://www.openarchives.org/OAI/2.0/oai_dc/ http://www.openarchives.org/OAI/2.0/oai_dc.xsd">
+                    <dc:creator></dc:creator>
+                    <dc:identifier>AU1000</dc:identifier>
+                    <dc:language>eng</dc:language>
+                    <dc:type>http://vocabulary.odm2.org/specimentype/core</dc:type>
+                    <dc:coverage>&lt;https://epsg.io/8311&gt; POINTZ(146.4618746 -31.177174 235.24)</dc:coverage>
+                </oai_dc:dc>
+            </metadata>
+        </record>
+        <record>
+            <header>
+                <identifier>AU10000</identifier>
+                <datestamp>2016-10-25T16:42:57Z</datestamp>
+            </header>
+            <metadata>
+                <oai_dc:dc
+                        xmlns:oai_dc="http://www.openarchives.org/OAI/2.0/oai_dc/"
+                        xmlns:dc="http://purl.org/dc/elements/1.1/"
+                        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                        xsi:schemaLocation="http://www.openarchives.org/OAI/2.0/oai_dc/ http://www.openarchives.org/OAI/2.0/oai_dc.xsd">
+                    <dc:creator></dc:creator>
+                    <dc:identifier>AU10000</dc:identifier>
+                    <dc:language>eng</dc:language>
+                    <dc:type>http://www.opengis.net/def/nil/OGC/0/missing</dc:type>
+                    <dc:coverage>&lt;https://epsg.io/8311&gt; POINT(138.6175388458 -18.7814898277)</dc:coverage>
+                </oai_dc:dc>
+            </metadata>
+        </record>
+        <record>
+            <header>
+                <identifier>AU100000</identifier>
+                <datestamp>2016-10-25T16:42:51Z</datestamp>
+            </header>
+            <metadata>
+                <oai_dc:dc
+                        xmlns:oai_dc="http://www.openarchives.org/OAI/2.0/oai_dc/"
+                        xmlns:dc="http://purl.org/dc/elements/1.1/"
+                        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                        xsi:schemaLocation="http://www.openarchives.org/OAI/2.0/oai_dc/ http://www.openarchives.org/OAI/2.0/oai_dc.xsd">
+                    <dc:creator></dc:creator>
+                    <dc:identifier>AU100000</dc:identifier>
+                    <dc:language>eng</dc:language>
+                    <dc:type>http://www.opengis.net/def/nil/OGC/0/missing</dc:type>
+                    <dc:coverage>&lt;https://epsg.io/8311&gt; POINT(139.1834398724 -19.7823022093)</dc:coverage>
+                </oai_dc:dc>
+            </metadata>
+        </record>
+        <record>
+            <header>
+                <identifier>AU1000000</identifier>
+                <datestamp>2017-03-21T14:46:50Z</datestamp>
+            </header>
+            <metadata>
+                <oai_dc:dc
+                        xmlns:oai_dc="http://www.openarchives.org/OAI/2.0/oai_dc/"
+                        xmlns:dc="http://purl.org/dc/elements/1.1/"
+                        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                        xsi:schemaLocation="http://www.openarchives.org/OAI/2.0/oai_dc/ http://www.openarchives.org/OAI/2.0/oai_dc.xsd">
+                    <dc:creator></dc:creator>
+                    <dc:identifier>AU1000000</dc:identifier>
+                    <dc:language>eng</dc:language>
+                    <dc:type>http://www.opengis.net/def/nil/OGC/0/missing</dc:type>
+                    <dc:coverage>&lt;https://epsg.io/8311&gt; POINTZ(121.3724129 -15.47114123 -155.7502)</dc:coverage>
+                </oai_dc:dc>
+            </metadata>
+        </record>
+        <record>
+            <header>
+                <identifier>AU1000001</identifier>
+                <datestamp>2017-03-21T14:46:50Z</datestamp>
+            </header>
+            <metadata>
+                <oai_dc:dc
+                        xmlns:oai_dc="http://www.openarchives.org/OAI/2.0/oai_dc/"
+                        xmlns:dc="http://purl.org/dc/elements/1.1/"
+                        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                        xsi:schemaLocation="http://www.openarchives.org/OAI/2.0/oai_dc/ http://www.openarchives.org/OAI/2.0/oai_dc.xsd">
+                    <dc:creator></dc:creator>
+                    <dc:identifier>AU1000001</dc:identifier>
+                    <dc:language>eng</dc:language>
+                    <dc:type>http://www.opengis.net/def/nil/OGC/0/missing</dc:type>
+                    <dc:coverage>&lt;https://epsg.io/8311&gt; POINTZ(121.3724129 -15.47114123 -155.7502)</dc:coverage>
+                </oai_dc:dc>
+            </metadata>
+        </record>
+        <record>
+            <header>
+                <identifier>AU1000002</identifier>
+                <datestamp>2017-03-21T14:46:50Z</datestamp>
+            </header>
+            <metadata>
+                <oai_dc:dc
+                        xmlns:oai_dc="http://www.openarchives.org/OAI/2.0/oai_dc/"
+                        xmlns:dc="http://purl.org/dc/elements/1.1/"
+                        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                        xsi:schemaLocation="http://www.openarchives.org/OAI/2.0/oai_dc/ http://www.openarchives.org/OAI/2.0/oai_dc.xsd">
+                    <dc:creator></dc:creator>
+                    <dc:identifier>AU1000002</dc:identifier>
+                    <dc:language>eng</dc:language>
+                    <dc:type>http://www.opengis.net/def/nil/OGC/0/missing</dc:type>
+                    <dc:coverage>&lt;https://epsg.io/8311&gt; POINTZ(121.3724129 -15.47114123 -155.7502)</dc:coverage>
+                </oai_dc:dc>
+            </metadata>
+        </record>
+        <record>
+            <header>
+                <identifier>AU1000003</identifier>
+                <datestamp>2017-03-21T14:46:50Z</datestamp>
+            </header>
+            <metadata>
+                <oai_dc:dc
+                        xmlns:oai_dc="http://www.openarchives.org/OAI/2.0/oai_dc/"
+                        xmlns:dc="http://purl.org/dc/elements/1.1/"
+                        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                        xsi:schemaLocation="http://www.openarchives.org/OAI/2.0/oai_dc/ http://www.openarchives.org/OAI/2.0/oai_dc.xsd">
+                    <dc:creator></dc:creator>
+                    <dc:identifier>AU1000003</dc:identifier>
+                    <dc:language>eng</dc:language>
+                    <dc:type>http://www.opengis.net/def/nil/OGC/0/missing</dc:type>
+                    <dc:coverage>&lt;https://epsg.io/8311&gt; POINTZ(121.3724129 -15.47114123 -155.7502)</dc:coverage>
+                </oai_dc:dc>
+            </metadata>
+        </record>
+        <resumptionToken expirationDate="2017-03-30T23:08:43Z" completeListSize="1966542" cursor="0">
+        2011-06-01T00:00:00Z,9999-12-31T23:59:59Z,10,oai_dc</resumptionToken>
+    </ListRecords>
+</OAI-PMH>
