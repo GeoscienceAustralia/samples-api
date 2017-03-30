@@ -18,8 +18,6 @@ def oai():
         for k, v in request.form.iteritems():
             request_args[k] = v
 
-    print request_args
-
     # TODO: validate args using functions_oai
     dt = datetime.datetime.now()
     date_stamp = datetime_to_datestamp(dt)
@@ -58,8 +56,6 @@ def oai():
     # https://github.com/infrae/pyoai/blob/beced901ea0b494f23053cbb3c6495872acb96a3/src/oaipmh/client.py#L61
 
     # now call underlying implementation
-
-    # TODO: implement using lxml etree or XML template?
     if verb == 'GetRecord':
         # render_template
         try:
@@ -84,6 +80,18 @@ def oai():
             response = make_response(template)
             response.mimetype = 'text/xml'
             return response
+
+    elif verb == 'Identify':
+        values = {
+            'response_date': date_stamp,
+            'admin_email': settings.ADMIN_EMAIL,
+            'base_url': settings.BASE_URI_OAI,
+            'earliest_date': oai_functions.get_earliest_datestamp()
+            }
+        template = render_template('oai_identify.xml', values=values)
+        response = make_response(template)
+        response.mimetype = 'text/xml'
+        return response
 
     elif verb == 'ListIdentifiers':
         # render_template
@@ -114,6 +122,18 @@ def oai():
             response = make_response(template)
             response.mimetype = 'text/xml''application/xml'
             return response
+
+    elif verb == 'ListMetadataFormats':
+        # render_template
+        values = {
+            'identifier': request_args['identifier'],
+            'response_date': date_stamp,
+            'base_url': settings.BASE_URI_OAI
+        }
+        template = render_template('oai_list_metadata_formats.xml', values=values), 200
+        response = make_response(template)
+        response.mimetype = 'text/xml'
+        return response
 
     elif verb == 'ListRecords':
         # render_template
@@ -147,40 +167,13 @@ def oai():
             response.mimetype = 'text/xml'
             return response
 
-    elif verb == 'Identify':
+    elif verb == 'ListSets':
+        # render_template
         values = {
             'response_date': date_stamp,
-            'admin_email': settings.ADMIN_EMAIL,
-            'base_url': settings.BASE_URI_OAI,
-            'earliest_date': oai_functions.get_earliest_datestamp()
-            }
-        template = render_template('oai_identify.xml', values=values)
+            'base_url': settings.BASE_URI_OAI
+        }
+        template = render_template('oai_list_sets.xml', values=values), 200
         response = make_response(template)
         response.mimetype = 'text/xml'
         return response
-
-    elif verb == 'ListMetadataFormats':
-        # render_template
-        try:
-            values = {
-                'identifier': request_args['identifier'],
-                'response_date': date_stamp,
-                'base_url': settings.BASE_URI_OAI
-            }
-            print values
-            template = render_template('oai_list_metadata_formats.xml', values=values), 200
-            response = make_response(template)
-            response.mimetype = 'text/xml'
-            return response
-
-        except ValueError:
-            values = {
-                'response_date': date_stamp,
-                'request_uri': base_url,
-                'error_code': 'idDoesNotExist',
-                'error_text': 'No matching identifier in GA Samples Database'
-            }
-            template = render_template('oai_error.xml', values=values), 400
-            response = make_response(template)
-            response.mimetype = 'text/xml'
-            return response

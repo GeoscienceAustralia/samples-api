@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<OAI-PMH xmlns="http://www.openarchives.org/OAI/2.0/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.openarchives.org/OAI/2.0/ http://www.openarchives.org/OAI/2.0/OAI-PMH.xsd">
+    <responseDate>{{values['response_date']}}</responseDate>
+    <request verb="ListSets">http://an.oa.org/OAI-script</request>
+    <ListSets>
+        <!-- We only offer one set for now -->
+        <set>
+            <setSpec>samples</setSpec>
+            <setName>Samples Collection</setName>
+            <setDescription>
+                <oai_dc:dc
+                    xmlns:oai_dc="http://www.openarchives.org/OAI/2.0/oai_dc/"
+                    xmlns:dc="http://purl.org/dc/elements/1.1/"
+                    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                    xsi:schemaLocation="http://www.openarchives.org/OAI/2.0/oai_dc/
+                    http://www.openarchives.org/OAI/2.0/oai_dc.xsd">
+                <dc:description>This set is the only set available via this API. IT contains all of Geoscience Asutralia's samples with IGSNs.</dc:description>
+            </oai_dc:dc>
+            </setDescription>
+        </set>
+    </ListSets>
+</OAI-PMH>
