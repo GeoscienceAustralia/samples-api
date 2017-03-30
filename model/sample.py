@@ -79,7 +79,7 @@ class Sample:
         self.modified_datestamp = None
         self.sample_no = None
         self.wkt = None
-
+        self.ga = URIRef(Sample.URI_GA)
         # populate all instance variables from API
         # TODO: lazy load this, i.e. only populate if a view that need populating is loaded which is every view except for Alternates
 
