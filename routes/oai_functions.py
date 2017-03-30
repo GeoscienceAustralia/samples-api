@@ -55,7 +55,6 @@ OAI_ERRORS = {
 
 
 def valid_oai_args(verb):
-
     argspec = OAI_ARGS.get(verb)
     if argspec is None:
         raise ParameterError('The OAI verb is not correct. Must be one of {0}'.format(', '.join(OAI_ARGS.iterkeys())))
@@ -112,7 +111,7 @@ def get_record(request):
 def list_records(request):
     samples_dict = []
     no_per_page = settings.OAI_BATCH_SIZE
-    page_no =1
+    page_no = 1
 
     #  TODO need to implement from, until, metadataprefix and resumption token
 
@@ -136,16 +135,15 @@ def list_records(request):
     return samples_dict, resumption_token
 
 
-
 def get_resumption_token(request):
-    '''
+    """
     <resumptionToken expirationDate="2017-03-24T05:02:52Z"
     completeListSize="6267770" cursor="100">
     1490328172912,2011-06-01T00:00:00Z,9999-12-31T23:59:59Z,150,null,oai_dc
     </resumptionToken>
     :param request:
     :return:
-    '''
+    """
 
     expiration_date = calc_expiration_datestamp()
 
@@ -181,12 +179,13 @@ def get_resumption_token(request):
 
     return next_resumption_token
 
+
 def get_earliest_date():
-    '''
+    """
     queries GA's ORACLE DB and gets the earliest modified
     date from the samples table.
     :return: a date object
-    '''
+    """
     r = requests.get(settings.XML_API_URL_MIN_DATE)
 
     if "No data" in r.content:
@@ -201,21 +200,23 @@ def get_earliest_date():
 
     return min_date
 
+
 def get_earliest_datestamp():
-    '''
+    """
     returns an OAI-PMH format datestamp of the earliest modified_date in GA's
     Samples database eg 2017-03-27T19:20:53Z
     :param :
     :return: an OAI-PMH format datestamp
-    '''
+    """
     return datetime_to_datestamp(get_earliest_date())
 
+
 def get_complete_list_size(str_from_date=None,str_until_date=None):
-    '''
+    """
     queries GA's ORACLE DB and gets the number of records the query
     matches from the samples table.
     :return: an integer
-    '''
+    """
 
     if str_from_date is None:
         str_from_date = convert_datestamp_to_oracle('2011-06-01T00:00:00Z')
@@ -240,13 +241,14 @@ def get_complete_list_size(str_from_date=None,str_until_date=None):
 
     return str_record_count
 
+
 def create_url_query_token(token):
-    '''
+    """
     returns the url to query GA's Samples database based
     on a resumption token.
     :param token: a resumption token
     :return:
-    '''
+    """
     no_per_page = settings.OAI_BATCH_SIZE
 
     [from_,until,batch_num,metadataPrefix] =token.split(',')
@@ -257,13 +259,12 @@ def create_url_query_token(token):
     return oracle_api_samples_url
 
 
-
 def list_identifiers(request):
-    '''
+    """
     Part of the
     :param request:
     :return:
-    '''
+    """
     samples_dict = []
     no_per_page = settings.OAI_BATCH_SIZE
     page_no =1
@@ -293,17 +294,15 @@ def list_identifiers(request):
     return samples_dict, resumption_token
 
 
-
 def props(x):
     return dict((key, getattr(x, key)) for key in dir(x) if key not in dir(x.__class__))
 
 
-
 def calc_expiration_datestamp():
-    '''
+    """
     responseDate = 2017-02-08T06:01:12Z
     expirationDate=2017-02-08T07:01:13Z
-    '''
+    """
     dt = datetime.now()
     request_datestamp = datetime_to_datestamp(dt)
     request_date = datestamp_to_datetime(request_datestamp)
@@ -311,6 +310,7 @@ def calc_expiration_datestamp():
     expiration_timestamp = datetime_to_datestamp(expiration_date)
 
     return expiration_timestamp
+
 
 class ParameterError(ValueError):
     pass
