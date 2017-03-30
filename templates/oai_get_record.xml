@@ -1,13 +1,15 @@
-<OAI-PMH xmlns="http://www.openarchives.org/OAI/2.0/"
-    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-    xsi:schemaLocation="http://www.openarchives.org/OAI/2.0/
-    http://www.openarchives.org/OAI/2.0/OAI-PMH.xsd">
+<?xml version="1.0" encoding="UTF-8" ?>
+<OAI-PMH
+        xmlns="http://www.openarchives.org/OAI/2.0/"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://www.openarchives.org/OAI/2.0/
+        http://www.openarchives.org/OAI/2.0/OAI-PMH.xsd">
     <responseDate>{{request_args['date_stamp']}}</responseDate>
     <request verb="GetRecord" identifier="{{sample['igsn']}}" metadataPrefix="{{request_args['metadataPrefix']}}">{{request_args['base_uri_oai']}}</request>
     <GetRecord>
         <record>
             <header>
-                <identifier>{{sample['entity_uri']}}</identifier>
+                <identifier>{{sample['igsn']}}</identifier>
                 <datestamp>{{sample['modified_datestamp']}}</datestamp>
             </header>
             <metadata>
