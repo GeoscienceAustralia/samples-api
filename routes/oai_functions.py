@@ -267,13 +267,12 @@ def list_identifiers(request):
     """
     samples_dict = []
     no_per_page = settings.OAI_BATCH_SIZE
-    page_no =1
+    page_no = 1
 
     #  TODO need to implement from, until, metadataprefix and resumption token
 
     if request.args.get('resumptionToken') is None:
-
-        oracle_api_samples_url = settings.XML_API_URL_SAMPLESET.format(page_no,no_per_page)
+        oracle_api_samples_url = settings.XML_API_URL_SAMPLESET.format(page_no, no_per_page)
     else:
         oracle_api_samples_url = create_url_query_token(request.args.get('resumptionToken'))
 
@@ -288,7 +287,7 @@ def list_identifiers(request):
     for event, elem in context:
         samples_dict.append(props(Sample(None, None, StringIO(etree.tostring(elem)))))
 
-#    context = etree.iterparse(StringIO(xml), tag='resumptionToken')
+    # context = etree.iterparse(StringIO(xml), tag='resumptionToken')
     resumption_token = get_resumption_token(request)
 
     return samples_dict, resumption_token
