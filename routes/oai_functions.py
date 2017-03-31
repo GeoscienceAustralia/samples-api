@@ -191,7 +191,8 @@ def get_earliest_date():
     for event, elem in context:
         str_min_date = elem.text
 
-    min_date = datetime.strptime(str_min_date, '%Y-%m-%d %H:%M:%S')
+    min_date = str2datetime(str_min_date)
+#    min_date = datetime.strptime(str_min_date, '%Y-%m-%dT%H:%M:%S')
 
     return min_date
 

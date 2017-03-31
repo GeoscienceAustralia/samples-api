@@ -2,7 +2,7 @@ from lxml import etree
 from rdflib import Graph, URIRef, RDF, XSD, Namespace, Literal, BNode
 from StringIO import StringIO
 import requests
-from model.datestamp import datetime_to_datestamp
+from model.datestamp import *
 from datetime import datetime
 from ldapi import LDAPI
 from flask import Response, render_template
@@ -288,7 +288,7 @@ class Sample:
                         self.lith = Sample.URI_MISSSING
             elif elem.tag == "ACQUIREDATE":
                 if elem.text is not None:
-                    self.date_acquired = datetime.strptime(elem.text, '%Y-%m-%d %H:%M:%S')
+                    self.date_acquired = str2datetime(elem.text)
             elif elem.tag == "ENO":
                 if elem.text is not None:
                     self.entity_uri = 'http://pid.geoscience.gov.au/site/' + elem.text
@@ -311,11 +311,12 @@ class Sample:
                 if elem.text is not None:
                     self.hole_lat_max = elem.text
             elif elem.tag == "MODIFIED_DATE":
-                try:
-                    if elem.text is not None:
-                        self.date_modified = datetime.strptime(elem.text, '%Y-%m-%dT%H:%M:%S')
-                except:
-                    self.date_modified = datetime.strptime(elem.text, '%Y-%m-%d %H:%M:%S')
+                self.date_modified = str2datetime(elem.text)
+                # try:
+                #     if elem.text is not None:
+                #         self.date_modified = datetime.strptime(elem.text, '%Y-%m-%dT%H:%M:%S')
+                # except:
+                #     self.date_modified = datetime.strptime(elem.text, '%Y-%m-%d %H:%M:%S')
             elif elem.tag == "SAMPLENO":
                 if elem.text is not None:
                     self.sample_no = elem.text

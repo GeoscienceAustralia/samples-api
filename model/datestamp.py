@@ -85,6 +85,30 @@ def tolerant_datestamp_to_datetime(datestamp):
     return datetime.datetime(
         int(YYYY), int(MM), int(DD), int(hh), int(mm), int(ss))
 
+def str2datetime(datetime_string):
+    '''
+    Helper function to convert a date string to a datetime
+    '''
+    datetime_format_list = ['%Y-%m-%d %H:%M:%S',
+                            '%Y-%m-%dT%H:%M:%S',
+                            '%Y-%m-%dT%H:%M:%S%Z',
+                            '%Y-%m-%d',
+                            '%d-%b-%y',
+                            '%Y-%m-%dT%H:%M:%S.%f',
+                            '%Y-%m-%dT%H:%M:%S%z',
+                            '%Y-%m-%dT%H:%M:%S%Z',
+                            '%Y-%m-%dT%H:%M:%S.%f%z'
+                            ]
+
+    date_time = None
+    for datetime_format in datetime_format_list:
+        try:
+            date_time = datetime.datetime.strptime(str(datetime_string).strip(), datetime_format)
+            break
+        except ValueError:
+            continue
+
+    return date_time
 
 def convert_datestamp_to_oracle(datestamp):
     """
