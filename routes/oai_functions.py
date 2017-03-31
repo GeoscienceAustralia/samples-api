@@ -160,7 +160,7 @@ def get_resumption_token(metadataPrefix, resumptionToken=None, from_=None, until
 
         cursor = 0
     complete_list_size = get_complete_list_size(from_, until)
-    cursor_next = cursor + settings.OAI_BATCH_SIZE
+    cursor_next = int(cursor) + settings.OAI_BATCH_SIZE
     if cursor_next >= complete_list_size:
         next_resumption_token = None
     else:
@@ -242,7 +242,7 @@ def create_url_query_token(token):
     returns the url to query GA's Samples database based
     on a resumption token.
     :param token: a resumption token
-    :return:
+    :return: A url for querying the samples DB
     """
     no_per_page = settings.OAI_BATCH_SIZE
 
