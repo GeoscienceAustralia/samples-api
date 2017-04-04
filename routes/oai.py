@@ -125,12 +125,12 @@ def oai():
 
     elif verb == 'ListMetadataFormats':
         # render_template
-        values = {
-            'identifier': request_args['identifier'],
-            'response_date': date_stamp,
-            'base_url': settings.BASE_URI_OAI
-        }
-        template = render_template('oai_list_metadata_formats.xml', values=values), 200
+        template = render_template(
+            'oai_list_metadata_formats.xml',
+            identifier=request_args.get('identifier'),
+            response_date=date_stamp,
+            base_url=settings.BASE_URI_OAI
+        ), 200
         response = make_response(template)
         response.mimetype = 'text/xml'
         return response

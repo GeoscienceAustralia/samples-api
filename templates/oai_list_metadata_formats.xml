@@ -3,8 +3,12 @@
         xmlns="http://www.openarchives.org/OAI/2.0/"
         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
         xsi:schemaLocation="http://www.openarchives.org/OAI/2.0/ http://www.openarchives.org/OAI/2.0/OAI-PMH.xsd">
-    <responseDate>{{values['response_date']}}</responseDate>
-    <request verb="ListMetadataFormats" identifier="{{ values['identifier'] }}">{{ values['base_uri_oai'] }}</request>
+    <responseDate>{{ response_date }}</responseDate>
+    {% if identifier is not none %}
+    <request verb="ListMetadataFormats" identifier="{{ identifier }}">{{ base_uri_oai }}</request>
+    {% else %}
+    <request verb="ListMetadataFormats">{{ base_uri_oai }}</request>
+    {% endif %}
     <ListMetadataFormats>
         <!-- We only support the OAI DC format for now -->
         <metadataFormat>

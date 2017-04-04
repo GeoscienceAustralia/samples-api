@@ -6,10 +6,13 @@ This is a Python Flask API.
 
 ### Contacts
 
-Nicholas Car
-Geoscience Australia
-nicholas.car@ga.gov.au
+**Nicholas Car**  
+Data Architect  
+Geoscience Australia  
+<nicholas.car@ga.gov.au>  
+<http://orcid.org/0000-0002-8742-7730>
 
-Vanessa Newey
-Geoscience Australia
-vanessa.newey@ga.gov.au
+**Vanessa Newey**  
+Software Developer  
+Geoscience Australia  
+vanessa.newey@ga.gov.au  
