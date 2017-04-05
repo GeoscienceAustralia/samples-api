@@ -57,17 +57,14 @@ def oai():
 
     # now call underlying implementation
     if verb == 'GetRecord':
-        # render_template
         try:
-            request_args['base_uri_oai'] = settings.BASE_URI_OAI
-            request_args['date_stamp'] = date_stamp
-            sample = oai_functions.get_record(request_args['identifier'])
-            template = render_template('oai_get_record.xml',
-                                       sample=sample,
-                                       request_args=request_args)
-            response = make_response(template)
-            response.mimetype = 'text/xml'
-            return response
+            from model.sample import Sample
+            s = Sample(settings.XML_API_URL_SAMPLE, request_args['identifier'])
+
+            if request_args['metadataPrefix'] == 'oai_dc':
+                return Response(s.export_dc_xml(), mimetype='text/xml')
+            elif request_args['metadataPrefix'] == 'igsn':
+                return Response(s.export_as_csirov3_xml(), mimetype='text/xml')
 
         except ValueError:
             values = {
@@ -138,23 +135,46 @@ def oai():
     elif verb == 'ListRecords':
         # render_template
         try:
-            samples, token = oai_functions.list_records(
+            # samples, token = oai_functions.list_records(
+            #     request_args.get('metadataPrefix'),
+            #     request_args.get('resumptionToken'),
+            #     request_args.get('from'),
+            #     request_args.get('until')
+            # )
+            #
+            # request_args['date_stamp'] = date_stamp
+            # request_args['base_uri_oai'] = settings.BASE_URI_OAI
+            # template = render_template('oai_list_records.xml',
+            #                            samples=samples,
+            #                            resumptiontoken=token,
+            #                            request_args=request_args,
+            #                            base_url=base_url)
+            # response = make_response(template)
+            # response.mimetype = 'text/xml'
+            # return response
+
+            samples, token = oai_functions.list_records_xml(
                 request_args.get('metadataPrefix'),
                 request_args.get('resumptionToken'),
                 request_args.get('from'),
                 request_args.get('until')
             )
 
+            dt = datetime.datetime.now()
+            date_stamp = datetime_to_datestamp(dt)
+
             request_args['date_stamp'] = date_stamp
             request_args['base_uri_oai'] = settings.BASE_URI_OAI
             template = render_template('oai_list_records.xml',
+                                       date_stamp=date_stamp,
+                                       metadataPrefix=request_args.get('metadataPrefix'),
+                                       base_uri_oai=request.base_url,
                                        samples=samples,
-                                       resumptiontoken=token,
-                                       request_args=request_args,
-                                       base_url=base_url)
+                                       resumptiontoken=token)
             response = make_response(template)
             response.mimetype = 'text/xml'
             return response
+
         except ValueError:
             values = {
                 'response_date': date_stamp,

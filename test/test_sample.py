@@ -32,28 +32,3 @@ class TestSample(unittest.TestCase):
 
     # def run_all_tests(self):
     #     self.test_populate_from_xml_file()
-
-
-# # Define test suites
-# def test_suite():
-#     """
-#     Returns a test suite of all the tests in this module.
-#     """
-#
-#     test_classes = [TestSample]
-#
-#     suite_list = map(unittest.defaultTestLoader.loadTestsFromTestCase,
-#                      test_classes)
-#
-#     suite = unittest.TestSuite(suite_list)
-#
-#     return suite
-#
-#
-# # Define main function
-# def main():
-#     unittest.TextTestRunner(verbosity=2).run(test_suite())
-#
-#
-# if __name__ == '__main__':
-#     main()

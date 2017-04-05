@@ -3,28 +3,11 @@
         xmlns="http://www.openarchives.org/OAI/2.0/"
         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
         xsi:schemaLocation="http://www.openarchives.org/OAI/2.0/ http://www.openarchives.org/OAI/2.0/OAI-PMH.xsd">
-    <responseDate>{{request_args['date_stamp']}}</responseDate>
-    <request verb="ListRecords" metadataPrefix="{{request_args['metadataPrefix']}}">{{request_args['base_uri_oai']}}</request>
+    <responseDate>{{ date_stamp }}</responseDate>
+    <request verb="ListRecords" metadataPrefix="{{ metadataPrefix }}">{{ base_uri_oai }}</request>
     <ListRecords>{% for sample in samples %}
-        <record>
-            <header>
-                <identifier>{{sample['igsn']}}</identifier>
-                <datestamp>{{sample['modified_datestamp']}}</datestamp>
-            </header>
-            <metadata>
-                <oai_dc:dc
-                        xmlns:oai_dc="http://www.openarchives.org/OAI/2.0/oai_dc/"
-                        xmlns:dc="http://purl.org/dc/elements/1.1/"
-                        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-                        xsi:schemaLocation="http://www.openarchives.org/OAI/2.0/oai_dc/ http://www.openarchives.org/OAI/2.0/oai_dc.xsd">
-                    <dc:creator>{{sample['ga']}}</dc:creator>
-                    <dc:identifier>{{sample['igsn']}}</dc:identifier>
-                    <dc:language>eng</dc:language>
-                    <dc:type>{{sample['sample_type']}}</dc:type>
-                    <dc:coverage>{{sample['wkt']}}</dc:coverage>
-                </oai_dc:dc>
-            </metadata>
-        </record>{% endfor %}{% if resumptiontoken %}
+        {{sample|safe}}
+        {% endfor %}{% if resumptiontoken %}
         <resumptionToken expirationDate="{{resumptiontoken['expiration_date']}}" completeListSize="{{resumptiontoken['complete_list_size']}}" cursor="{{resumptiontoken['cursor']}}">
         {{resumptiontoken['from_']}},{{resumptiontoken['until']}},{{resumptiontoken['cursor_next']}},{{resumptiontoken['metadataPrefix']}}</resumptionToken>{% endif %}
     </ListRecords>

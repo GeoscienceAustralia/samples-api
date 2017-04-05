@@ -1,0 +1,29 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<cs:resources xmlns:cs="https://igsn.csiro.au/schemas/3.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="https://igsn.csiro.au/schemas/3.0 igsn-csiro-v3.0.xsd">
+  <cs:resource registrationType="http://pid.geoscience.gov.au/def/voc/igsn-codelists/SampleResource">
+    <cs:resourceIdentifier>AU240</cs:resourceIdentifier>
+    <cs:landingPage>https://pid.geoscience.gov.au/sample/AU240</cs:landingPage>
+    <cs:resourceTitle>Sample igsn:AU240</cs:resourceTitle>
+    <cs:resourceTypes>
+      <cs:resourceType>http://vocabulary.odm2.org/specimentype/core</cs:resourceType>
+    </cs:resourceTypes>
+    <cs:materialTypes>
+      <cs:materialType>http://vocabulary.odm2.org/medium/rock</cs:materialType>
+    </cs:materialTypes>
+    <cs:method>http://www.opengis.net/def/nil/OGC/0/missing</cs:method>
+    <cs:location>
+      <cs:geometry srid="https://epsg.io/8311" verticalDatum="https://epsg.io/4283">POINTZ(137.6284422 -34.2186182 103)</cs:geometry>
+    </cs:location>
+    <cs:curationDetails>
+      <cs:curation>
+        <cs:curator>Geoscience Australia</cs:curator>
+        <cs:curationDate>2017</cs:curationDate>
+        <cs:curationLocation>Geoscience Australia, Jerrabomberra Ave, Symonston, ACT, Australia</cs:curationLocation>
+        <cs:curatingInstitution institutionURI="http://pid.geoscience.gov.au/org/ga"/>
+      </cs:curation>
+    </cs:curationDetails>
+    <cs:alternateIdentifiers>
+      <cs:alternateIdentifiers>240</cs:alternateIdentifiers>
+    </cs:alternateIdentifiers>
+  </cs:resource>
+</cs:resources>

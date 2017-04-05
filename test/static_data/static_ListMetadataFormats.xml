@@ -6,11 +6,15 @@
     <responseDate>2017-03-30T18:56:13Z</responseDate>
     <request verb="ListMetadataFormats" identifier="AU240"></request>
     <ListMetadataFormats>
-        <!-- We only support the OAI DC format for now -->
         <metadataFormat>
             <metadataPrefix>oai_dc</metadataPrefix>
             <schema>http://www.openarchives.org/OAI/2.0/oai_dc.xsd</schema>
             <metadataNamespace>http://www.openarchives.org/OAI/2.0/oai_dc/</metadataNamespace>
+        </metadataFormat>
+        <metadataFormat>
+            <metadataPrefix>igsn</metadataPrefix>
+            <schema>https://github.com/IGSN/metadata/blob/dev/description/resource.xsd</schema>
+            <metadataNamespace>http://schema.igsn.org/description/1.0</metadataNamespace>
         </metadataFormat>
     </ListMetadataFormats>
 </OAI-PMH>

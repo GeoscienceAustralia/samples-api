@@ -131,6 +131,35 @@ def list_records(metadataPrefix, resumptionToken=None, from_=None, until=None):
     return samples_dict, resumption_token
 
 
+def list_records_xml(metadataPrefix, resumptionToken=None, from_=None, until=None):
+    no_per_page = settings.OAI_BATCH_SIZE
+    page_no = 1
+
+    if resumptionToken is None:
+        oracle_api_samples_url = settings.XML_API_URL_SAMPLESET.format(page_no, no_per_page)
+    else:
+        oracle_api_samples_url = create_url_query_token(resumptionToken)
+
+    r = requests.get(oracle_api_samples_url)
+
+    if "No data" in r.content:
+        raise ParameterError('No Data')
+
+    xml = r.content
+    context = etree.iterparse(StringIO(xml), tag='ROW')
+    samples = []
+
+    for event, elem in context:
+        if metadataPrefix.replace(u'\u200b', '') == u'oai_dc':
+            samples.append(Sample(None, None, StringIO(etree.tostring(elem))).export_dc_xml_record_for_listrecords())
+        else:
+            samples.append(Sample(None, None, StringIO(etree.tostring(elem))).export_igsn_xml_record_for_listrecords())
+
+    resumption_token = get_resumption_token(metadataPrefix, resumptionToken, from_, until)
+
+    return samples, resumption_token
+
+
 def get_resumption_token(metadataPrefix, resumptionToken=None, from_=None, until=None):
     """
     <resumptionToken expirationDate="2017-03-24T05:02:52Z"

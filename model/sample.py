@@ -573,22 +573,6 @@ class Sample:
         :return: XML string
         """
 
-        '''
-        <record>
-        <header><identifier>oai:registry.igsn.org:18211</identifier>
-        <datestamp>2013-06-19T15:28:23Z</datestamp>
-        <setSpec>IEDA</setSpec><setSpec>IEDA.SESAR</setSpec>
-        </header>
-        <metadata><oai_dc:dc xmlns:dc="http://purl.org/dc/elements/1.1/"
-           xmlns:oai_dc="http://www.openarchives.org/OAI/2.0/oai_dc/"
-           xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-           xsi:schemaLocation="http://www.openarchives.org/OAI/2.0/oai_dc/ http://www.openarchives.org/OAI/2.0/oai_dc.xsd">
-        <dc:creator>IEDA</dc:creator>
-        <dc:identifier>http://hdl.handle.net/10273/847000108</dc:identifier>
-        <dc:identifier>igsn:10273/847000108</dc:identifier>
-        </oai_dc:dc></metadata></record>
-        '''
-
         if isinstance(self.date_acquired, datetime):
             sampling_time = self.date_acquired.isoformat()
         elif isinstance(self.date_modified, datetime):
@@ -610,30 +594,81 @@ class Sample:
 
         # sample location in GML & WKT, formulation from GeoSPARQL
         wkt = Literal(self._generate_sample_wkt(), datatype=GEOSP.wktLiteral)
-        gml = Literal(self._generate_sample_gml(), datatype=GEOSP.gmlLiteral)
 
         format = URIRef(self.material_type)
 
         date_stamp = datetime_to_datestamp(datetime.now())
-        # TODO:   add is site uri
-        xml = 'xml = <record>\
-        <header>\
-        <identifier>' + self.entity_uri + '</identifier>\
-        <datestamp>' + date_stamp + '</datestamp>\
-        </header>\
-        <metadata><oai_dc:dc xmlns:dc="http://purl.org/dc/elements/1.1/"\
-           xmlns:oai_dc="http://www.openarchives.org/OAI/2.0/oai_dc/"\
-           xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"\
-           xsi:schemaLocation="http://www.openarchives.org/OAI/2.0/oai_dc/ http://www.openarchives.org/OAI/2.0/oai_dc.xsd">\
-        <dc:creator>' + ga + '</dc:creator>\
-        <dc:identifier>' + self.igsn + '</dc:identifier>\
-        <dc:type>' + self.sample_type + '</dc:type>\
-        <dc:coverage>' + wkt + '</dc:coverage>\
-        </oai_dc:dc> \
-        </metadata> \
-        </record>'
+        template = render_template(
+            'oai_get_record_dc.xml',
+            date_stamp=date_stamp,
+            igsn=self.igsn,
+            metadataPrefix='oai_dc',
+            base_uri_oai='http://pid.geoscience.gov.au/samples/oai',
+            modified_datestamp=self.modified_datestamp,
+            ga=self.URI_GA,
+            sample_type=self.sample_type,
+            wkt=wkt,
+        )
 
-        return xml
+        return template
+
+    def export_dc_xml_record_for_listrecords(self):
+        """
+        Exports this Sample instance in XML that validates against the OAI Dublin Core Metadata from
+        https://www.openarchives.org/OAI/openarchivesprotocol.html
+
+        using the IGSN to Dublin Core mappings from
+        https://github.com/IGSN/metadata/wiki/IGSN-Registration-Metadata-Version-1.0
+
+        :return: XML string
+        """
+        # URI for this sample
+        base_uri = 'http://pid.geoscience.gov.au/sample/'
+        GEOSP = Namespace('http://www.opengis.net/ont/geosparql#')
+
+        # sample location in GML & WKT, formulation from GeoSPARQL
+        wkt = Literal(self._generate_sample_wkt(), datatype=GEOSP.wktLiteral)
+
+        date_stamp = datetime_to_datestamp(datetime.now())
+        template = render_template(
+            'oai_list_records_record_dc.xml',
+            date_stamp=date_stamp,
+            igsn=self.igsn,
+            metadataPrefix='oai_dc',
+            base_uri_oai='http://pid.geoscience.gov.au/samples/oai',
+            modified_datestamp=self.modified_datestamp,
+            ga=self.URI_GA,
+            sample_type=self.sample_type,
+            wkt=wkt,
+        )
+
+        return template
+
+    def export_igsn_xml_record_for_listrecords(self):
+        # URI for this sample
+        base_uri = 'http://pid.geoscience.gov.au/sample/'
+        GEOSP = Namespace('http://www.opengis.net/ont/geosparql#')
+
+        # sample location in GML & WKT, formulation from GeoSPARQL
+        wkt = 'POINT' + self._generate_sample_wkt().split('POINT')[1]  # kludge to remove EPSG URI
+
+        date_stamp = datetime_to_datestamp(datetime.now())
+        template = render_template(
+            'oai_list_records_record_igsn.xml',
+            date_stamp=date_stamp,
+            igsn=self.igsn,
+            metadataPrefix='oai_dc',
+            base_uri_oai='http://pid.geoscience.gov.au/samples/oai',
+            modified_datestamp=self.modified_datestamp,
+            ga=self.URI_GA,
+            sample_type=self.sample_type,
+            material_type=self.material_type,
+            method_type=self.method_type,
+            wkt=wkt,
+            sampleid=self.sampleid
+        )
+
+        return template
 
     def export_as_csirov3_xml(self):
         """

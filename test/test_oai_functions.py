@@ -44,7 +44,7 @@ class TestFunctionsOAI(unittest.TestCase):
         self.assertRaises(ParameterError, validate_oai_parameters, args)
 
     # live test each of the 6 OAI verb functions
-    def test_GetRecord(self):
+    def test_GetRecordDc(self):
         # dynamic
         data = {
             'verb': 'GetRecord',
@@ -59,10 +59,33 @@ class TestFunctionsOAI(unittest.TestCase):
         )[0].text
 
         # static
-        static_record = etree.parse(os.path.join(self.dir, 'static_data', 'static_GetRecord_240.xml'))
+        static_record = etree.parse(os.path.join(self.dir, 'static_data', 'static_GetRecord_240_dc.xml'))
         static_identifier = static_record.xpath(
             '//oai:identifier',
             namespaces={'oai': 'http://www.openarchives.org/OAI/2.0/'}
+        )[0].text
+
+        assert dynamic_identifier == static_identifier
+
+    def test_GetRecordIgsn(self):
+        # dynamic
+        data = {
+            'verb': 'GetRecord',
+            'identifier': 'AU240',
+            'metadataPrefix': 'igsn'
+        }
+        r = requests.get(self.uri, params=data)
+        dynamic_record = etree.parse(StringIO(r.content))
+        dynamic_identifier = dynamic_record.xpath(
+            '//cs:resourceIdentifier',
+            namespaces={'cs': 'https://igsn.csiro.au/schemas/3.0'}
+        )[0].text
+
+        # static
+        static_record = etree.parse(os.path.join(self.dir, 'static_data', 'static_GetRecord_240_igsn.xml'))
+        static_identifier = static_record.xpath(
+            '//cs:resourceIdentifier',
+            namespaces={'cs': 'https://igsn.csiro.au/schemas/3.0'}
         )[0].text
 
         assert dynamic_identifier == static_identifier

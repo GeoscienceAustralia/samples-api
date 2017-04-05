@@ -2,15 +2,14 @@
 <OAI-PMH
         xmlns="http://www.openarchives.org/OAI/2.0/"
         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-        xsi:schemaLocation="http://www.openarchives.org/OAI/2.0/
-        http://www.openarchives.org/OAI/2.0/OAI-PMH.xsd">
-    <responseDate>{{request_args['date_stamp']}}</responseDate>
-    <request verb="GetRecord" identifier="{{sample['igsn']}}" metadataPrefix="{{request_args['metadataPrefix']}}">{{request_args['base_uri_oai']}}</request>
+        xsi:schemaLocation="http://www.openarchives.org/OAI/2.0/ http://www.openarchives.org/OAI/2.0/OAI-PMH.xsd">
+    <responseDate>{{ date_stamp }}</responseDate>
+    <request verb="GetRecord" identifier="{{ igsn }}" metadataPrefix="{{ metadataPrefix }}">{{ base_uri_oai }}</request>
     <GetRecord>
         <record>
             <header>
-                <identifier>{{sample['igsn']}}</identifier>
-                <datestamp>{{sample['modified_datestamp']}}</datestamp>
+                <identifier>{{ igsn }}</identifier>
+                <datestamp>{{ modified_datestamp }}</datestamp>
             </header>
             <metadata>
                 <oai_dc:dc
@@ -18,11 +17,11 @@
                         xmlns:dc="http://purl.org/dc/elements/1.1/"
                         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
                         xsi:schemaLocation="http://www.openarchives.org/OAI/2.0/oai_dc/ http://www.openarchives.org/OAI/2.0/oai_dc.xsd">
-                    <dc:creator>{{sample['ga']}}</dc:creator>
-                    <dc:identifier>{{sample['igsn']}}</dc:identifier>
+                    <dc:creator>{{ ga }}</dc:creator>
+                    <dc:identifier>{{ igsn }}</dc:identifier>
                     <dc:language>eng</dc:language>
-                    <dc:type>{{sample['sample_type']}}</dc:type>
-                    <dc:coverage>{{sample['wkt']}}</dc:coverage>
+                    <dc:type>{{ sample_type }}</dc:type>
+                    <dc:coverage>{{ wkt }}</dc:coverage>
                 </oai_dc:dc>
             </metadata>
         </record>
