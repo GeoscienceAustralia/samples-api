@@ -115,7 +115,7 @@ def list_records(metadataPrefix, resumptionToken=None, from_=None, until=None):
         oracle_api_samples_url = settings.XML_API_URL_SAMPLESET.format(page_no, no_per_page)
     else:
         oracle_api_samples_url = create_url_query_token(resumptionToken)
-
+        [from_,until,batch_num,metadataPrefix] =resumptionToken.split(',')
     r = requests.get(oracle_api_samples_url)
 
     if "No data" in r.content:
@@ -132,6 +132,7 @@ def list_records(metadataPrefix, resumptionToken=None, from_=None, until=None):
 
 
 def list_records_xml(metadataPrefix, resumptionToken=None, from_=None, until=None):
+    print metadataPrefix
     no_per_page = settings.OAI_BATCH_SIZE
     page_no = 1
 
@@ -139,6 +140,7 @@ def list_records_xml(metadataPrefix, resumptionToken=None, from_=None, until=Non
         oracle_api_samples_url = settings.XML_API_URL_SAMPLESET.format(page_no, no_per_page)
     else:
         oracle_api_samples_url = create_url_query_token(resumptionToken)
+        [from_,until,batch_num,metadataPrefix] =resumptionToken.split(',')
 
     r = requests.get(oracle_api_samples_url)
 
