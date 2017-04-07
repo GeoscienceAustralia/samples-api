@@ -132,7 +132,7 @@ def list_records(metadataPrefix, resumptionToken=None, from_=None, until=None):
 
 
 def list_records_xml(metadataPrefix, resumptionToken=None, from_=None, until=None):
-    print metadataPrefix
+
     no_per_page = settings.OAI_BATCH_SIZE
     page_no = 1
 
