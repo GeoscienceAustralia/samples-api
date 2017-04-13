@@ -44,7 +44,7 @@ class Sample:
     def __init__(self, oracle_api_samples_url, igsn, xml=None):
         self.oracle_api_samples_url = oracle_api_samples_url
         self.igsn = igsn
-        self.sampleid = None
+        self.sample_id = None
         self.sample_type = None
         self.method_type = None
         self.material_type = None
@@ -92,21 +92,22 @@ class Sample:
         if mimetype in LDAPI.get_rdf_mimetypes_list():
             return Response(self.export_as_rdf(view, mimetype), mimetype=mimetype)
 
-        if view == 'igsn':
+        if view == 'igsn-o':  # the GA IGSN Ontology in RDF or HTML
             # RDF formats handled by general case
             # HTML is the only other enabled format for igsn view
             return self.export_as_html(model_view=view)
-        elif view == 'dc':
+        elif view == 'dc':  # Dublin Core in RDF or HTML
             # RDF formats handled by general case
             if mimetype == 'application/xml':
                 return self.export_dc_xml()
             else:
                 return self.export_as_html(model_view=view)
-        elif view == 'prov':
+        elif view == 'prov':  # PROV-O in RDF (soon or HTML)
             # RDF formats handled by general case
             # only RDF for this view so set the mimetype to our favourite mime format
             mimetype = 'text/turtle'
             return Response(self.export_as_rdf('prov', mimetype), mimetype=mimetype)
+            # return self.export_as_html(model_view=view)
         elif view == 'csirov3':
             # only XML for this view
             return Response(
@@ -114,6 +115,13 @@ class Sample:
                 status=200,
                 mimetype='application/xml',
             # headers={'Content-Disposition': 'attachment; filename=' + igsn + '.xml'}
+            )
+        elif view == 'igsn':  # the community agreed description metadata schema
+            # only XML for this view
+            return Response(
+                self.export_as_igsn_xml(),
+                status=200,
+                mimetype='application/xml'
             )
 
     def validate_xml(self, xml):
@@ -141,12 +149,9 @@ class Sample:
         # deal with missing XML declaration
         if "No data" in r.content:
             raise ParameterError('No Data')
-        if not r.content.startswith('<?xml version="1.0" ?>'):
-            xml = '<?xml version="1.0" ?>\n' + r.content
-        else:
-            xml = r.content
-        if self.validate_xml(xml):
-            self._populate_from_xml_file(StringIO(xml))
+
+        if self.validate_xml(r.content):
+            self._populate_from_xml_file(StringIO(r.content))
             return True
         else:
             return False
@@ -207,7 +212,7 @@ class Sample:
             if elem.tag == "IGSN":
                 self.igsn = elem.text
             elif elem.tag == "SAMPLEID":
-                self.sampleid = elem.text
+                self.sample_id = elem.text
             elif elem.tag == "SAMPLE_TYPE_NEW":
                 if elem.text is not None:
                     self.sample_type = TERM_LOOKUP['sample_type'].get(elem.text)
@@ -289,6 +294,8 @@ class Sample:
             elif elem.tag == "ACQUIREDATE":
                 if elem.text is not None:
                     self.date_acquired = str2datetime(elem.text)
+                else:
+                    self.date_acquired = Sample.URI_MISSSING
             elif elem.tag == "ENO":
                 if elem.text is not None:
                     self.entity_uri = 'http://pid.geoscience.gov.au/site/' + elem.text
@@ -312,18 +319,10 @@ class Sample:
                     self.hole_lat_max = elem.text
             elif elem.tag == "MODIFIED_DATE":
                 self.date_modified = str2datetime(elem.text)
-                # try:
-                #     if elem.text is not None:
-                #         self.date_modified = datetime.strptime(elem.text, '%Y-%m-%dT%H:%M:%S')
-                # except:
-                #     self.date_modified = datetime.strptime(elem.text, '%Y-%m-%d %H:%M:%S')
             elif elem.tag == "SAMPLENO":
                 if elem.text is not None:
                     self.sample_no = elem.text
         self.modified_datestamp = datetime_to_datestamp(self.date_modified)
-
-        GEOSP = Namespace('http://www.opengis.net/ont/geosparql#')
-        self.wkt = Literal(self._generate_sample_wkt(), datatype=GEOSP.wktLiteral)
 
         return True
 
@@ -612,6 +611,96 @@ class Sample:
 
         return template
 
+    def export_igsn_xml(self):
+        """
+        Exports this Sample instance in XML that validates against the OAI Dublin Core Metadata from
+        https://www.openarchives.org/OAI/openarchivesprotocol.html
+
+        using the IGSN to Dublin Core mappings from
+        https://github.com/IGSN/metadata/wiki/IGSN-Registration-Metadata-Version-1.0
+
+        :return: XML string
+        """
+
+        if isinstance(self.date_acquired, datetime):
+            sampling_time = self.date_acquired.isoformat()
+        elif isinstance(self.date_modified, datetime):
+            sampling_time = self.date_modified.isoformat()
+        else:
+            sampling_time = Sample.URI_MISSSING
+        if isinstance(self.date_modified, datetime):
+            modified_time = self.date_modified.isoformat()
+        else:
+            modified_time = Sample.URI_MISSSING
+         # URI for this sample
+        base_uri = 'http://pid.geoscience.gov.au/sample/'
+        this_sample = URIRef(base_uri + self.igsn)
+
+        # define GA
+        ga = URIRef(Sample.URI_GA)
+
+        GEOSP = Namespace('http://www.opengis.net/ont/geosparql#')
+
+        # sample location in GML & WKT, formulation from GeoSPARQL
+        wkt = Literal(self._generate_sample_wkt(), datatype=GEOSP.wktLiteral)
+
+        format = URIRef(self.material_type)
+
+        date_stamp = datetime_to_datestamp(datetime.now())
+        template = render_template(
+            'oai_get_record_dc.xml',
+            date_stamp=date_stamp,
+            igsn=self.igsn,
+            metadataPrefix='oai_dc',
+            base_uri_oai='http://pid.geoscience.gov.au/samples/oai',
+            modified_datestamp=self.modified_datestamp,
+            ga=self.URI_GA,
+            sample_type=self.sample_type,
+            wkt=wkt,
+        )
+
+        return template
+
+    def export_as_csirov3_xml(self):
+        """
+        Exports this Sample instance in XML that validates against the CSIRO v3 Schema
+
+        :return: XML string
+        """
+        # sample location in GML & WKT, formulation from GeoSPARQL
+        template = render_template(
+            'sample_csirov3.xml',
+            igsn=self.igsn,
+            sample_type=self.sample_type,
+            material_type=self.material_type,
+            method_type=self.method_type,
+            wkt='POINT' + self._generate_sample_wkt().split('POINT')[1],  # kludge to remove EPSG URI,
+            sample_id=self.sample_id,
+            collection_time=self.date_acquired
+        )
+
+        return template
+
+    def export_as_igsn_xml(self):
+        """
+        Exports this Sample instance in XML that validates against the IGSN XML Schema
+
+        :return: XML string
+        """
+        template = render_template(
+            'sample_igsn.xml',
+            igsn=self.igsn,
+            sample_id=self.sample_id,
+            description=self.remark,
+            wkt='POINT' + self._generate_sample_wkt().split('POINT')[1],  # gml = self._generate_sample_gml()
+            sample_type=self.sample_type,
+            material_type=self.material_type,
+            collection_method=self.method_type,
+            collection_time=self.date_acquired
+        )
+
+        return template
+
     def export_dc_xml_record_for_listrecords(self):
         """
         Exports this Sample instance in XML that validates against the OAI Dublin Core Metadata from
@@ -645,16 +734,44 @@ class Sample:
         return template
 
     def export_igsn_xml_record_for_listrecords(self):
+        """
+        Exports this Sample instance in XML that validates against the OAI Dublin Core Metadata from
+        https://www.openarchives.org/OAI/openarchivesprotocol.html
+
+        using the IGSN to Dublin Core mappings from
+        https://github.com/IGSN/metadata/wiki/IGSN-Registration-Metadata-Version-1.0
+
+        :return: XML string
+        """
         # URI for this sample
         base_uri = 'http://pid.geoscience.gov.au/sample/'
         GEOSP = Namespace('http://www.opengis.net/ont/geosparql#')
 
         # sample location in GML & WKT, formulation from GeoSPARQL
+        wkt = Literal(self._generate_sample_wkt(), datatype=GEOSP.wktLiteral)
+
+        date_stamp = datetime_to_datestamp(datetime.now())
+        template = render_template(
+            'oai_list_records_record_dc.xml',
+            date_stamp=date_stamp,
+            igsn=self.igsn,
+            metadataPrefix='oai_dc',
+            base_uri_oai='http://pid.geoscience.gov.au/samples/oai',
+            modified_datestamp=self.modified_datestamp,
+            ga=self.URI_GA,
+            sample_type=self.sample_type,
+            wkt=wkt,
+        )
+
+        return template
+
+    def export_csirov3_xml_record_for_listrecords(self):
+        # sample location in GML & WKT, formulation from GeoSPARQL
         wkt = 'POINT' + self._generate_sample_wkt().split('POINT')[1]  # kludge to remove EPSG URI
 
         date_stamp = datetime_to_datestamp(datetime.now())
         template = render_template(
-            'oai_list_records_record_igsn.xml',
+            'oai_list_records_record_csirov3.xml',
             date_stamp=date_stamp,
             igsn=self.igsn,
             metadataPrefix='oai_dc',
@@ -665,145 +782,10 @@ class Sample:
             material_type=self.material_type,
             method_type=self.method_type,
             wkt=wkt,
-            sampleid=self.sampleid
+            sample_id=self.sample_id
         )
 
         return template
-
-    def export_as_csirov3_xml(self):
-        """
-        Exports this Sample instance in XML that validates against the CSIRO v3 Schema
-
-        :return: XML string
-        """
-        # CSIRO
-        '''
-        <?xml version="1.0" encoding="UTF-8"?>
-        <igsn:samples
-                xsi:schemaLocation="http://igsn.org/schema/kernel-v.1.0 ../xml-validation/igsn-csiro-v2.0.xsd"
-                xmlns:igsn="http://igsn.org/schema/kernel-v.1.0"
-                xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
-            <!-- from https://github.com/kitchenprinzessin3880/csiro-igsn-schema/blob/master/example-capricon.xml -->
-            <!--igsn:subNamespace>CAP</igsn:subNamespace -->
-            <igsn:sample>
-                <igsn:sampleNumber identifierType="igsn">CSCAP0001</igsn:sampleNumber>
-                <igsn:sampleName>Cap0001-JHP8</igsn:sampleName>
-                <igsn:isPublic>1</igsn:isPublic>
-                <igsn:landingPage><![CDATA[https://capdf.csiro.au/gs-hydrogeochem/public/ows?service=WFS&version=1.0.0&request=GetFeature&typeName=public:hydrogeochem&cql_filter=sid%3D243]]></igsn:landingPage>
-                <igsn:sampleTypes>
-                    <igsn:sampleType>http://vocabulary.odm2.org/specimentype/precipitationBulk</igsn:sampleType>
-                </igsn:sampleTypes>
-                <igsn:materialTypes>
-                    <igsn:materialType>http://vocabulary.odm2.org/medium/snow</igsn:materialType>
-                </igsn:materialTypes>
-                <igsn:samplingLocation/>
-                <igsn:sampling_time/>
-                <igsn:sampleCuration>
-                    <igsn:curation> <!-- nick -->
-                        <igsn:curator>Mineral Resources Flagship,CSIRO</igsn:curator>
-                        <igsn:curationLocation>Some location</igsn:curationLocation>
-                    </igsn:curation> <!-- nick -->
-                </igsn:sampleCuration>
-                <igsn:classification>rock</igsn:classification>
-                <igsn:comments>This is a fake comment</igsn:comments>
-                <igsn:otherNames>
-                    <igsn:otherName>FakeOtherName</igsn:otherName>
-                </igsn:otherNames>
-                <igsn:purpose>Fake purpose</igsn:purpose>
-                <igsn:samplingFeatures>
-                    <igsn:samplingFeature>
-                        <igsn:samplingFeatureName>mountain X</igsn:samplingFeatureName>
-                    </igsn:samplingFeature>
-                </igsn:samplingFeatures>
-                <igsn:sampleCollectors>
-                    <igsn:collector>Nick Car</igsn:collector>
-                </igsn:sampleCollectors>
-                <igsn:samplingMethod>bucket</igsn:samplingMethod>
-                <igsn:samplingCampaign>Campaign X</igsn:samplingCampaign>
-                <igsn:relatedResources>
-                    <igsn:relatedResourceIdentifier>abcd1234</igsn:relatedResourceIdentifier>
-                </igsn:relatedResources>
-                <igsn:logElement event="submitted" timeStamp="2015-09-10T18:20:30" />
-            </igsn:sample>
-        </igsn:samples>
-        '''
-
-        # CSIRO v3
-        sample_wkt = self._generate_sample_wkt_csirov3_xml()
-        xsi = 'http://www.w3.org/2001/XMLSchema-instance'
-        cs = 'https://igsn.csiro.au/schemas/3.0'
-        root = etree.Element(
-            '{%s}resources' % cs,
-            # namespace='https://igsn.csiro.au/schemas/3.0',
-            nsmap={'xsi': xsi, 'cs': cs})
-        root.attrib['{%s}schemaLocation' % xsi] = \
-            'https://igsn.csiro.au/schemas/3.0 igsn-csiro-v3.0.xsd'
-        r = etree.SubElement(root, '{%s}resource' % cs)
-        r.attrib['registrationType'] = 'http://pid.geoscience.gov.au/def/voc/igsn-codelists/SampleResource'
-        etree.SubElement(r, '{%s}resourceIdentifier' % cs).text = self.igsn
-        etree.SubElement(r, '{%s}landingPage' % cs).text = 'https://pid.geoscience.gov.au/sample/' + self.igsn
-        # etree.SubElement(r, '{%s}isPublic' % cs).text = 'true'
-        etree.SubElement(r, '{%s}resourceTitle' % cs).text = 'Sample igsn:' + self.igsn
-        rt = etree.SubElement(r, '{%s}resourceTypes' % cs)
-        etree.SubElement(rt, '{%s}resourceType' % cs).text = self.sample_type
-        mt = etree.SubElement(r, '{%s}materialTypes' % cs)
-        etree.SubElement(mt, '{%s}materialType' % cs).text = self.material_type
-        etree.SubElement(r, '{%s}method' % cs).text = self.method_type
-        # etree.SubElement(r, '{%s}campaign' % cs).text = ''
-        l = etree.SubElement(r, '{%s}location' % cs)
-        g = etree.SubElement(l, '{%s}geometry' % cs)
-        if self.srid is not None:
-            g.text = sample_wkt
-            g.attrib['srid'] = 'https://epsg.io/' + self.srid
-            g.attrib['verticalDatum'] = 'https://epsg.io/4283'
-        # g.attrib['geometryURI'] = 'http://www.altova.com'
-        cd = etree.SubElement(r, '{%s}curationDetails' % cs)
-        c = etree.SubElement(cd, '{%s}curation' % cs)
-        etree.SubElement(c, '{%s}curator' % cs).text = 'Geoscience Australia'
-        etree.SubElement(c, '{%s}curationDate' % cs).text = datetime.now().strftime('%Y')
-        etree.SubElement(c, '{%s}curationLocation' % cs).text = \
-            'Geoscience Australia, Jerrabomberra Ave, Symonston, ACT, Australia'
-        etree.SubElement(c, '{%s}curatingInstitution' % cs).attrib['institutionURI'] = \
-            'http://pid.geoscience.gov.au/org/ga'
-
-        if self.sample_no is not None:
-            ai = etree.SubElement(r, '{%s}alternateIdentifiers' % cs)
-            etree.SubElement(ai, '{%s}alternateIdentifiers' % cs).text = self.sample_no
-
-        if self.date_acquired is not None:
-            ti = etree.SubElement(r, '{%s}date' % cs)
-            etree.SubElement(ti, '{%s}timeInstant' % cs).text = self.date_acquired
-
-        if self.remark is not None:
-            etree.SubElement(r, '{%s}comment' % cs).text = self.remark
-        # em.classifications(
-        #     em.classification('')),
-        # em.purpose('a'),
-        # em.sampledFeatures(
-        #     em.sampledFeature('token', sampledFeatureURI='http://www.altova.com')),
-        # em.collectors(
-        #     em.collector(
-        #         em.collectorName('a'),
-        #         em.collectorIdentifier(
-        #             'token',
-        #             collectorIdentifierType='http://pid.geoscience.gov.au/def/voc/igsn-codelists/URL'))),
-        # em.contributors(
-        #     em.contributor(
-        #         em.contributorName('a'),
-        #         em.contributorIdentifier(
-        #             'token',
-        #             contributorIdentifierType='http://pid.geoscience.gov.au/def/voc/igsn-codelists/Handle'
-        #         ),
-        #         contributorType='http://pid.geoscience.gov.au/def/voc/igsn-codelists/Other')),
-        # em.relatedResourceIdentifiers(
-        #     em.relatedResourceIdentifier(
-        #         'String',
-        #         relatedIdentifierType='http://pid.geoscience.gov.au/def/voc/igsn-codelists/bibcode',
-        #         relationType='http://pid.geoscience.gov.au/def/voc/igsn-codelists/IsSourceOf')),
-        # em.logDate('2001', eventType='registered')
-
-        xml = etree.tostring(root, pretty_print=True, xml_declaration=True, encoding='UTF-8')
-        return xml
 
     def export_as_html(self, model_view='default'):
         """
@@ -813,56 +795,36 @@ class Sample:
             'default']
         :return: HTML string
         """
-        html = '<style>' + \
-               '   table.data {' + \
-               '       border-collapse: collapse;' + \
-               '       border: solid 2px black;' + \
-               '   }' + \
-               '   table.data td, table.data th {' + \
-               '       border: solid 1px black;' + \
-               '       padding: 5px;' + \
-               '   }' + \
-               '</style>'
-
-        html += '<table class="data">'
-        html += '   <tr><th>Property</th><th>Value</th></tr>'
-        if model_view == 'igsn':
-            # TODO: complete the properties in this view
-            html += '   <tr><th>IGSN</th><td>' + self.igsn + '</td></tr>'
-            html += '   <tr><th>Identifier</th><td>' + self.igsn + '</td></tr>'
-            if self.sampleid is not None:
-                html += '   <tr><th>Sample ID</th><td>' + self.sampleid + '</td></tr>'
-            if self.date_acquired is not None:
-                html += '   <tr><th>Date</th><td>' + self.date_acquired.isoformat() + '</td></tr>'
-            if self.sample_type is not None:
-                html += '   <tr><th>Sample Type</th><td><a href="' + self.sample_type + '">' + self.sample_type.split('/')[-1] + '</a></td></tr>'
-            html += '   <tr><th>Sampling Location (WKT)</th><td>' + self._generate_sample_wkt() + '</td></tr>'
-            html += '   <tr><th>Current Location</th><td>GA Services building</td></tr>'
-            # TODO: make this resolve
-            html += '   <tr><th>Sampling Feature</th><td><a href="' + TERM_LOOKUP['entity_type'][self.entity_type] + '">' + TERM_LOOKUP['entity_type'][self.entity_type].split('/')[-1] + '</a></td></tr>'
-            if self.method_type is not None:
-                html += '   <tr><th>Method Type</th><td><a href="' + self.method_type + '">' + self.method_type.split('/')[-1] + '</a></td></tr>'
-            # TODO: replace with dynamic
-            html += '   <tr><th>Access Rights</th><td><a href="http://pid.geoscience.gov.au/def/voc/igsn-codelists/Public">public</a></td></tr>'
-            html += '   <tr><th>Publisher</th><td><a href="http://pid.geoscience.gov.au/org/ga">Geoscience Australia</a></td></tr>'
-            if self.remark is not None:
-                html += '   <tr><th>Description</th><td>' + self.remark + '</td></tr>'
+        if model_view == 'igsn-o':
+            view_title = 'IGSN Ontology view'
+            sample_table_html = render_template(
+                'sample_igsn-o.html',
+                igsn=self.igsn,
+                sample_id=self.sample_id,
+                description=self.remark,
+                date_acquired=self.date_acquired,
+                sample_type=self.sample_type,
+                wkt='POINT' + self._generate_sample_wkt().split('POINT')[1],
+                sampling_feature=TERM_LOOKUP['entity_type'][self.entity_type],
+                method_type=self.method_type,
+                material_type=self.material_type
+            )
 
         elif model_view == 'dc':
-            html += '   <tr><th>IGSN</th><td>' + self.igsn + '</td></tr>'
-            html += '   <tr><th>Coverage</th><td>' + self._generate_sample_wkt() + '</td></tr>'
-            if self.date_acquired is not None:
-                html += '   <tr><th>Date</th><td>' + self.date_acquired.isoformat() + '</td></tr>'
-            if self.remark is not None:
-                html += '   <tr><th>Description</th><td>' + self.remark + '</td></tr>'
-            if self.material_type is not None:
-                html += '   <tr><th>Format</th><td>' + self.material_type + '</td></tr>'
-            if self.sample_type is not None:
-                html += '   <tr><th>Type</th><td>' + self.sample_type + '</td></tr>'
+            view_title = 'Dublin Core view'
+            sample_table_html = render_template(
+                'sample_dc.html',
+                identifier=self.igsn,
+                description=self.remark,
+                date=self.date_acquired,
+                type=self.sample_type,
+                format=self.material_type,
+                wkt='POINT' + self._generate_sample_wkt().split('POINT')[1],
+            )
 
-        html += '</table>'
+        # TODO: add in the PROV HTML version including the SVG graphig
 
-        if self.date_acquired is not None:
+        if self.date_acquired is not None and self.date_acquired != Sample.URI_MISSSING:
             year_acquired = datetime.strftime(self.date_acquired, '%Y')
         else:
             year_acquired = 'XXXX'
@@ -872,7 +834,8 @@ class Sample:
             view=model_view,
             igsn=self.igsn,
             year_acquired=year_acquired,
-            placed_html=html,
+            view_title=view_title,
+            sample_table_html=sample_table_html,
             date_now=datetime.now().strftime('%d %B %Y'),
             system_url='http://54.66.133.7'
         )

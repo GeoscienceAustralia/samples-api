@@ -151,9 +151,9 @@ def list_records_xml(metadataPrefix, resumptionToken=None, from_=None, until=Non
 
     for event, elem in context:
         if metadataPrefix.replace(u'\u200b', '') == u'oai_dc':
-            samples.append(Sample(None, None, StringIO(etree.tostring(elem))).export_dc_xml_record_for_listrecords())
-        else:
             samples.append(Sample(None, None, StringIO(etree.tostring(elem))).export_igsn_xml_record_for_listrecords())
+        else:
+            samples.append(Sample(None, None, StringIO(etree.tostring(elem))).export_csirov3_xml_record_for_listrecords())
 
     resumption_token = get_resumption_token(metadataPrefix, resumptionToken, from_, until)
 

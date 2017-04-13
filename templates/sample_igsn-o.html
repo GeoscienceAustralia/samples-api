@@ -1,0 +1,24 @@
+<table class="lined">
+    <tr><th>Property</th><th>Value</th></tr>
+    <tr><th>IGSN</th><td>{{ igsn }}</td></tr>
+    <tr><th>Sample ID</th><td>{{ sample_id }}</td></tr>
+    {% if description is not none %}
+    <tr><th>Description</th><td>{{ description }}</td></tr>
+    {% endif %}
+    <tr><th>Date Acquired</th><td>{{ date_acquired.split('/')[-1] }}</td></tr>
+    <tr><th>Current Location</th><td>GA Services building</td></tr>
+    <tr><th>Access Rights</th><td><a href="http://pid.geoscience.gov.au/def/voc/igsn-codelists/Public">public</a></td></tr>
+    <tr><th>Publisher</th><td><a href="http://pid.geoscience.gov.au/org/ga">Geoscience Australia</a></td></tr>
+    <tr><th>Sample Type</th><td><a href="{{ sample_type }}">{{ sample_type.split('/')[-1] }}</a></td></tr>
+    <tr>
+        <th>
+            Sampling Location (WKT)<br />
+            srid: <a href="https://epsg.io/8311">8311</a><br />
+            vertical datum: <a href="https://epsg.io/4283">4283</a>
+        </th>
+        <td>{{ wkt }}</td>
+    </tr>
+    <tr><th>Sampling Feature</th><td><a href="{{ sampling_feature }}">{{ sampling_feature.split('/')[-1] }}</a></td></tr>
+    <tr><th>Method Type</th><td><a href="{{ method_type }}">{{ method_type.split('/')[-1] }}</a></td></tr>
+    <tr><th>Material Type</th><td><a href="{{ material_type }}">{{ material_type.split('/')[-1] }}</a></td></tr>
+</table>

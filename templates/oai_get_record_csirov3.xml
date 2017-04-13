@@ -1,10 +1,8 @@
-        <record>
-            <header>
-                <identifier>{{ igsn }}</identifier>
-                <datestamp>{{ modified_datestamp }}</datestamp>
-            </header>
-            <metadata>
-                <cs:resource registrationType="http://pid.geoscience.gov.au/def/voc/igsn-codelists/SampleResource" xmlns:cs="https://igsn.csiro.au/schemas/3.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="https://igsn.csiro.au/schemas/3.0 igsn-csiro-v3.0.xsd">
+                <cs:resource
+                        registrationType="http://pid.geoscience.gov.au/def/voc/igsn-codelists/SampleResource"
+                        xmlns:cs="https://igsn.csiro.au/schemas/3.0"
+                        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                        xsi:schemaLocation="https://igsn.csiro.au/schemas/3.0 igsn-csiro-v3.0.xsd">
                     <cs:resourceIdentifier>{{ igsn }}</cs:resourceIdentifier>
                     <cs:landingPage>https://pid.geoscience.gov.au/sample/{{ igsn }}</cs:landingPage>
                     <cs:resourceTitle>Sample igsn:{{ igsn }}</cs:resourceTitle>
@@ -30,5 +28,3 @@
                         <cs:alternateIdentifiers>{{ sampleid }}</cs:alternateIdentifiers>
                     </cs:alternateIdentifiers>
                 </cs:resource>
-            </metadata>
-        </record>

@@ -1,0 +1,19 @@
+<table class="lined">
+    <tr><th>Property</th><th>Value</th></tr>
+    <tr><th>Identifier</th><td>{{ identifier }}</td></tr>
+    <tr><th>Title</th><td>Sample igsn:{{ identifier }}</td></tr>
+    {% if description is not none %}
+    <tr><th>Description</th><td>{{ description }}</td></tr>
+    {% endif %}
+    <tr><th>Date</th><td>{{ date.split('/')[-1] }}</td></tr>
+    <tr><th>Type</th><td><a href="{{ type }}">{{ type.split('/')[-1] }}</a></td></tr>
+    <tr><th>Format</th><td><a href="{{ format }}">{{ format.split('/')[-1] }}</a></td></tr>
+    <tr>
+        <th>
+            Coverage<br />
+            srid: <a href="https://epsg.io/8311">8311</a><br />
+            vertical datum: <a href="https://epsg.io/4283">4283</a>
+        </th>
+        <td>{{ wkt }}</td>
+    </tr>
+</table>

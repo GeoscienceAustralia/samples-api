@@ -2,15 +2,11 @@
 
 {% block content %}
     <h1>Sample</h1>
-    {% if view == 'alternates' %}
-        <h2>Alternates view</h2>
-    {% elif view == 'igsn' %}
-        <h2>IGSN Ontology view</h2>
-    {% elif view == 'dc' %}
-        <h2>Dublin Core view</h2>
-    {% endif %}
+    <h2>{{ view_title }}</h2>
     <p><a href="{{ url_for('model_classes.sample', igsn=igsn) }}">html</a> | <a href="{{ url_for('model_classes.sample', igsn=igsn) }}?_view={{ view }}&_format=text/turtle">rdf/turtle</a></p>
-    {{ placed_html|safe }}
+
+    {{ sample_table_html|safe }}
+
     <p>Other views of this Sample are listed in the <a href="{{ url_for('model_classes.sample', igsn=igsn) }}?_view=alternates">Alternates View</a>.</p>
     <h2>Citation</h2>
     <p>If you wish to cite this sample as you would a publication, please use the following format:</p>

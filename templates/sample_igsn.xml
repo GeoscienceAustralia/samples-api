@@ -1,0 +1,45 @@
+<igsn:resource
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xmlns:igsn="http://schema.igsn.org/description/1.0/"
+        xmlns:gml="http://www.opengis.net/gml"
+        xsi:schemaLocation="http://schema.igsn.org/description/1.0 https://raw.githubusercontent.com/IGSN/metadata/dev/description/resource.xsd"
+        registedObjectType="http://schema.igsn.org/vocab/PhysicalSample">
+    <igsn:identifier type="IGSN">{{ igsn }}</igsn:identifier>
+    <igsn:alternateIdentifiers>
+        <igsn:alternateIdentifier>{{ sample_id }}</igsn:alternateIdentifier>
+    </igsn:alternateIdentifiers>
+    <igsn:name>Sample igsn:{{ igsn }}</igsn:name>
+    <igsn:description>{{ description }}</igsn:description>
+    <igsn:registrant>
+        <igsn:name>Geoscience Australia</igsn:name>
+        <igsn:affiliation>
+            <igsn:identifier type="URL">http://pid.geoscience.gov.au/org/ga</igsn:identifier>
+            <igsn:name>Geoscience Australia</igsn:name>
+        </igsn:affiliation>
+    </igsn:registrant>
+    <igsn:contributors>
+        <igsn:contributor type="HostingInstitution">
+            <igsn:identifier type="URL">http://pid.geoscience.gov.au/org/ga</igsn:identifier>
+            <igsn:name>Geoscience Australia</igsn:name>
+        </igsn:contributor>
+    </igsn:contributors>
+    <igsn:geoLocations>
+        <igsn:geoLocation>
+            <igsn:geometry type="Point" sridType="4326">{{ wkt }}</igsn:geometry>
+        </igsn:geoLocation>
+    </igsn:geoLocations>
+    <igsn:resourceTypes>
+        <igsn:resourceType>Sample</igsn:resourceType>
+        <igsn:resourceType>{{ sample_type }}</igsn:resourceType>
+    </igsn:resourceTypes>
+    <igsn:materials>
+        <igsn:material>{{ material_type }}</igsn:material>
+    </igsn:materials>
+    <igsn:collectionMethods>
+        <igsn:collectionMethod>{{ collection_method }}</igsn:collectionMethod>
+    </igsn:collectionMethods>
+    {% if collection_time is not none %}
+    <igsn:collectionTime>{{ collection_time.isoformat() }}</igsn:collectionTime>
+    {% endif %}
+    <igsn:sampleAccess>Public</igsn:sampleAccess>
+</igsn:resource>

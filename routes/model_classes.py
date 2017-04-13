@@ -49,7 +49,7 @@ def sample(igsn):
                 s = Sample(settings.XML_API_URL_SAMPLE, igsn)
                 return s.render(view, mimetype)
             except ValueError:
-                return render_template('no_record_sample.html')
+                return render_template('sample_no_record.html')
 
     except LdapiParameterError, e:
         return routes_functions.client_error_Response(e)
