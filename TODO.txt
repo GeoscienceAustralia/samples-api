@@ -5,11 +5,4 @@
 * check CSIRO's CSIROv3 metadata issue for schema errors
     * https://igsn.csiro.au/igsn30/api/service/30/oai?verb=GetRecord&identifier=IGSN:CSIRO:AU:CSRWA1096&metadataPrefix=cs_igsn
 
-* integrate the IGSN & DC XML templates into the OAI GetRecords and ListRecords functions
-
 * update online API, send to Victor for testing
-
-* add this to DC: <dc:identifier>http://hdl.handle.net/10273/847000107</dc:identifier>
-    * use igsn.org/
-
-* work out how to have oai_dc in place of the metadata element in the GetRecords version of DC
