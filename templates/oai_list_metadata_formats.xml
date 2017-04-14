@@ -20,5 +20,10 @@
             <schema>https://github.com/IGSN/metadata/blob/dev/description/resource.xsd</schema>
             <metadataNamespace>http://schema.igsn.org/description/1.0</metadataNamespace>
         </metadataFormat>
+        <metadataFormat>
+            <metadataPrefix>csirov3</metadataPrefix>
+            <schema>https://igsn.csiro.au/schemas/3.0/igsn-csiro-v3.0.xsd</schema>
+            <metadataNamespace>https://igsn.csiro.au/schemas/3.0</metadataNamespace>
+        </metadataFormat>
     </ListMetadataFormats>
 </OAI-PMH>
