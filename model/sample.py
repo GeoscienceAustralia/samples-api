@@ -98,30 +98,28 @@ class Sample:
             return self.export_as_html(model_view=view)
         elif view == 'dc':  # Dublin Core in RDF or HTML
             # RDF formats handled by general case
-            if mimetype == 'application/xml':
-                return self.export_dc_xml()
+            if mimetype == 'text/xml':
+                return Response(
+                    '<?xml version="1.0" encoding="utf-8"?>\n' + self.export_dc_xml(),
+                    mimetype='text/xml')
             else:
                 return self.export_as_html(model_view=view)
+        elif view == 'igsn':  # the community agreed description metadata schema
+            # only XML for this view
+            return Response(
+                '<?xml version="1.0" encoding="utf-8"?>\n' + self.export_igsn_xml(),
+                mimetype='text/xml'
+            )
+        elif view == 'csirov3':
+            # only XML for this view
+            return Response(
+                '<?xml version="1.0" encoding="utf-8"?>\n' + self.export_csirov3_xml(),
+                mimetype='text/xml'
+            )
         elif view == 'prov':  # PROV-O in RDF (soon or HTML)
             # RDF formats handled by general case
             # only RDF for this view so set the mimetype to our favourite mime format
             return self.export_as_html(model_view=view)
-            # return self.export_as_html(model_view=view)
-        elif view == 'csirov3':
-            # only XML for this view
-            return Response(
-                self.export_csirov3_xml(),
-                status=200,
-                mimetype='application/xml',
-            # headers={'Content-Disposition': 'attachment; filename=' + igsn + '.xml'}
-            )
-        elif view == 'igsn':  # the community agreed description metadata schema
-            # only XML for this view
-            return Response(
-                self.export_igsn_xml(),
-                status=200,
-                mimetype='application/xml'
-            )
 
     def validate_xml(self, xml):
         parser = etree.XMLParser(dtd_validation=False)
@@ -689,7 +687,7 @@ class Sample:
         """
         template = render_template(
             'sample_dc.xml',
-            igsn=self.igsn,
+            identifier=self.igsn,
             description=self.remark,
             date=self.date_acquired,
             type=self.sample_type,

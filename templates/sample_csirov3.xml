@@ -1,7 +1,6 @@
 <cs:resource
         registrationType="http://pid.geoscience.gov.au/def/voc/igsn-codelists/SampleResource"
         xmlns:cs="https://igsn.csiro.au/schemas/3.0/"
-        xmlns:gml="http://www.opengis.net/gml"
         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
         xsi:schemaLocation="https://igsn.csiro.au/schemas/3.0/ igsn-csiro-v3.0.xsd">
     <cs:resourceIdentifier>{{ igsn }}</cs:resourceIdentifier>
@@ -27,9 +26,12 @@
         </cs:curation>
     </cs:curationDetails>
     <cs:alternateIdentifiers>
-        <cs:alternateIdentifiers>{{ sample_id }}</cs:alternateIdentifiers>
+        <cs:alternateIdentifier type="URL">http://pid.geoscience.gov.au/sample/{{ igsn }}</cs:alternateIdentifier>
+        {% if sample_id is not none %}
+        <cs:alternateIdentifier>{{ sample_id }}</cs:alternateIdentifier>
+        {% endif %}
     </cs:alternateIdentifiers>
     {% if collection_time is not none %}
-    <cs:logDate eventType="registered">{{ collection_time.isoformat() }}</cs:logDate>
+    <cs:logDate eventType="registered">{{ collection_time }}</cs:logDate>
     {% endif %}
 </cs:resource>

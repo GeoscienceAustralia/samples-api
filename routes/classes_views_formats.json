@@ -10,10 +10,10 @@
     "default": "igsn-o",
     "alternates": ["text/html", "text/turtle", "application/rdf+xml", "application/rdf+json", "application/json"],
     "igsn-o": ["text/html", "text/turtle", "application/rdf+xml", "application/rdf+json"],
-    "igsn": ["application/xml"],
-    "csirov3": ["application/xml"],
+    "igsn": ["text/xml"],
+    "csirov3": ["text/xml"],
     "prov": ["text/turtle", "application/rdf+xml", "application/rdf+json"],
-    "dc": ["text/html", "application/xml", "text/turtle", "application/rdf+xml", "application/rdf+json"]
+    "dc": ["text/html", "text/xml", "text/turtle", "application/rdf+xml", "application/rdf+json"]
   },
   "http://purl.org/linked-data/registry#Register":{
     "renderer": "RegisterRenderer",

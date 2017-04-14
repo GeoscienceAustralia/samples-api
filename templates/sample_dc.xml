@@ -1,18 +1,20 @@
-<metadata:dc
+<metadata
         xmlns:oai_dc="http://www.openarchives.org/OAI/2.0/oai_dc/"
         xmlns:dc="http://purl.org/dc/elements/1.1/"
         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
         xsi:schemaLocation="http://www.openarchives.org/OAI/2.0/oai_dc/ http://www.openarchives.org/OAI/2.0/oai_dc.xsd">
-    <dc:identifier>{{ igsn }}</dc:identifier>
-    <dc:title>Sample igsn:{{ igsn }}</dc:title>
+    <dc:identifier>{{ identifier }}</dc:identifier>
+    <dc:identifier>http://igsn.org/{{ identifier }}</dc:identifier>
+    <dc:identifier>http://hdl.handle.net/10273/{{ identifier }}</dc:identifier>
+    <dc:title>Sample igsn:{{ identifier }}</dc:title>
     {% if description is not none %}
     <dc:description>{{ description }}</dc:description>
     {% endif %}
-    <dc:date>{{ date }}</dc:date>
+    <dc:date>{{ datestamp }}</dc:date>
     <dc:type>{{ type }}</dc:type>
     <dc:format>{{ format }}</dc:format>
     <dc:coverage>SRID=8311;{{ wkt }}</dc:coverage>
     <dc:creator>{{ creator }}</dc:creator>
     <dc:publisher>{{ publisher }}</dc:publisher>
     <dc:rights>https://creativecommons.org/licenses/by/4.0/</dc:rights>
-</metadata:dc>
+</metadata>

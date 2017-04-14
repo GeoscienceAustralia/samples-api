@@ -18,7 +18,6 @@ def oai():
         for k, v in request.form.iteritems():
             request_args[k] = v
 
-    # TODO: validate args using functions_oai
     dt = datetime.datetime.now()
     date_stamp = datetime_to_datestamp(dt)
     base_url = request.base_url
@@ -32,10 +31,11 @@ def oai():
         }
         template = render_template('oai_error.xml', values=values), 400
         response = make_response(template)
-        response.headers['Content-Type'] = 'application/xml'
+        response.headers['Content-Type'] = 'text/xml'
 
         return response
 
+    # validate all request variables
     try:
         oai_functions.validate_oai_parameters(request_args)
     except ValueError:
@@ -48,23 +48,38 @@ def oai():
             }
         template = render_template('oai_error.xml', values=values), 400
         response = make_response(template)
-        response.headers['Content-Type'] = 'application/xml'
+        response.headers['Content-Type'] = 'text/xml'
 
         return response
 
-    # encode datetimes as datestamps??
-    # https://github.com/infrae/pyoai/blob/beced901ea0b494f23053cbb3c6495872acb96a3/src/oaipmh/client.py#L61
-
-    # now call underlying implementation
+    # now call underlying implementation, based on the verb
     if verb == 'GetRecord':
         try:
             from model.sample import Sample
             s = Sample(settings.XML_API_URL_SAMPLE, request_args['identifier'])
 
             if request_args['metadataPrefix'] == 'oai_dc':
-                return Response(s.export_dc_xml(), mimetype='text/xml')
+                record_xml = s.export_dc_xml()
             elif request_args['metadataPrefix'] == 'igsn':
-                return Response(s.export_as_csirov3_xml(), mimetype='text/xml')
+                record_xml = s.export_igsn_xml()
+            elif request_args['metadataPrefix'] == 'csirov3':
+                record_xml = s.export_csirov3_xml()
+
+            if s.date_acquired != 'http://www.opengis.net/def/nil/OGC/0/missing':
+                datestamp = datetime_to_datestamp(s.date_acquired)
+            else:
+                datestamp = ''
+            return Response(
+                render_template(
+                    'oai_get_record.xml',
+                    response_date=datetime_to_datestamp(datetime.datetime.now()),
+                    identifier=request_args['identifier'],
+                    metadataPrefix=request_args['metadataPrefix'],
+                    datestamp=datestamp,
+                    record_xml=record_xml
+                ),
+                mimetype='text/xml'
+            )
 
         except ValueError:
             values = {
@@ -117,7 +132,7 @@ def oai():
                 }
             template = render_template('oai_error.xml', values=values), 400
             response = make_response(template)
-            response.mimetype = 'text/xml''application/xml'
+            response.mimetype = 'text/xml''text/xml'
             return response
 
     elif verb == 'ListMetadataFormats':
@@ -133,26 +148,7 @@ def oai():
         return response
 
     elif verb == 'ListRecords':
-        # render_template
         try:
-            # samples, token = oai_functions.list_records(
-            #     request_args.get('metadataPrefix'),
-            #     request_args.get('resumptionToken'),
-            #     request_args.get('from'),
-            #     request_args.get('until')
-            # )
-            #
-            # request_args['date_stamp'] = date_stamp
-            # request_args['base_uri_oai'] = settings.BASE_URI_OAI
-            # template = render_template('oai_list_records.xml',
-            #                            samples=samples,
-            #                            resumptiontoken=token,
-            #                            request_args=request_args,
-            #                            base_url=base_url)
-            # response = make_response(template)
-            # response.mimetype = 'text/xml'
-            # return response
-
             samples, token = oai_functions.list_records_xml(
                 request_args.get('metadataPrefix'),
                 request_args.get('resumptionToken'),
@@ -166,7 +162,7 @@ def oai():
             request_args['date_stamp'] = date_stamp
             request_args['base_uri_oai'] = settings.BASE_URI_OAI
             template = render_template('oai_list_records.xml',
-                                       date_stamp=date_stamp,
+                                       datestamp=date_stamp,
                                        metadataPrefix=request_args.get('metadataPrefix'),
                                        base_uri_oai=request.base_url,
                                        samples=samples,
@@ -188,6 +184,7 @@ def oai():
             return response
 
     elif verb == 'ListSets':
+        # TODO: create a set for all GA records in readiness for sets for each other Geological Survey samples GA houses
         # render_template
         values = {
             'response_date': date_stamp,

@@ -63,6 +63,7 @@ def valid_oai_args(verb):
 
 
 def validate_oai_parameters(qsa_args):
+    # TODO: return differentiated error messages. See OAI spec
     argspec = OAI_ARGS.get(qsa_args['verb'])
     if argspec is None:
         raise ParameterError('The OAI verb is not correct. Must be one of {0}'.format(', '.join(OAI_ARGS.iterkeys())))
@@ -150,11 +151,43 @@ def list_records_xml(metadataPrefix, resumptionToken=None, from_=None, until=Non
     samples = []
 
     for event, elem in context:
-        if metadataPrefix.replace(u'\u200b', '') == u'oai_dc':
-            samples.append(Sample(None, None, StringIO(etree.tostring(elem))).export_igsn_xml_record_for_listrecords())
+        # create a Sample for each XML ROW
+        s = Sample(None, None, StringIO(etree.tostring(elem)))
+        if s.date_acquired != 'http://www.opengis.net/def/nil/OGC/0/missing':
+            datestamp = datetime_to_datestamp(s.date_acquired)
         else:
-            samples.append(Sample(None, None, StringIO(etree.tostring(elem))).export_csirov3_xml_record_for_listrecords())
+            datestamp = ''
 
+        # make the record XML using the Sample export
+        # for some reason, there's this odd whitespace character in the metadataPrefix
+        metadataPrefix = metadataPrefix.replace(u'\u200b', '')
+        if metadataPrefix == u'igsn':
+            record_xml = s.export_igsn_xml()
+        elif metadataPrefix == u'csirov3':
+            record_xml = s.export_csirov3_xml()
+        else:  # oai_dc
+            record_xml = s.export_dc_xml()
+
+        # make the full OAI record
+        oai_record_vars = {
+            'identifier': s.igsn,
+            'datestamp': datestamp,
+            'record_xml': record_xml
+        }
+        oai_record = '''
+        <record>
+            <header>
+                <identifier>{identifier}</identifier>
+                <datestamp>{datestamp}</datestamp>
+            </header>
+            <metadata>
+                {record_xml}
+            </metadata>
+        </record>
+                '''.format(**oai_record_vars)
+
+        # add the OAI record to the list of samples
+        samples.append(oai_record)
     resumption_token = get_resumption_token(metadataPrefix, resumptionToken, from_, until)
 
     return samples, resumption_token
