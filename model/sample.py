@@ -1,5 +1,5 @@
 from lxml import etree
-from rdflib import Graph, URIRef, RDF, XSD, Namespace, Literal, BNode
+from rdflib import Graph, URIRef, RDF, RDFS, XSD, Namespace, Literal, BNode
 from StringIO import StringIO
 import requests
 from model.datestamp import *
@@ -90,7 +90,7 @@ class Sample:
 
     def render(self, view, mimetype):
         if mimetype in LDAPI.get_rdf_mimetypes_list():
-            return Response(self.export_as_rdf(view, mimetype), mimetype=mimetype)
+            return Response(self.export_rdf(view, mimetype), mimetype=mimetype)
 
         if view == 'igsn-o':  # the GA IGSN Ontology in RDF or HTML
             # RDF formats handled by general case
@@ -105,13 +105,12 @@ class Sample:
         elif view == 'prov':  # PROV-O in RDF (soon or HTML)
             # RDF formats handled by general case
             # only RDF for this view so set the mimetype to our favourite mime format
-            mimetype = 'text/turtle'
-            return Response(self.export_as_rdf('prov', mimetype), mimetype=mimetype)
+            return self.export_as_html(model_view=view)
             # return self.export_as_html(model_view=view)
         elif view == 'csirov3':
             # only XML for this view
             return Response(
-                self.export_as_csirov3_xml(),
+                self.export_csirov3_xml(),
                 status=200,
                 mimetype='application/xml',
             # headers={'Content-Disposition': 'attachment; filename=' + igsn + '.xml'}
@@ -119,7 +118,7 @@ class Sample:
         elif view == 'igsn':  # the community agreed description metadata schema
             # only XML for this view
             return Response(
-                self.export_as_igsn_xml(),
+                self.export_igsn_xml(),
                 status=200,
                 mimetype='application/xml'
             )
@@ -388,7 +387,122 @@ class Sample:
 
         return gml
 
-    def export_as_rdf(self, model_view='default', rdf_mime='text/turtle'):
+    def __graph_preconstruct(self, g):
+        u = '''
+            PREFIX prov: <http://www.w3.org/ns/prov#>
+            DELETE {
+                ?a prov:generated ?e .
+            }
+            INSERT {
+                ?e prov:wasGeneratedBy ?a .
+            }
+            WHERE {
+                ?a prov:generated ?e .
+            }
+        '''
+        g.update(u)
+
+        return g
+
+    def __gen_visjs_nodes(self, g):
+        nodes = ''
+
+        q = '''
+            PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
+            PREFIX prov: <http://www.w3.org/ns/prov#>
+            SELECT *
+            WHERE {
+                ?s a ?o .
+                {?s a prov:Entity .}
+                UNION
+                {?s a prov:Activity .}
+                UNION
+                {?s a prov:Agent .}
+                OPTIONAL {?s rdfs:label ?label .}
+            }
+            '''
+        for row in g.query(q):
+            if str(row['o']) == 'http://www.w3.org/ns/prov#Entity':
+                if row['label'] is not None:
+                    label = row['label']
+                else:
+                    label = 'Entity'
+                nodes += '\t\t\t\t{id: "%(node_id)s", label: "%(label)s", shape: "ellipse", color:{background:"#FFFC87", border:"#808080"}},\n' % {
+                    'node_id': row['s'],
+                    'label': label
+                }
+            elif str(row['o']) == 'http://www.w3.org/ns/prov#Activity':
+                if row['label'] is not None:
+                    label = row['label']
+                else:
+                    label = 'Activity'
+                nodes += '\t\t\t\t{id: "%(node_id)s", label: "%(label)s", shape: "box", color:{background:"#9FB1FC", border:"blue"}},\n' % {
+                    'node_id': row['s'],
+                    'label': label
+                }
+            elif str(row['o']) == 'http://www.w3.org/ns/prov#Agent':
+                if row['label'] is not None:
+                    label = row['label']
+                else:
+                    label = 'Agent'
+                nodes += '\t\t\t\t{id: "%(node_id)s", label: "%(label)s", image: "/static/img/agent.png", shape: "image"},\n' % {
+                    'node_id': row['s'],
+                    'label': label
+                }
+
+        return nodes
+
+    def __gen_visjs_edges(self, g):
+        edges = ''
+
+        q = '''
+            PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
+            PREFIX prov: <http://www.w3.org/ns/prov#>
+            SELECT *
+            WHERE {
+                ?s ?p ?o .
+                ?s prov:wasAttributedTo|prov:wasGeneratedBy|prov:used|prov:wasDerivedFrom|prov:wasInformedBy ?o .
+            }
+            '''
+        for row in g.query(q):
+            edges += '\t\t\t\t{from: "%(from)s", to: "%(to)s", arrows:"to", font: {align: "bottom"}, color:{color:"black"}, label: "%(relationship)s"},\n' % {
+                'from': row['s'],
+                'to': row['o'],
+                'relationship': str(row['p']).split('#')[1]
+            }
+
+        return edges
+
+    def _make_vsjs(self, g):
+        g = self.__graph_preconstruct(g)
+
+        nodes = 'var nodes = new vis.DataSet([\n'
+        nodes += self.__gen_visjs_nodes(g)
+        nodes = nodes.rstrip().rstrip(',') + '\n\t\t\t]);\n'
+
+        edges = 'var edges = new vis.DataSet([\n'
+        edges += self.__gen_visjs_edges(g)
+        edges = edges.rstrip().rstrip(',') + '\n\t\t\t]);\n'
+
+        visjs = '''
+        %(nodes)s
+
+        %(edges)s
+
+        var container = document.getElementById('network');
+
+        var data = {
+            nodes: nodes,
+            edges: edges,
+        };
+
+        var options = {};
+        var network = new vis.Network(container, data, options);
+        ''' % {'nodes': nodes, 'edges': edges}
+
+        return visjs
+
+    def export_rdf(self, model_view='default', rdf_mime='text/turtle'):
         """
         Exports this instance in RDF, according to a given model from the list of supported models,
         in a given rdflib RDF format
@@ -421,6 +535,7 @@ class Sample:
         # URI for this sample
         base_uri = 'http://pid.geoscience.gov.au/sample/'
         this_sample = URIRef(base_uri + self.igsn)
+        g.add((this_sample, RDFS.label, Literal('Sample igsn:' + self.igsn, datatype=XSD.string)))
 
         # define GA
         ga = URIRef(Sample.URI_GA)
@@ -430,7 +545,7 @@ class Sample:
         gml = Literal(self._generate_sample_gml(), datatype=GEOSP.gmlLiteral)
 
         # select model view
-        if model_view == 'igsn':
+        if model_view == 'igsn-o':
             # default model is the IGSN model
             # IGSN model required namespaces
             IGSN = Namespace('http://pid.geoscience.gov.au/def/ont/igsn#')
@@ -540,6 +655,11 @@ class Sample:
             g.add((qualified_attribution, PROV.hadRole, AUROLE.Publisher))
             g.add((this_sample, PROV.qualifiedAttribution, qualified_attribution))
 
+            # just for visjs
+            g.add((ga, RDF.type, PROV.Agent))
+            g.add((this_sample, PROV.wasAttributedTo, ga))
+            g.add((ga, RDFS.label, Literal('Geoscience Australia', datatype=XSD.string)))
+
         return g.serialize(format=LDAPI.get_rdf_parser_for_mimetype(rdf_mime))
 
     def _is_xml_export_valid(self, xml_string):
@@ -563,125 +683,25 @@ class Sample:
 
     def export_dc_xml(self):
         """
-        Exports this Sample instance in XML that validates against the OAI Dublin Core Metadata from
-        https://www.openarchives.org/OAI/openarchivesprotocol.html
-
-        using the IGSN to Dublin Core mappings from
-        https://github.com/IGSN/metadata/wiki/IGSN-Registration-Metadata-Version-1.0
+        Exports this Sample instance in XML that validates against the IGSN XML Schema
 
         :return: XML string
         """
-
-        if isinstance(self.date_acquired, datetime):
-            sampling_time = self.date_acquired.isoformat()
-        elif isinstance(self.date_modified, datetime):
-            sampling_time = self.date_modified.isoformat()
-        else:
-            sampling_time = Sample.URI_MISSSING
-        if isinstance(self.date_modified, datetime):
-            modified_time = self.date_modified.isoformat()
-        else:
-            modified_time = Sample.URI_MISSSING
-         # URI for this sample
-        base_uri = 'http://pid.geoscience.gov.au/sample/'
-        this_sample = URIRef(base_uri + self.igsn)
-
-        # define GA
-        ga = URIRef(Sample.URI_GA)
-
-        GEOSP = Namespace('http://www.opengis.net/ont/geosparql#')
-
-        # sample location in GML & WKT, formulation from GeoSPARQL
-        wkt = Literal(self._generate_sample_wkt(), datatype=GEOSP.wktLiteral)
-
-        format = URIRef(self.material_type)
-
-        date_stamp = datetime_to_datestamp(datetime.now())
         template = render_template(
-            'oai_get_record_dc.xml',
-            date_stamp=date_stamp,
+            'sample_dc.xml',
             igsn=self.igsn,
-            metadataPrefix='oai_dc',
-            base_uri_oai='http://pid.geoscience.gov.au/samples/oai',
-            modified_datestamp=self.modified_datestamp,
-            ga=self.URI_GA,
-            sample_type=self.sample_type,
-            wkt=wkt,
+            description=self.remark,
+            date=self.date_acquired,
+            type=self.sample_type,
+            format=self.material_type,
+            wkt='POINT' + self._generate_sample_wkt().split('POINT')[1],  # gml = self._generate_sample_gml()
+            creator='Geoscience Australia',
+            publisher='Geoscience Australia'
         )
 
         return template
 
     def export_igsn_xml(self):
-        """
-        Exports this Sample instance in XML that validates against the OAI Dublin Core Metadata from
-        https://www.openarchives.org/OAI/openarchivesprotocol.html
-
-        using the IGSN to Dublin Core mappings from
-        https://github.com/IGSN/metadata/wiki/IGSN-Registration-Metadata-Version-1.0
-
-        :return: XML string
-        """
-
-        if isinstance(self.date_acquired, datetime):
-            sampling_time = self.date_acquired.isoformat()
-        elif isinstance(self.date_modified, datetime):
-            sampling_time = self.date_modified.isoformat()
-        else:
-            sampling_time = Sample.URI_MISSSING
-        if isinstance(self.date_modified, datetime):
-            modified_time = self.date_modified.isoformat()
-        else:
-            modified_time = Sample.URI_MISSSING
-         # URI for this sample
-        base_uri = 'http://pid.geoscience.gov.au/sample/'
-        this_sample = URIRef(base_uri + self.igsn)
-
-        # define GA
-        ga = URIRef(Sample.URI_GA)
-
-        GEOSP = Namespace('http://www.opengis.net/ont/geosparql#')
-
-        # sample location in GML & WKT, formulation from GeoSPARQL
-        wkt = Literal(self._generate_sample_wkt(), datatype=GEOSP.wktLiteral)
-
-        format = URIRef(self.material_type)
-
-        date_stamp = datetime_to_datestamp(datetime.now())
-        template = render_template(
-            'oai_get_record_dc.xml',
-            date_stamp=date_stamp,
-            igsn=self.igsn,
-            metadataPrefix='oai_dc',
-            base_uri_oai='http://pid.geoscience.gov.au/samples/oai',
-            modified_datestamp=self.modified_datestamp,
-            ga=self.URI_GA,
-            sample_type=self.sample_type,
-            wkt=wkt,
-        )
-
-        return template
-
-    def export_as_csirov3_xml(self):
-        """
-        Exports this Sample instance in XML that validates against the CSIRO v3 Schema
-
-        :return: XML string
-        """
-        # sample location in GML & WKT, formulation from GeoSPARQL
-        template = render_template(
-            'sample_csirov3.xml',
-            igsn=self.igsn,
-            sample_type=self.sample_type,
-            material_type=self.material_type,
-            method_type=self.method_type,
-            wkt='POINT' + self._generate_sample_wkt().split('POINT')[1],  # kludge to remove EPSG URI,
-            sample_id=self.sample_id,
-            collection_time=self.date_acquired
-        )
-
-        return template
-
-    def export_as_igsn_xml(self):
         """
         Exports this Sample instance in XML that validates against the IGSN XML Schema
 
@@ -701,88 +721,22 @@ class Sample:
 
         return template
 
-    def export_dc_xml_record_for_listrecords(self):
+    def export_csirov3_xml(self):
         """
-        Exports this Sample instance in XML that validates against the OAI Dublin Core Metadata from
-        https://www.openarchives.org/OAI/openarchivesprotocol.html
-
-        using the IGSN to Dublin Core mappings from
-        https://github.com/IGSN/metadata/wiki/IGSN-Registration-Metadata-Version-1.0
+        Exports this Sample instance in XML that validates against the CSIRO v3 Schema
 
         :return: XML string
         """
-        # URI for this sample
-        base_uri = 'http://pid.geoscience.gov.au/sample/'
-        GEOSP = Namespace('http://www.opengis.net/ont/geosparql#')
-
         # sample location in GML & WKT, formulation from GeoSPARQL
-        wkt = Literal(self._generate_sample_wkt(), datatype=GEOSP.wktLiteral)
-
-        date_stamp = datetime_to_datestamp(datetime.now())
         template = render_template(
-            'oai_list_records_record_dc.xml',
-            date_stamp=date_stamp,
+            'sample_csirov3.xml',
             igsn=self.igsn,
-            metadataPrefix='oai_dc',
-            base_uri_oai='http://pid.geoscience.gov.au/samples/oai',
-            modified_datestamp=self.modified_datestamp,
-            ga=self.URI_GA,
-            sample_type=self.sample_type,
-            wkt=wkt,
-        )
-
-        return template
-
-    def export_igsn_xml_record_for_listrecords(self):
-        """
-        Exports this Sample instance in XML that validates against the OAI Dublin Core Metadata from
-        https://www.openarchives.org/OAI/openarchivesprotocol.html
-
-        using the IGSN to Dublin Core mappings from
-        https://github.com/IGSN/metadata/wiki/IGSN-Registration-Metadata-Version-1.0
-
-        :return: XML string
-        """
-        # URI for this sample
-        base_uri = 'http://pid.geoscience.gov.au/sample/'
-        GEOSP = Namespace('http://www.opengis.net/ont/geosparql#')
-
-        # sample location in GML & WKT, formulation from GeoSPARQL
-        wkt = Literal(self._generate_sample_wkt(), datatype=GEOSP.wktLiteral)
-
-        date_stamp = datetime_to_datestamp(datetime.now())
-        template = render_template(
-            'oai_list_records_record_dc.xml',
-            date_stamp=date_stamp,
-            igsn=self.igsn,
-            metadataPrefix='oai_dc',
-            base_uri_oai='http://pid.geoscience.gov.au/samples/oai',
-            modified_datestamp=self.modified_datestamp,
-            ga=self.URI_GA,
-            sample_type=self.sample_type,
-            wkt=wkt,
-        )
-
-        return template
-
-    def export_csirov3_xml_record_for_listrecords(self):
-        # sample location in GML & WKT, formulation from GeoSPARQL
-        wkt = 'POINT' + self._generate_sample_wkt().split('POINT')[1]  # kludge to remove EPSG URI
-
-        date_stamp = datetime_to_datestamp(datetime.now())
-        template = render_template(
-            'oai_list_records_record_csirov3.xml',
-            date_stamp=date_stamp,
-            igsn=self.igsn,
-            metadataPrefix='oai_dc',
-            base_uri_oai='http://pid.geoscience.gov.au/samples/oai',
-            modified_datestamp=self.modified_datestamp,
-            ga=self.URI_GA,
             sample_type=self.sample_type,
             material_type=self.material_type,
             method_type=self.method_type,
-            wkt=wkt,
-            sample_id=self.sample_id
+            wkt='POINT' + self._generate_sample_wkt().split('POINT')[1],  # kludge to remove EPSG URI,
+            sample_id=self.sample_id,
+            collection_time=self.date_acquired
         )
 
         return template
@@ -797,6 +751,7 @@ class Sample:
         """
         if model_view == 'igsn-o':
             view_title = 'IGSN Ontology view'
+
             sample_table_html = render_template(
                 'sample_igsn-o.html',
                 igsn=self.igsn,
@@ -812,6 +767,7 @@ class Sample:
 
         elif model_view == 'dc':
             view_title = 'Dublin Core view'
+
             sample_table_html = render_template(
                 'sample_dc.html',
                 identifier=self.igsn,
@@ -819,10 +775,21 @@ class Sample:
                 date=self.date_acquired,
                 type=self.sample_type,
                 format=self.material_type,
-                wkt='POINT' + self._generate_sample_wkt().split('POINT')[1],
+                wkt='POINT' + self._generate_sample_wkt().split('POINT')[1],  # gml = self._generate_sample_gml()
+                creator='Geoscience Australia',
+                publisher='Geoscience Australia'
             )
 
-        # TODO: add in the PROV HTML version including the SVG graphig
+        elif model_view == 'prov':
+            view_title = 'PROV Ontology view'
+            prov_turtle = self.export_rdf('prov', 'text/turtle')
+            g = Graph().parse(data=prov_turtle, format='turtle')
+
+            sample_table_html = render_template(
+                'sample_prov.html',
+                visjs=self._make_vsjs(g),
+                prov_turtle=prov_turtle,
+            )
 
         if self.date_acquired is not None and self.date_acquired != Sample.URI_MISSSING:
             year_acquired = datetime.strftime(self.date_acquired, '%Y')

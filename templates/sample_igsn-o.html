@@ -13,12 +13,12 @@
     <tr>
         <th>
             Sampling Location (WKT)<br />
-            srid: <a href="https://epsg.io/8311">8311</a><br />
             vertical datum: <a href="https://epsg.io/4283">4283</a>
         </th>
-        <td>{{ wkt }}</td>
+        <td>SRID=<a href="https://epsg.io/8311">8311</a>;{{ wkt }}</td>
     </tr>
     <tr><th>Sampling Feature</th><td><a href="{{ sampling_feature }}">{{ sampling_feature.split('/')[-1] }}</a></td></tr>
     <tr><th>Method Type</th><td><a href="{{ method_type }}">{{ method_type.split('/')[-1] }}</a></td></tr>
     <tr><th>Material Type</th><td><a href="{{ material_type }}">{{ material_type.split('/')[-1] }}</a></td></tr>
+    <tr><th>Has Provenance</th><td><a href="{{ request.base_url }}?_view=prov&_format=text/turtle">{{ request.base_url }}?_view=prov</a></td></tr>
 </table>

@@ -13,7 +13,7 @@
     "igsn": ["application/xml"],
     "csirov3": ["application/xml"],
     "prov": ["text/turtle", "application/rdf+xml", "application/rdf+json"],
-    "dc": ["text/html", "text/turtle", "application/rdf+xml", "application/rdf+json"]
+    "dc": ["text/html", "application/xml", "text/turtle", "application/rdf+xml", "application/rdf+json"]
   },
   "http://purl.org/linked-data/registry#Register":{
     "renderer": "RegisterRenderer",
