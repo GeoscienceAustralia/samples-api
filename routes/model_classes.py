@@ -89,7 +89,7 @@ def samples():
         else:
             from model import register
 
-            # handle pagination
+            # pagination
             page = int(request.args.get('page')) if request.args.get('page') is not None else 1
             per_page = int(request.args.get('per_page')) if request.args.get('per_page') is not None else 100
 
@@ -100,11 +100,16 @@ def samples():
                     mimetype='text/plain'
                 )
 
-            # if this isn't the first page, add a link to "first"
             links = []
+            links.append('<{}?per_page={}>; rel="first"'.format(settings.BASE_URI_SAMPLE, per_page))
+
+            # if this isn't the first page, add a link to "prev"
             if page != 1:
-                links.append('<{}>; rel="first"'.format(settings.BASE_URI_SAMPLE))
-                links.append('<{}?page={}>; rel="prev"'.format(settings.BASE_URI_SAMPLE, (page - 1)))
+                links.append('<{}?per_page={}&page={}>; rel="prev"'.format(
+                    settings.BASE_URI_SAMPLE,
+                    per_page,
+                    (page - 1)
+                ))
 
             # add a link to "next" and "last"
             try:
@@ -115,20 +120,21 @@ def samples():
                 # if we've gotten the last page value successfully, we can choke if someone enters a larger value
                 if page > last_page_no:
                     return Response(
-                        'You must enter either no value for page or an integer <= {} which is the last page number.'.format(last_page_no),
+                        'You must enter either no value for page or an integer <= {} which is the last page number.'
+                            .format(last_page_no),
                         status=400,
                         mimetype='text/plain'
                     )
 
                 # add a link to "next"
                 if page != last_page_no:
-                    links.append('<{}?page={}>; rel="next"'.format(settings.BASE_URI_SAMPLE, (page + 1)))
+                    links.append('<{}?per_page={}&page={}>; rel="next"'.format(settings.BASE_URI_SAMPLE, per_page, (page + 1)))
 
                 # add a link to "last"
-                links.append('<{}?page={}>; rel="last"'.format(settings.BASE_URI_SAMPLE, last_page_no))
+                links.append('<{}?per_page={}&page={}>; rel="last"'.format(settings.BASE_URI_SAMPLE, per_page, last_page_no))
             except:
                 # if there's some error in getting the no of samples, add the "next" link but not the "last" link
-                links.append('<{}?page={}>; rel="next"'.format(settings.BASE_URI_SAMPLE, (page + 1)))
+                links.append('<{}?per_page={}&page={}>; rel="next"'.format(settings.BASE_URI_SAMPLE, per_page, (page + 1)))
 
             headers = {
                 'Link': ', '.join(links)
