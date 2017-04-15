@@ -95,7 +95,7 @@ class Sample:
         if view == 'igsn-o':  # the GA IGSN Ontology in RDF or HTML
             # RDF formats handled by general case
             # HTML is the only other enabled format for igsn view
-            return self.export_as_html(model_view=view)
+            return self.export_html(model_view=view)
         elif view == 'dc':  # Dublin Core in RDF or HTML
             # RDF formats handled by general case
             if mimetype == 'text/xml':
@@ -103,7 +103,7 @@ class Sample:
                     '<?xml version="1.0" encoding="utf-8"?>\n' + self.export_dc_xml(),
                     mimetype='text/xml')
             else:
-                return self.export_as_html(model_view=view)
+                return self.export_html(model_view=view)
         elif view == 'igsn':  # the community agreed description metadata schema
             # only XML for this view
             return Response(
@@ -119,7 +119,7 @@ class Sample:
         elif view == 'prov':  # PROV-O in RDF (soon or HTML)
             # RDF formats handled by general case
             # only RDF for this view so set the mimetype to our favourite mime format
-            return self.export_as_html(model_view=view)
+            return self.export_html(model_view=view)
 
     def validate_xml(self, xml):
         parser = etree.XMLParser(dtd_validation=False)
@@ -739,7 +739,7 @@ class Sample:
 
         return template
 
-    def export_as_html(self, model_view='default'):
+    def export_html(self, model_view='default'):
         """
         Exports this instance in HTML, according to a given model from the list of supported models.
 

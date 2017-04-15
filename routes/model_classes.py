@@ -7,7 +7,7 @@ import settings
 from ldapi import LDAPI, LdapiParameterError
 from routes import model_classes_functions
 import urllib
-# from oaipmh.datestamp import datestamp_to_datetime, datetime_to_datestamp
+import requests
 
 model_classes = Blueprint('model_classes', __name__)
 
@@ -88,16 +88,54 @@ def samples():
             )
         else:
             from model import register
-            page_no = int(request.args.get('page_no')) if request.args.get('page_no') is not None else 1
-            no_per_page = int(request.args.get('no_per_page')) if request.args.get('no_per_page') is not None else 50
-            if no_per_page > 50:
+
+            # handle pagination
+            page = int(request.args.get('page')) if request.args.get('page') is not None else 1
+            per_page = int(request.args.get('per_page')) if request.args.get('per_page') is not None else 100
+
+            if per_page > 100:
                 return Response(
-                    'You must enter either no value for no_per_page or an integer <= 50.',
+                    'You must enter either no value for per_page or an integer <= 100.',
                     status=400,
                     mimetype='text/plain'
                 )
 
-            return register.RegisterRenderer(request, class_uri, None, page_no, no_per_page).render(view, mime_format)
+            # if this isn't the first page, add a link to "first"
+            links = []
+            if page != 1:
+                links.append('<{}>; rel="first"'.format(settings.BASE_URI_SAMPLE))
+                links.append('<{}?page={}>; rel="prev"'.format(settings.BASE_URI_SAMPLE, (page - 1)))
+
+            # add a link to "next" and "last"
+            try:
+                r = requests.get('http://dbforms.ga.gov.au/www_distp/a.igsn_api.get_Number_Modified')
+                no_of_samples = int(r.content.split('<RECORD_COUNT>')[1].split('</RECORD_COUNT>')[0])
+                last_page_no = int(round(no_of_samples / per_page, 0)) + 1  # same as math.ceil()
+
+                # if we've gotten the last page value successfully, we can choke if someone enters a larger value
+                if page > last_page_no:
+                    return Response(
+                        'You must enter either no value for page or an integer <= {} which is the last page number.'.format(last_page_no),
+                        status=400,
+                        mimetype='text/plain'
+                    )
+
+                # add a link to "next"
+                if page != last_page_no:
+                    links.append('<{}?page={}>; rel="next"'.format(settings.BASE_URI_SAMPLE, (page + 1)))
+
+                # add a link to "last"
+                links.append('<{}?page={}>; rel="last"'.format(settings.BASE_URI_SAMPLE, last_page_no))
+            except:
+                # if there's some error in getting the no of samples, add the "next" link but not the "last" link
+                links.append('<{}?page={}>; rel="next"'.format(settings.BASE_URI_SAMPLE, (page + 1)))
+
+            headers = {
+                'Link': ', '.join(links)
+            }
+
+            return register.RegisterRenderer(request, class_uri, None, page, per_page)\
+                .render(view, mime_format, extra_headers=headers)
 
     except LdapiParameterError, e:
         return routes_functions.client_error_Response(e)

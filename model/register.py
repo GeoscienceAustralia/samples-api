@@ -19,7 +19,7 @@ class RegisterRenderer(Renderer):
 
         self._get_details_from_oracle_api(page_no, no_per_page)
 
-    def render(self, view, mimetype):
+    def render(self, view, mimetype, extra_headers=None):
         if view == 'reg':
             # is an RDF format requested?
             if mimetype in LDAPI.get_rdf_mimetypes_list():
@@ -29,14 +29,19 @@ class RegisterRenderer(Renderer):
                 return Response(
                     self.g.serialize(format=rdflib_format),
                     status=200,
-                    mimetype=mimetype
+                    mimetype=mimetype,
+                    headers=extra_headers
                 )
             elif mimetype == 'text/html':
-                return render_template(
-                    'class_register.html',
-                    class_name=self.uri,
-                    register=self.register,
-                    system_url='http://54.66.133.7'
+                return Response(
+                    render_template(
+                        'class_register.html',
+                        class_name=self.uri,
+                        register=self.register,
+                        system_url='http://54.66.133.7'
+                    ),
+                    mimetype='text/html',
+                    headers=extra_headers
                 )
         else:
             return Response('The requested model model is not valid for this class', status=400, mimetype='text/plain')
@@ -72,7 +77,6 @@ class RegisterRenderer(Renderer):
         #os.environ['NO_PROXY'] = 'ga.gov.au'
         r = requests.get(settings.XML_API_URL_SAMPLESET.format(page_no, no_per_page), timeout=3)
         xml = r.content
-        print(xml)
 
         if self.validate_xml(xml):
             self._get_details_from_file(StringIO(xml))
