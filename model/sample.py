@@ -576,20 +576,22 @@ class Sample:
 
             # properties
             g.add((this_sample, SAMFL.currentLocation, Literal('GA Services building', datatype=XSD.string)))
-            if self.material_type is not None:
+
+            if self.material_type != 'http://www.opengis.net/def/nil/OGC/0/missing':
                 g.add((this_sample, SAMFL.materialClass, URIRef(self.material_type)))
-            if self.method_type is not None:
+            if self.method_type != 'http://www.opengis.net/def/nil/OGC/0/missing':
                 g.add((this_sample, SAMFL.samplingMethod, URIRef(self.method_type)))
-            if self.date_acquired is not None:
+            if self.date_acquired != 'http://www.opengis.net/def/nil/OGC/0/missing':
                 g.add((this_sample, SAMFL.samplingTime, Literal(self.date_acquired.isoformat(), datatype=XSD.datetime)))
+
             # TODO: represent Public/Private (and other?) access methods in DB, add to terms in vocab?
             g.add((this_sample, DCT.accessRights, URIRef(TERM_LOOKUP['access']['Public'])))
             # TODO: make a register of Entities
-            if self.entity_uri is not None:
+            if self.entity_uri != 'http://www.opengis.net/def/nil/OGC/0/missing':
                 this_parent = URIRef(self.entity_uri)
             else:
                 # TODO: get a real parent URL
-                this_parent = URIRef('http://fake.com')
+                this_parent = URIRef('http://www.opengis.net/def/nil/OGC/0/missing')
 
             g.add((this_sample, SAMFL.relatedSamplingFeature, this_parent))  # could be OM.featureOfInterest
 
