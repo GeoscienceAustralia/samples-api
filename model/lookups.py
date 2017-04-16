@@ -28,42 +28,6 @@ def get_feature_of_interest_types():
 if __name__ == '__main__':
     print get_feature_of_interest_types()
 
-FEATURE_OF_INTEREST_TYPES = [
-    'http://pid.geoscience.gov.au/def/voc/featureofinteresttype/aceragerelease',
-    'http://pid.geoscience.gov.au/def/voc/featureofinteresttype/borehole',
-    'http://pid.geoscience.gov.au/def/voc/featureofinteresttype/country',
-    'http://pid.geoscience.gov.au/def/voc/featureofinteresttype/drillhole',
-    'http://pid.geoscience.gov.au/def/voc/featureofinteresttype/emitter',
-    'http://pid.geoscience.gov.au/def/voc/featureofinteresttype/essci',
-    'http://pid.geoscience.gov.au/def/voc/featureofinteresttype/estuary',
-    'http://pid.geoscience.gov.au/def/voc/featureofinteresttype/explorationpermit',
-    'http://pid.geoscience.gov.au/def/voc/featureofinteresttype/facies',
-    'http://pid.geoscience.gov.au/def/voc/featureofinteresttype/fieldsite',
-    'http://pid.geoscience.gov.au/def/voc/featureofinteresttype/mapsheet',
-    'http://pid.geoscience.gov.au/def/voc/featureofinteresttype/marsegment',
-    'http://pid.geoscience.gov.au/def/voc/featureofinteresttype/mineraldeposit',
-    'http://pid.geoscience.gov.au/def/voc/featureofinteresttype/mineralisedzone',
-    'http://pid.geoscience.gov.au/def/voc/featureofinteresttype/mineralproject',
-    'http://pid.geoscience.gov.au/def/voc/featureofinteresttype/observatory',
-    'http://pid.geoscience.gov.au/def/voc/featureofinteresttype/pipeline',
-    'http://pid.geoscience.gov.au/def/voc/featureofinteresttype/placename',
-    'http://pid.geoscience.gov.au/def/voc/featureofinteresttype/politicalregion',
-    'http://pid.geoscience.gov.au/def/voc/featureofinteresttype/port',
-    'http://pid.geoscience.gov.au/def/voc/featureofinteresttype/powerstation',
-    'http://pid.geoscience.gov.au/def/voc/featureofinteresttype/productionlicense',
-    'http://pid.geoscience.gov.au/def/voc/featureofinteresttype/project',
-    'http://pid.geoscience.gov.au/def/voc/featureofinteresttype/province',
-    'http://pid.geoscience.gov.au/def/voc/featureofinteresttype/resourceprocessingplant',
-    'http://pid.geoscience.gov.au/def/voc/featureofinteresttype/resourceproject',
-    'http://pid.geoscience.gov.au/def/voc/featureofinteresttype/retentionlease',
-    'http://pid.geoscience.gov.au/def/voc/featureofinteresttype/section',
-    'http://pid.geoscience.gov.au/def/voc/featureofinteresttype/seismicline',
-    'http://pid.geoscience.gov.au/def/voc/featureofinteresttype/state',
-    'http://pid.geoscience.gov.au/def/voc/featureofinteresttype/survey',
-    'http://pid.geoscience.gov.au/def/voc/featureofinteresttype/well',
-    'http://pid.geoscience.gov.au/def/voc/featureofinteresttype/wildcatlocation'
-]
-
 TERM_LOOKUP = {
     'access': {
         'Public': 'http://pid.geoscience.gov.au/def/voc/igsn-codelists/Public',
@@ -794,10 +758,39 @@ TERM_LOOKUP = {
         'dolomite carbonatite': 'http://resource.geosciml.org/classifier/cgi/lithology/carbonatite'
     },
     'entity_type': {
-        'BOREHOLE': 'http://pid.geoscience.gov.au/def/voc/featureofinteresttype/borehole',
-        'FIELD SITE': 'http://pid.geoscience.gov.au/def/voc/featureofinteresttype/site',
-        'SURVEY': 'http://pid.geoscience.gov.au/def/voc/featureofinteresttype/survey',
-        'SECTION': 'http://pid.geoscience.gov.au/def/voc/featureofinteresttype/section'
         # see vocab <http://pid.geoscience.gov.au/def/voc/featureofinteresttype>, listed above in F_O_I_TYPE list
+        'ACERAGERELEASE': 'http://pid.geoscience.gov.au/def/voc/featureofinteresttype/aceragerelease',
+        'BOREHOLE': 'http://pid.geoscience.gov.au/def/voc/featureofinteresttype/borehole',
+        'COUNTRY': 'http://pid.geoscience.gov.au/def/voc/featureofinteresttype/country',
+        'DRILLHOLE': 'http://pid.geoscience.gov.au/def/voc/featureofinteresttype/drillhole',
+        'EMITTER': 'http://pid.geoscience.gov.au/def/voc/featureofinteresttype/emitter',
+        'ESSCI': 'http://pid.geoscience.gov.au/def/voc/featureofinteresttype/essci',
+        'ESTUARY': 'http://pid.geoscience.gov.au/def/voc/featureofinteresttype/estuary',
+        'EXPLORATIONPERMIT': 'http://pid.geoscience.gov.au/def/voc/featureofinteresttype/explorationpermit',
+        'FACIES': 'http://pid.geoscience.gov.au/def/voc/featureofinteresttype/facies',
+        'FIELD SITE': 'http://pid.geoscience.gov.au/def/voc/featureofinteresttype/site',
+        'MAPSHEET': 'http://pid.geoscience.gov.au/def/voc/featureofinteresttype/mapsheet',
+        'MARSEGMENT': 'http://pid.geoscience.gov.au/def/voc/featureofinteresttype/marsegment',
+        'MINERALDEPOSIT': 'http://pid.geoscience.gov.au/def/voc/featureofinteresttype/mineraldeposit',
+        'MINERALISEDZONE': 'http://pid.geoscience.gov.au/def/voc/featureofinteresttype/mineralisedzone',
+        'MINERALPROJECT': 'http://pid.geoscience.gov.au/def/voc/featureofinteresttype/mineralproject',
+        'OBSERVATORY': 'http://pid.geoscience.gov.au/def/voc/featureofinteresttype/observatory',
+        'PIPELINE': 'http://pid.geoscience.gov.au/def/voc/featureofinteresttype/pipeline',
+        'PLACENAME': 'http://pid.geoscience.gov.au/def/voc/featureofinteresttype/placename',
+        'POLITICALREGION': 'http://pid.geoscience.gov.au/def/voc/featureofinteresttype/politicalregion',
+        'PORT': 'http://pid.geoscience.gov.au/def/voc/featureofinteresttype/port',
+        'POWERSTATION': 'http://pid.geoscience.gov.au/def/voc/featureofinteresttype/powerstation',
+        'PRODUCTIONLICENSE': 'http://pid.geoscience.gov.au/def/voc/featureofinteresttype/productionlicense',
+        'PROJECT': 'http://pid.geoscience.gov.au/def/voc/featureofinteresttype/project',
+        'PROVINCE': 'http://pid.geoscience.gov.au/def/voc/featureofinteresttype/province',
+        'RESOURCEPROCESSINGPLANT': 'http://pid.geoscience.gov.au/def/voc/featureofinteresttype/resourceprocessingplant',
+        'RESOURCEPROJECT': 'http://pid.geoscience.gov.au/def/voc/featureofinteresttype/resourceproject',
+        'RETENTIONLEASE': 'http://pid.geoscience.gov.au/def/voc/featureofinteresttype/retentionlease',
+        'SECTION': 'http://pid.geoscience.gov.au/def/voc/featureofinteresttype/section',
+        'SEISMICLINE': 'http://pid.geoscience.gov.au/def/voc/featureofinteresttype/seismicline',
+        'STATE': 'http://pid.geoscience.gov.au/def/voc/featureofinteresttype/state',
+        'SURVEY': 'http://pid.geoscience.gov.au/def/voc/featureofinteresttype/survey',
+        'WELL': 'http://pid.geoscience.gov.au/def/voc/featureofinteresttype/well',
+        'WILDCATLOCATION': 'http://pid.geoscience.gov.au/def/voc/featureofinteresttype/wildcatlocation'
     }
 }
