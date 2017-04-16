@@ -1,4 +1,5 @@
 from lxml import etree
+from lxml import objectify
 from rdflib import Graph, URIRef, RDF, RDFS, XSD, Namespace, Literal, BNode
 from StringIO import StringIO
 import requests
@@ -7,6 +8,7 @@ from datetime import datetime
 from ldapi import LDAPI
 from flask import Response, render_template
 from lookups import TERM_LOOKUP
+import settings
 
 
 class Sample:
@@ -42,7 +44,6 @@ class Sample:
     URI_GA = 'http://pid.geoscience.gov.au/org/ga'
 
     def __init__(self, oracle_api_samples_url, igsn, xml=None):
-        self.oracle_api_samples_url = oracle_api_samples_url
         self.igsn = igsn
         self.sample_id = None
         self.sample_type = None
@@ -78,13 +79,9 @@ class Sample:
         self.date_modified = None
         self.modified_datestamp = None
         self.sample_no = None
-        self.wkt = None
-        self.ga = URIRef(Sample.URI_GA)
-        # populate all instance variables from API
-        # TODO: lazy load this, i.e. only populate if a view that need populating is loaded which is every view except for Alternates
 
-        if oracle_api_samples_url is None:
-            self._populate_from_xml_file(xml)
+        if xml is not None:  # even if there are values for Oracle API URI and IGSN, load from XML file if present
+            self._populate_from_xml_file(open(xml).read())
         else:
             self._populate_from_oracle_api()
 
@@ -142,13 +139,13 @@ class Sample:
         # internal URI
         # os.environ['NO_PROXY'] = 'ga.gov.au'
         # call API
-        r = requests.get(self.oracle_api_samples_url.format(self.igsn))
+        r = requests.get(settings.XML_API_URL_SAMPLE.format(self.igsn))
         # deal with missing XML declaration
         if "No data" in r.content:
             raise ParameterError('No Data')
 
         if self.validate_xml(r.content):
-            self._populate_from_xml_file(StringIO(r.content))
+            self._populate_from_xml_file(r.content)
             return True
         else:
             return False
@@ -160,166 +157,221 @@ class Sample:
         :param xml: XML according to GA's Oracle XML API from the Samples DB
         :return: None
         """
-        # iterate through the elements in the XML element tree and handle each
-        for event, elem in etree.iterparse(xml):
-            '''
-            <ROWSET>
-             <ROW>
-              <IGSN>AU2648696</IGSN>
-              <SAMPLEID>1905_50252</SAMPLEID>
-              <SAMPLE_TYPE_NEW/>
-              <SAMPLING_METHOD/>
-              <MATERIAL_CLASS/>
-              <SAMPLE_MIN_LONGITUDE/>
-              <SAMPLE_MAX_LONGITUDE/>
-              <SAMPLE_MIN_LATITUDE/>
-              <SAMPLE_MAX_LATITUDE/>
-              <GEOM>
-               <SDO_GTYPE>3001</SDO_GTYPE>
-               <SDO_SRID>8311</SDO_SRID>
-               <SDO_POINT>
-                <X>143.43508333</X>
-                <Y>-26.94486389</Y>
-                <Z>219.453</Z>
-               </SDO_POINT>
-               <SDO_ELEM_INFO/>
-               <SDO_ORDINATES/>
-              </GEOM>
-              <STATEID>QLD</STATEID>
-              <COUNTRY>AUS</COUNTRY>
-              <TOP_DEPTH>843</TOP_DEPTH>
-              <BASE_DEPTH>868</BASE_DEPTH>
-              <STRATNAME/>
-              <AGE/>
-              <REMARK/>
-              <LITHNAME/>
-              <ACQUIREDATE/>
-              <ENTITY_TYPE>BOREHOLE</ENTITY_TYPE>
-              <ENTITYID>TALGEBERRY 4</ENTITYID>
-              <HOLE_MIN_LONGITUDE>143.43508333</HOLE_MIN_LONGITUDE>
-              <HOLE_MAX_LONGITUDE/>
-              <HOLE_MIN_LATITUDE>-26.94486389</HOLE_MIN_LATITUDE>
-              <HOLE_MAX_LATITUDE/>
-              <LOADEDDATE>10-NOV-16</LOADEDDATE>
-              <SAMPLENO>2648696</SAMPLENO>
-              <ENO>15846</ENO>
-             </ROW>
-            </ROWSET>
-            '''
-            if elem.tag == "IGSN":
-                self.igsn = elem.text
-            elif elem.tag == "SAMPLEID":
-                self.sample_id = elem.text
-            elif elem.tag == "SAMPLE_TYPE_NEW":
-                if elem.text is not None:
-                    self.sample_type = TERM_LOOKUP['sample_type'].get(elem.text)
-                    if self.sample_type is None:
-                        self.sample_type = Sample.URI_MISSSING
-            elif elem.tag == "SAMPLING_METHOD":
-                if elem.text is not None:
-                    self.method_type = TERM_LOOKUP['method_type'].get(elem.text)
-                    if self.method_type is None:
-                        self.method_type = Sample.URI_MISSSING
-            elif elem.tag == "MATERIAL_CLASS":
-                if elem.text is not None:
-                    self.material_type = TERM_LOOKUP['material_type'].get(elem.text)
-                    if self.material_type is None:
-                        self.material_type = Sample.URI_MISSSING
-            elif elem.tag == "SAMPLE_MIN_LONGITUDE":
-                if elem.text is not None:
-                    self.long_min = elem.text
-            elif elem.tag == "SAMPLE_MAX_LONGITUDE":
-                if elem.text is not None:
-                    self.long_max = elem.text
-            elif elem.tag == "SAMPLE_MIN_LATITUDE":
-                if elem.text is not None:
-                    self.lat_min = elem.text
-            elif elem.tag == "SAMPLE_MAX_LATITUDE":
-                if elem.text is not None:
-                    self.lat_max = elem.text
-            elif elem.tag == "SDO_GTYPE":
-                if elem.text is not None:
-                    self.gtype = elem.text
-            elif elem.tag == "SDO_SRID":
-                if elem.text is not None:
-                    self.srid = elem.text
-            elif elem.tag == "X":
-                if elem.text is not None:
-                    self.x = elem.text
-            elif elem.tag == "Y":
-                if elem.text is not None:
-                    self.y = elem.text
-            elif elem.tag == "Z":
-                if elem.text is not None:
-                    self.z = elem.text
-            elif elem.tag == "SDO_ELEM_INFO":
-                if elem.text is not None:
-                    self.elem_info = elem.text
-            elif elem.tag == "SDO_ORDINATES":
-                if elem.text is not None:
-                    self.ordinates = elem.text
-            elif elem.tag == "STATEID":
-                if elem.text is not None:
-                    self.state = TERM_LOOKUP['state'].get(elem.text)
-                    if self.state is None:
-                        self.state = Sample.URI_MISSSING
-            elif elem.tag == "COUNTRY":
-                if elem.text is not None:
-                    self.country = TERM_LOOKUP['country'].get(elem.text)
-                    if self.country is None:
-                        self.country = Sample.URI_MISSSING
-            elif elem.tag == "TOP_DEPTH":
-                if elem.text is not None:
-                    self.depth_top = elem.text
-            elif elem.tag == "BASE_DEPTH":
-                if elem.text is not None:
-                    self.depth_base = elem.text
-            elif elem.tag == "STRATNAME":
-                if elem.text is not None:
-                    self.strath = elem.text
-            elif elem.tag == "AGE":
-                if elem.text is not None:
-                    self.age = elem.text
-            elif elem.tag == "REMARK":
-                if elem.text:
-                    self.remark = elem.text
-            elif elem.tag == "LITHNAME":
-                if elem.text is not None:
-                    self.lith = TERM_LOOKUP['lith'].get(elem.text)
-                    if self.lith is None:
-                        self.lith = Sample.URI_MISSSING
-            elif elem.tag == "ACQUIREDATE":
-                if elem.text is not None:
-                    self.date_acquired = str2datetime(elem.text)
-                else:
-                    self.date_acquired = Sample.URI_MISSSING
-            elif elem.tag == "ENO":
-                if elem.text is not None:
-                    self.entity_uri = 'http://pid.geoscience.gov.au/site/' + elem.text
-            elif elem.tag == "ENTITYID":
-                if elem.text is not None:
-                    self.entity_name = elem.text
-            elif elem.tag == "ENTITY_TYPE":
-                if elem.text is not None:
-                    self.entity_type = elem.text
-            elif elem.tag == "HOLE_MIN_LONGITUDE":
-                if elem.text is not None:
-                    self.hole_long_min = elem.text
-            elif elem.tag == "HOLE_MAX_LONGITUDE":
-                if elem.text is not None:
-                    self.hole_long_max = elem.text
-            elif elem.tag == "HOLE_MIN_LATITUDE":
-                if elem.text is not None:
-                    self.hole_lat_min = elem.text
-            elif elem.tag == "HOLE_MAX_LATITUDE":
-                if elem.text is not None:
-                    self.hole_lat_max = elem.text
-            elif elem.tag == "MODIFIED_DATE":
-                self.date_modified = str2datetime(elem.text)
-            elif elem.tag == "SAMPLENO":
-                if elem.text is not None:
-                    self.sample_no = elem.text
-        self.modified_datestamp = datetime_to_datestamp(self.date_modified)
+        try:
+            root = objectify.fromstring(xml)
+
+            self.igsn = root.ROW.IGSN
+            self.sample_id = root.ROW.SAMPLEID
+            self.sample_type = TERM_LOOKUP['sample_type'].get(root.ROW.SAMPLE_TYPE_NEW)
+            if self.sample_type is None:
+                self.sample_type = Sample.URI_MISSSING
+            self.method_type = TERM_LOOKUP['method_type'].get(root.ROW.SAMPLING_METHOD)
+            if self.method_type is None:
+                self.method_type = Sample.URI_MISSSING
+            self.material_type = TERM_LOOKUP['material_type'].get(root.ROW.MATERIAL_CLASS)
+            if self.material_type is None:
+                self.material_type = Sample.URI_MISSSING
+            # self.long_min = root.ROW.SAMPLE_MIN_LONGITUDE
+            # self.long_max = root.ROW.SAMPLE_MAX_LONGITUDE
+            # self.lat_min = root.ROW.SAMPLE_MIN_LATITUDE
+            # self.lat_max = root.ROW.SAMPLE_MAX_LATITUDE
+            self.gtype = root.ROW.GEOM.SDO_GTYPE
+            self.srid = root.ROW.GEOM.SDO_SRID
+            self.x = root.ROW.GEOM.SDO_POINT.X
+            self.y = root.ROW.GEOM.SDO_POINT.Y
+            self.z = root.ROW.GEOM.SDO_POINT.Z
+            self.elem_info = root.ROW.GEOM.SDO_ELEM_INFO
+            self.ordinates = root.ROW.GEOM.SDO_ORDINATES
+            self.state = TERM_LOOKUP['state'].get(root.ROW.STATEID)
+            if self.state is None:
+                self.state = Sample.URI_MISSSING
+            self.country = root.ROW.COUNTRY
+            self.depth_top = root.ROW.TOP_DEPTH
+            self.depth_base = root.ROW.BASE_DEPTH
+            self.strath = root.ROW.STRATNAME
+            self.age = root.ROW.AGE
+            self.remark = root.ROW.REMARK
+            self.lith = TERM_LOOKUP['lith'].get(root.ROW.LITHNAME)
+            if self.lith is None:
+                self.lith = Sample.URI_MISSSING
+            if root.ROW.ACQUIREDATE != '':
+                 self.date_acquired = str2datetime(root.ROW.ACQUIREDATE).date()
+            else:
+                 self.date_acquired = datetime(1990, 1, 1).date()
+            self.entity_uri = 'http://pid.geoscience.gov.au/site/' + str(root.ROW.ENO) if root.ROW.ENO is not None else None
+            self.entity_name = root.ROW.ENTITYID
+            self.entity_type = TERM_LOOKUP['entity_type'].get(root.ROW.ENTITY_TYPE)
+            self.hole_long_min = root.ROW.HOLE_MIN_LONGITUDE
+            self.hole_long_max = root.ROW.HOLE_MAX_LONGITUDE
+            self.hole_lat_min = root.ROW.HOLE_MIN_LATITUDE
+            self.hole_lat_max = root.ROW.HOLE_MAX_LATITUDE
+            # self.date_modified = None
+            # self.modified_datestamp = None
+            self.sample_no = root.ROW.SAMPLENO
+            # TODO: replace all the other calles to this with a call to self.wkt instead
+            # self.wkt = self._generate_sample_wkt()
+        except Exception as e:
+            print(e)
+
+        # # iterate through the elements in the XML element tree and handle each
+        # for event, elem in etree.iterparse(xml):
+        #     '''
+        #     <ROWSET>
+        #      <ROW>
+        #       <IGSN>AU2648696</IGSN>
+        #       <SAMPLEID>1905_50252</SAMPLEID>
+        #       <SAMPLE_TYPE_NEW/>
+        #       <SAMPLING_METHOD/>
+        #       <MATERIAL_CLASS/>
+        #       <SAMPLE_MIN_LONGITUDE/>
+        #       <SAMPLE_MAX_LONGITUDE/>
+        #       <SAMPLE_MIN_LATITUDE/>
+        #       <SAMPLE_MAX_LATITUDE/>
+        #       <GEOM>
+        #        <SDO_GTYPE>3001</SDO_GTYPE>
+        #        <SDO_SRID>8311</SDO_SRID>
+        #        <SDO_POINT>
+        #         <X>143.43508333</X>
+        #         <Y>-26.94486389</Y>
+        #         <Z>219.453</Z>
+        #        </SDO_POINT>
+        #        <SDO_ELEM_INFO/>
+        #        <SDO_ORDINATES/>
+        #       </GEOM>
+        #       <STATEID>QLD</STATEID>
+        #       <COUNTRY>AUS</COUNTRY>
+        #       <TOP_DEPTH>843</TOP_DEPTH>
+        #       <BASE_DEPTH>868</BASE_DEPTH>
+        #       <STRATNAME/>
+        #       <AGE/>
+        #       <REMARK/>
+        #       <LITHNAME/>
+        #       <ACQUIREDATE/>
+        #       <ENTITY_TYPE>BOREHOLE</ENTITY_TYPE>
+        #       <ENTITYID>TALGEBERRY 4</ENTITYID>
+        #       <HOLE_MIN_LONGITUDE>143.43508333</HOLE_MIN_LONGITUDE>
+        #       <HOLE_MAX_LONGITUDE/>
+        #       <HOLE_MIN_LATITUDE>-26.94486389</HOLE_MIN_LATITUDE>
+        #       <HOLE_MAX_LATITUDE/>
+        #       <LOADEDDATE>10-NOV-16</LOADEDDATE>
+        #       <SAMPLENO>2648696</SAMPLENO>
+        #       <ENO>15846</ENO>
+        #      </ROW>
+        #     </ROWSET>
+        #     '''
+        #     if elem.tag == "IGSN":
+        #         self.igsn = elem.text
+        #     elif elem.tag == "SAMPLEID":
+        #         self.sample_id = elem.text
+        #     elif elem.tag == "SAMPLE_TYPE_NEW":
+        #         if elem.text is not None:
+        #             self.sample_type = TERM_LOOKUP['sample_type'].get(elem.text)
+        #             if self.sample_type is None:
+        #                 self.sample_type = Sample.URI_MISSSING
+        #     elif elem.tag == "SAMPLING_METHOD":
+        #         if elem.text is not None:
+        #             self.method_type = TERM_LOOKUP['method_type'].get(elem.text)
+        #             if self.method_type is None:
+        #                 self.method_type = Sample.URI_MISSSING
+        #     elif elem.tag == "MATERIAL_CLASS":
+        #         if elem.text is not None:
+        #             self.material_type = TERM_LOOKUP['material_type'].get(elem.text)
+        #             if self.material_type is None:
+        #                 self.material_type = Sample.URI_MISSSING
+        #     elif elem.tag == "SAMPLE_MIN_LONGITUDE":
+        #         if elem.text is not None:
+        #             self.long_min = elem.text
+        #     elif elem.tag == "SAMPLE_MAX_LONGITUDE":
+        #         if elem.text is not None:
+        #             self.long_max = elem.text
+        #     elif elem.tag == "SAMPLE_MIN_LATITUDE":
+        #         if elem.text is not None:
+        #             self.lat_min = elem.text
+        #     elif elem.tag == "SAMPLE_MAX_LATITUDE":
+        #         if elem.text is not None:
+        #             self.lat_max = elem.text
+        #     elif elem.tag == "SDO_GTYPE":
+        #         if elem.text is not None:
+        #             self.gtype = elem.text
+        #     elif elem.tag == "SDO_SRID":
+        #         if elem.text is not None:
+        #             self.srid = elem.text
+        #     elif elem.tag == "X":
+        #         if elem.text is not None:
+        #             self.x = elem.text
+        #     elif elem.tag == "Y":
+        #         if elem.text is not None:
+        #             self.y = elem.text
+        #     elif elem.tag == "Z":
+        #         if elem.text is not None:
+        #             self.z = elem.text
+        #     elif elem.tag == "SDO_ELEM_INFO":
+        #         if elem.text is not None:
+        #             self.elem_info = elem.text
+        #     elif elem.tag == "SDO_ORDINATES":
+        #         if elem.text is not None:
+        #             self.ordinates = elem.text
+        #     elif elem.tag == "STATEID":
+        #         if elem.text is not None:
+        #             self.state = TERM_LOOKUP['state'].get(elem.text)
+        #             if self.state is None:
+        #                 self.state = Sample.URI_MISSSING
+        #     elif elem.tag == "COUNTRY":
+        #         if elem.text is not None:
+        #             self.country = TERM_LOOKUP['country'].get(elem.text)
+        #             if self.country is None:
+        #                 self.country = Sample.URI_MISSSING
+        #     elif elem.tag == "TOP_DEPTH":
+        #         if elem.text is not None:
+        #             self.depth_top = elem.text
+        #     elif elem.tag == "BASE_DEPTH":
+        #         if elem.text is not None:
+        #             self.depth_base = elem.text
+        #     elif elem.tag == "STRATNAME":
+        #         if elem.text is not None:
+        #             self.strath = elem.text
+        #     elif elem.tag == "AGE":
+        #         if elem.text is not None:
+        #             self.age = elem.text
+        #     elif elem.tag == "REMARK":
+        #         if elem.text:
+        #             self.remark = elem.text
+        #     elif elem.tag == "LITHNAME":
+        #         if elem.text is not None:
+        #             self.lith = TERM_LOOKUP['lith'].get(elem.text)
+        #             if self.lith is None:
+        #                 self.lith = Sample.URI_MISSSING
+        #     elif elem.tag == "ACQUIREDATE":
+        #         if elem.text is not None:
+        #             self.date_acquired = str2datetime(elem.text)
+        #         else:
+        #             self.date_acquired = Sample.URI_MISSSING
+        #     elif elem.tag == "ENO":
+        #         if elem.text is not None:
+        #             self.entity_uri = 'http://pid.geoscience.gov.au/site/' + elem.text
+        #     elif elem.tag == "ENTITYID":
+        #         if elem.text is not None:
+        #             self.entity_name = elem.text
+        #     elif elem.tag == "ENTITY_TYPE":
+        #         if elem.text is not None:
+        #             self.entity_type = elem.text
+        #     elif elem.tag == "HOLE_MIN_LONGITUDE":
+        #         if elem.text is not None:
+        #             self.hole_long_min = elem.text
+        #     elif elem.tag == "HOLE_MAX_LONGITUDE":
+        #         if elem.text is not None:
+        #             self.hole_long_max = elem.text
+        #     elif elem.tag == "HOLE_MIN_LATITUDE":
+        #         if elem.text is not None:
+        #             self.hole_lat_min = elem.text
+        #     elif elem.tag == "HOLE_MAX_LATITUDE":
+        #         if elem.text is not None:
+        #             self.hole_lat_max = elem.text
+        #     # elif elem.tag == "MODIFIED_DATE":
+        #     #     self.date_modified = str2datetime(elem.text)
+        #     # elif elem.tag == "SAMPLENO":
+        #     #     if elem.text is not None:
+        #     #         self.sample_no = elem.text
 
         return True
 
@@ -694,7 +746,7 @@ class Sample:
             date=self.date_acquired,
             type=self.sample_type,
             format=self.material_type,
-            wkt='POINT' + self._generate_sample_wkt().split('POINT')[1],  # gml = self._generate_sample_gml()
+            wkt='wkt',  #'POINT' + self._generate_sample_wkt().split('POINT')[1],  # gml = self._generate_sample_gml()
             creator='Geoscience Australia',
             publisher='Geoscience Australia'
         )
@@ -759,8 +811,8 @@ class Sample:
                 description=self.remark,
                 date_acquired=self.date_acquired,
                 sample_type=self.sample_type,
-                wkt='POINT' + self._generate_sample_wkt().split('POINT')[1],
-                sampling_feature=TERM_LOOKUP['entity_type'][self.entity_type],
+                wkt='WKT',  # ''POINT' + self._generate_sample_wkt().split('POINT')[1],
+                sampling_feature=self.entity_type,
                 method_type=self.method_type,
                 material_type=self.material_type
             )
@@ -812,8 +864,44 @@ class ParameterError(ValueError):
     pass
 
 if __name__ == '__main__':
-    s = Sample('http://fake.com', 'AU100')
-    print s.export_dc_xml()
+    s = Sample(None, None, xml='c:/work/samples-api/test/static_data/AU239.xml')
+    # print s.igsn
+    # print s.sample_id
+    # print 'sample_type ' + s.sample_type
+    # print 'method_type ' + s.method_type
+    # print 'material_type ' + s.material_type
+    # # print 'long_min ' + s.long_min
+    # # print 'long_max ' + s.long_max
+    # # print 'lat_min ' + s.lat_min
+    # # print 'lat_max ' + s.lat_max
+    # print 'gtype ' + str(s.gtype)
+    # print 'srid ' + str(s.srid)
+    # print 'x ' + str(s.x)
+    # print 'y ' + str(s.y)
+    # print 'z ' + str(s.z)
+    # print 'elem_info ' + s.elem_info
+    # print 'ordinates ' + s.ordinates
+    # print 'state ' + s.state
+    # print 'country ' + s.country
+    # print 'depth_top ' + str(s.depth_top)
+    # print 'depth_base ' + str(s.depth_base)
+    # print 'strath ' + s.strath
+    # print 'age ' + s.age
+    # print 'remark ' + s.remark
+    # print 'lith ' + s.lith
+    # print 'date_acquired ' + s.date_acquired.isoformat()
+    # print 'entity_uri ' + s.entity_uri
+    # print 'entity_name ' + s.entity_name
+    # print 'entity_type ' + s.entity_type
+    # print 'hole_long_min ' + str(s.hole_long_min)
+    # print 'hole_long_max ' + str(s.hole_long_max)
+    # print 'hole_lat_min ' + str(s.hole_lat_min)
+    # print 'hole_lat_max ' + str(s.hole_lat_max)
+    # print 'sample_no ' + str(s.sample_no)
+    s.export_rdf()
+
+    # s = Sample('http://dbforms.ga.gov.au/www_distp/a.igsn_api.get_igsnSample?pIGSN={0}', 'AU239')
+    # print s.igsn
 
     # print s.is_xml_export_valid(open('../test/sample_eg3_IGSN_schema.xml').read())
     # print s.export_as_igsn_xml()
