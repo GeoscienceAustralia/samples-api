@@ -2,6 +2,7 @@ import datetime
 
 # taken from https://github.com/infrae/pyoai/blob/master/src/oaipmh/datestamp.py
 
+
 def datetime_to_datestamp(dt, day_granularity=False):
     assert dt.tzinfo is None  # only accept timezone naive datetimes
     # ignore microseconds
@@ -85,10 +86,11 @@ def tolerant_datestamp_to_datetime(datestamp):
     return datetime.datetime(
         int(YYYY), int(MM), int(DD), int(hh), int(mm), int(ss))
 
+
 def str2datetime(datetime_string):
-    '''
+    """
     Helper function to convert a date string to a datetime
-    '''
+    """
     datetime_format_list = ['%Y-%m-%d %H:%M:%S',
                             '%Y-%m-%dT%H:%M:%S',
                             '%Y-%m-%dT%H:%M:%S%Z',
@@ -110,6 +112,7 @@ def str2datetime(datetime_string):
 
     return date_time
 
+
 def convert_datestamp_to_oracle(datestamp):
     """
     convert an OAI-PMH format datestamp into the date format
@@ -122,6 +125,7 @@ def convert_datestamp_to_oracle(datestamp):
         return oracle_api_date
     except ValueError:
         raise DatestampError(datestamp)
+
 
 # errors not defined by OAI-PMH but which can occur in a client when
 # the server is somehow misbehaving
