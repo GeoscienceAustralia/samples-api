@@ -162,6 +162,7 @@ class Sample:
 
             self.igsn = root.ROW.IGSN
             self.sample_id = root.ROW.SAMPLEID
+            self.sample_no = root.ROW.SAMPLENO
             self.sample_type = TERM_LOOKUP['sample_type'].get(root.ROW.SAMPLE_TYPE_NEW)
             if self.sample_type is None:
                 self.sample_type = Sample.URI_MISSSING
@@ -195,19 +196,18 @@ class Sample:
             if self.lith is None:
                 self.lith = Sample.URI_MISSSING
             if root.ROW.ACQUIREDATE != '':
-                 self.date_acquired = str2datetime(root.ROW.ACQUIREDATE).date()
+                self.date_acquired = str2datetime(root.ROW.ACQUIREDATE).date()
             else:
-                 self.date_acquired = datetime(1990, 1, 1).date()
+                self.date_acquired = datetime(1990, 1, 1).date()
             self.entity_uri = 'http://pid.geoscience.gov.au/site/' + str(root.ROW.ENO) if root.ROW.ENO is not None else None
             self.entity_name = root.ROW.ENTITYID
             self.entity_type = TERM_LOOKUP['entity_type'].get(root.ROW.ENTITY_TYPE)
-            self.hole_long_min = root.ROW.HOLE_MIN_LONGITUDE
-            self.hole_long_max = root.ROW.HOLE_MAX_LONGITUDE
-            self.hole_lat_min = root.ROW.HOLE_MIN_LATITUDE
-            self.hole_lat_max = root.ROW.HOLE_MAX_LATITUDE
+            self.hole_long_min = root.ROW.HOLE_MIN_LONGITUDE if root.ROW.HOLE_MIN_LONGITUDE != '' else None
+            self.hole_long_max = root.ROW.HOLE_MAX_LONGITUDE if root.ROW.HOLE_MAX_LONGITUDE != '' else None
+            self.hole_lat_min = root.ROW.HOLE_MIN_LATITUDE if root.ROW.HOLE_MIN_LATITUDE != '' else None
+            self.hole_lat_max = root.ROW.HOLE_MAX_LATITUDE if root.ROW.HOLE_MAX_LATITUDE != '' else None
             # self.date_modified = None
             # self.modified_datestamp = None
-            self.sample_no = root.ROW.SAMPLENO
             # TODO: replace all the other calles to this with a call to self.wkt instead
             # self.wkt = self._generate_sample_wkt()
         except Exception as e:
@@ -377,26 +377,10 @@ class Sample:
 
     def _generate_sample_wkt(self):
         if self.z is not None:
-            # wkt = "SRID=" + self.srid + ";POINTZ(" + self.x + " " + self.y + " " + self.z + ")"
-            wkt = "<https://epsg.io/" + self.srid + "> " \
-                  "POINTZ(" + self.x + " " + self.y + " " + self.z + ")"
+            wkt = 'SRID={};POINTZ({} {} {})'.format(self.srid, self.x, self.y, self.z)
         else:
-            # wkt = "SRID=" + self.srid + ";POINT(" + self.x + " " + self.y + ")"
             if self.srid is not None and self.x is not None and self.y is not None:
-                wkt = "<https://epsg.io/" + self.srid + "> POINT(" + self.x + " " + self.y + ")"
-            else:
-                wkt = ''
-
-        return wkt
-
-    def _generate_sample_wkt_csirov3_xml(self):
-        if self.z is not None:
-            # wkt = "SRID=" + self.srid + ";POINTZ(" + self.x + " " + self.y + " " + self.z + ")"
-            wkt = "POINTZ(" + self.x + " " + self.y + " " + self.z + ")"
-        else:
-            # wkt = "SRID=" + self.srid + ";POINT(" + self.x + " " + self.y + ")"
-            if self.srid is not None and self.x is not None and self.y is not None:
-                wkt = "POINT(" + self.x + " " + self.y + ")"
+                wkt = 'SRID={};POINT({} {} {})'.format(self.srid, self.x, self.y)
             else:
                 wkt = ''
 
@@ -404,34 +388,66 @@ class Sample:
 
     def _generate_sample_gml(self):
         if self.z is not None:
-            gml = '<gml:Point srsDimension="3" srsName="https://epsg.io/' + self.srid + '">' \
-                  '<gml:pos>' + self.x + ' ' + self.y + ' ' + self.z + '</gml:pos>' \
-                  '</gml:Point>'
+            gml = '<gml:Point srsDimension="3" srsName="https://epsg.io/{}">' \
+                  '<gml:pos>{} {} {}</gml:pos>' \
+                  '</gml:Point>'.format(self.srid, self.x, self.y, self.z)
         else:
             if self.srid is not None and self.x is not None and self.y is not None:
-                gml = '<gml:Point srsDimension="2" srsName="https://epsg.io/' + self.srid + '">' \
-                      '<gml:pos>' + self.x + ' ' + self.y + '</gml:pos>' \
-                      '</gml:Point>'
+                gml = '<gml:Point srsDimension="2" srsName="https://epsg.io/{}">' \
+                      '<gml:pos>{} {}</gml:pos>' \
+                      '</gml:Point>'.format(self.srid, self.x, self.y)
             else:
                 gml = ''
 
         return gml
 
     def _generate_parent_wkt(self):
-        # TODO: add support for geometries other than Point
-        if self.srid is not None and self.x is not None and self.y is not None:
-            wkt = "<https://epsg.io/" + self.srid + ">POINT(" + self.hole_long_min + " " + self.hole_lat_min + ")"
+        if self.hole_long_min is not None and self.hole_long_max is not None:
+            coordinates = {
+                'srid': self.srid,
+                'long_min': self.hole_long_min,
+                'long_max': self.hole_long_max,
+                'lat_min': self.hole_lat_min,
+                'lat_max': self.hole_lat_max
+            }
+            wkt = 'SRID={srid};POLYGON(({long_min} {lat_max}, {long_max} {lat_max}, {long_max} {lat_min}, {long_max} {lat_min}, {long_min} {lat_max}))'.format(**coordinates)
+        elif self.hole_long_min is not None:
+            coordinates = {
+                'srid': self.srid,
+                'long_min': self.hole_long_min,
+                'lat_min': self.hole_lat_min
+            }
+            wkt = 'SRID={srid};POINT({long_min} {lat_min})'.format(**coordinates)
         else:
             wkt = ''
 
         return wkt
 
     def _generate_parent_gml(self):
-        # TODO: add support for geometries other than Point
-        if self.srid is not None and self.x is not None and self.y is not None:
-            gml = '<gml:Point srsDimension="2" srsName="https://epsg.io/' + \
-                  self.srid + '"><gml:pos>' + self.hole_long_min + ' ' + self.hole_lat_min + '</gml:pos>' \
-                  '</gml:Point>'
+        if self.hole_long_min is not None and self.hole_long_max is not None:
+            coordinates = {
+                'srid': self.srid,
+                'long_min': self.hole_long_min,
+                'long_max': self.hole_long_max,
+                'lat_min': self.hole_lat_min,
+                'lat_max': self.hole_lat_max
+            }
+            gml = '<ogc:BBOX>'\
+                    '<ogc:PropertyName>ows:BoundingBox</ogc:PropertyName>'\
+                    '<gml:Envelope srsName="https://epsg.io/{srid}">' \
+                        '<gml:upperCorner>{long_min} {lat_max}</gml:upperCorner>' \
+                            '<gml:lowerCorner>{long_max} {lat_min}</gml:lowerCorner>'\
+                    '</gml:Envelope>'\
+                '</ogc:BBOX>'.format(**coordinates)
+        elif self.hole_long_min is not None:
+            coordinates = {
+                'srid': self.srid,
+                'long_min': self.hole_long_min,
+                'lat_min': self.hole_lat_min
+            }
+            gml = '<gml:Point srsDimension="2" srsName="https://epsg.io/{srid}">' \
+                    '<gml:pos>{long_min} {lat_min}</gml:pos>' \
+                  '</gml:Point>'.format(**coordinates)
         else:
             gml = ''
 
@@ -552,7 +568,7 @@ class Sample:
 
         return visjs
 
-    def export_rdf(self, model_view='default', rdf_mime='text/turtle'):
+    def export_rdf(self, model_view='igsn-o', rdf_mime='text/turtle'):
         """
         Exports this instance in RDF, according to a given model from the list of supported models,
         in a given rdflib RDF format
@@ -649,7 +665,7 @@ class Sample:
 
             # parent
             if self.entity_type is not None:
-                g.add((this_parent, RDF.type, URIRef(TERM_LOOKUP['entity_type'][self.entity_type])))
+                g.add((this_parent, RDF.type, URIRef(self.entity_type)))
             else:
                 g.add((
                     this_parent,
@@ -808,10 +824,10 @@ class Sample:
                 'sample_igsn-o.html',
                 igsn=self.igsn,
                 sample_id=self.sample_id,
-                description=self.remark,
-                date_acquired=self.date_acquired,
+                description=self.remark if self.remark != '' else '-',
+                date_acquired=self.date_acquired if self.date_acquired != datetime(1990, 1, 1).date() else '<a href="{}">{}</a>'.format(Sample.URI_MISSSING, Sample.URI_MISSSING.split('/')[-1]),
                 sample_type=self.sample_type,
-                wkt='WKT',  # ''POINT' + self._generate_sample_wkt().split('POINT')[1],
+                wkt=self._generate_sample_wkt(),
                 sampling_feature=self.entity_type,
                 method_type=self.method_type,
                 material_type=self.material_type
@@ -823,13 +839,13 @@ class Sample:
             sample_table_html = render_template(
                 'sample_dc.html',
                 identifier=self.igsn,
-                description=self.remark,
-                date=self.date_acquired,
+                description=self.remark if self.remark != '' else '-',
+                date=self.date_acquired if self.date_acquired != datetime(1990, 1, 1).date() else '<a href="{}">{}</a>'.format(Sample.URI_MISSSING, Sample.URI_MISSSING.split('/')[-1]),
                 type=self.sample_type,
                 format=self.material_type,
-                wkt='POINT' + self._generate_sample_wkt().split('POINT')[1],  # gml = self._generate_sample_gml()
-                creator='Geoscience Australia',
-                publisher='Geoscience Australia'
+                wkt=self._generate_sample_wkt(),
+                creator='<a href="{}">Geoscience Australia</a>'.format(Sample.URI_GA),
+                publisher='<a href="{}">Geoscience Australia</a>'.format(Sample.URI_GA),
             )
 
         elif model_view == 'prov':
@@ -843,10 +859,10 @@ class Sample:
                 prov_turtle=prov_turtle,
             )
 
-        if self.date_acquired is not None and self.date_acquired != Sample.URI_MISSSING:
-            year_acquired = datetime.strftime(self.date_acquired, '%Y')
+        if self.date_acquired != datetime(1990, 1, 1).date():
+            year_acquired = '({})'.format(datetime.strftime(self.date_acquired, '%Y'))
         else:
-            year_acquired = 'XXXX'
+            year_acquired = ''
 
         return render_template(
             'page_sample.html',
@@ -898,7 +914,7 @@ if __name__ == '__main__':
     # print 'hole_lat_min ' + str(s.hole_lat_min)
     # print 'hole_lat_max ' + str(s.hole_lat_max)
     # print 'sample_no ' + str(s.sample_no)
-    s.export_rdf()
+    # print s.export_dc_xml()
 
     # s = Sample('http://dbforms.ga.gov.au/www_distp/a.igsn_api.get_igsnSample?pIGSN={0}', 'AU239')
     # print s.igsn

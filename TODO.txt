@@ -6,3 +6,5 @@
     * https://igsn.csiro.au/igsn30/api/service/30/oai?verb=GetRecord&identifier=IGSN:CSIRO:AU:CSRWA1096&metadataPrefix=cs_igsn
 
 * update online API, send to Victor for testing
+
+* replace _populate_from_xml_file if/else with objectify

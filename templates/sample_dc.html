@@ -5,7 +5,7 @@
     {% if description is not none %}
     <tr><th>Description</th><td>{{ description }}</td></tr>
     {% endif %}
-    <tr><th>Date</th><td>{{ date }}</td></tr>
+    <tr><th>Date</th><td>{{ date|safe }}</td></tr>
     <tr><th>Type</th><td><a href="{{ type }}">{{ type.split('/')[-1] }}</a></td></tr>
     <tr><th>Format</th><td><a href="{{ format }}">{{ format.split('/')[-1] }}</a></td></tr>
     <tr>
@@ -13,9 +13,9 @@
             Coverage<br />
             vertical datum: <a href="https://epsg.io/4283">4283</a>
         </th>
-        <td>SRID=<a href="https://epsg.io/8311">8311</a>;{{ wkt }}</td>
+        <td>{{ wkt }}</td>
     </tr>
-    <tr><th>Creator:</th><td>{{ creator }}</td></tr>
-    <tr><th>Publisher:</th><td>{{ publisher }}</td></tr>
+    <tr><th>Creator:</th><td>{{ creator|safe }}</td></tr>
+    <tr><th>Publisher:</th><td>{{ publisher|safe }}</td></tr>
     <tr><th>Rights:</th><td><a href="https://creativecommons.org/licenses/by/4.0/">Creative Commons 4.0</a></td></tr>
 </table>
