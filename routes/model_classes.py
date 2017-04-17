@@ -3,7 +3,7 @@ This file contains all the HTTP routes for classes from the IGSN model, such as 
 """
 from flask import Blueprint, render_template, request, Response
 import routes_functions
-import settings
+import config
 from ldapi import LDAPI, LdapiParameterError
 from routes import model_classes_functions
 import urllib
@@ -101,12 +101,12 @@ def samples():
                 )
 
             links = []
-            links.append('<{}?per_page={}>; rel="first"'.format(settings.BASE_URI_SAMPLE, per_page))
+            links.append('<{}?per_page={}>; rel="first"'.format(config.BASE_URI_SAMPLE, per_page))
 
             # if this isn't the first page, add a link to "prev"
             if page != 1:
                 links.append('<{}?per_page={}&page={}>; rel="prev"'.format(
-                    settings.BASE_URI_SAMPLE,
+                    config.BASE_URI_SAMPLE,
                     per_page,
                     (page - 1)
                 ))
@@ -128,13 +128,13 @@ def samples():
 
                 # add a link to "next"
                 if page != last_page_no:
-                    links.append('<{}?per_page={}&page={}>; rel="next"'.format(settings.BASE_URI_SAMPLE, per_page, (page + 1)))
+                    links.append('<{}?per_page={}&page={}>; rel="next"'.format(config.BASE_URI_SAMPLE, per_page, (page + 1)))
 
                 # add a link to "last"
-                links.append('<{}?per_page={}&page={}>; rel="last"'.format(settings.BASE_URI_SAMPLE, per_page, last_page_no))
+                links.append('<{}?per_page={}&page={}>; rel="last"'.format(config.BASE_URI_SAMPLE, per_page, last_page_no))
             except:
                 # if there's some error in getting the no of samples, add the "next" link but not the "last" link
-                links.append('<{}?per_page={}&page={}>; rel="next"'.format(settings.BASE_URI_SAMPLE, per_page, (page + 1)))
+                links.append('<{}?per_page={}&page={}>; rel="next"'.format(config.BASE_URI_SAMPLE, per_page, (page + 1)))
 
             headers = {
                 'Link': ', '.join(links)

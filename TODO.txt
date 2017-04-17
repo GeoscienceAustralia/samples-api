@@ -1,10 +1,9 @@
-* relate CSIRO's IGSN XML metadata errors to Victor:
-    * https://igsn.csiro.au/igsn30/api/service/30/oai?verb=GetRecord&identifier=IGSN:CSIRO:AU:CSRWA1096&metadataPrefix=igsn
-        * used the code "URI" for identifierType but the controlled list only permits URL, not URI
-
 * check CSIRO's CSIROv3 metadata issue for schema errors
     * https://igsn.csiro.au/igsn30/api/service/30/oai?verb=GetRecord&identifier=IGSN:CSIRO:AU:CSRWA1096&metadataPrefix=cs_igsn
 
 * update online API, send to Victor for testing
 
-* replace _populate_from_xml_file if/else with objectify
+* move all missing values for data_acquired from != datestamp(1990, 1, 1) to missing URI
+    * this will allow ListIdentifiers and ListRecords to print out <datestamp/>, rather than <datestamp>1990-01-01</datestamp>
+    * and ListRecords & GetRecord igsn to print <igsn:collectionTime/> instead of <igsn:collectionTime>1990-01-01</igsn:collectionTime>, like the dc format already does
+    * and ListRecords & GetRecord csirov3 to print <cs:logDate eventType="registered"/> not <cs:logDate eventType="registered">1990-01-01</cs:logDate>

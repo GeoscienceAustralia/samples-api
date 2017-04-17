@@ -14,7 +14,7 @@ are required.
 To run in test mode:
 
 * just run # python app.py at the command line and adjust settings in
-settings.py appropriately.
+the config module appropriately.
 
 
 ## Production mode
@@ -27,7 +27,7 @@ To run in prod mode:
     * you may need to get the module: # sudo aptitude install libapache2-mod-wsgi
     * # sudo a2enmod wsgi
 * configure the *.wsgi file
-    * igsn-ld-api.wsgi: replace variables ({{}}) with values from settings.py
+    * igsn-ld-api.wsgi: replace variables ({{}}) with values from the config module
 * configure Apache
-    * adapt the file apache.conf with values from settings.py
+    * adapt the file apache.conf with values from config module
    

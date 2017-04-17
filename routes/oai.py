@@ -2,7 +2,7 @@ import datetime
 from flask import Blueprint, render_template, request, make_response, Response
 import oai_functions
 from model.datestamp import datetime_to_datestamp
-import settings
+import config
 oai_ = Blueprint('oai', __name__)
 
 
@@ -96,8 +96,8 @@ def oai():
     elif verb == 'Identify':
         values = {
             'response_date': date_stamp,
-            'admin_email': settings.ADMIN_EMAIL,
-            'base_url': settings.BASE_URI_OAI,
+            'admin_email': config.ADMIN_EMAIL,
+            'base_url': config.BASE_URI_OAI,
             'earliest_date': oai_functions.get_earliest_datestamp()
             }
         template = render_template('oai_identify.xml', values=values)
@@ -114,7 +114,7 @@ def oai():
                 request_args.get('from'),
                 request_args.get('until')
             )
-            request_args['base_uri_oai'] = settings.BASE_URI_OAI
+            request_args['base_uri_oai'] = config.BASE_URI_OAI
             request_args['date_stamp'] = date_stamp
             template = render_template('oai_list_identifiers.xml',
                                        samples=samples,
@@ -141,7 +141,7 @@ def oai():
             'oai_list_metadata_formats.xml',
             identifier=request_args.get('identifier'),
             response_date=date_stamp,
-            base_url=settings.BASE_URI_OAI
+            base_url=config.BASE_URI_OAI
         ), 200
         response = make_response(template)
         response.mimetype = 'text/xml'
@@ -160,7 +160,7 @@ def oai():
             date_stamp = datetime_to_datestamp(dt)
 
             request_args['date_stamp'] = date_stamp
-            request_args['base_uri_oai'] = settings.BASE_URI_OAI
+            request_args['base_uri_oai'] = config.BASE_URI_OAI
             template = render_template('oai_list_records.xml',
                                        datestamp=date_stamp,
                                        metadataPrefix=request_args.get('metadataPrefix'),
@@ -188,7 +188,7 @@ def oai():
         # render_template
         values = {
             'response_date': date_stamp,
-            'base_url': settings.BASE_URI_OAI
+            'base_url': config.BASE_URI_OAI
         }
         template = render_template('oai_list_sets.xml', values=values), 200
         response = make_response(template)

@@ -8,7 +8,7 @@ from datetime import datetime
 from ldapi import LDAPI
 from flask import Response, render_template
 from lookups import TERM_LOOKUP
-import settings
+import config
 
 
 class Sample:
@@ -139,7 +139,7 @@ class Sample:
         # internal URI
         # os.environ['NO_PROXY'] = 'ga.gov.au'
         # call API
-        r = requests.get(settings.XML_API_URL_SAMPLE.format(self.igsn))
+        r = requests.get(config.XML_API_URL_SAMPLE.format(self.igsn))
         # deal with missing XML declaration
         if "No data" in r.content:
             raise ParameterError('No Data')
