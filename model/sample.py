@@ -646,7 +646,7 @@ class Sample:
                 g.add((this_sample, SAMFL.materialClass, URIRef(self.material_type)))
             if self.method_type != 'http://www.opengis.net/def/nil/OGC/0/missing':
                 g.add((this_sample, SAMFL.samplingMethod, URIRef(self.method_type)))
-            if self.date_acquired != 'http://www.opengis.net/def/nil/OGC/0/missing':
+            if self.date_acquired is not None:
                 g.add((this_sample, SAMFL.samplingTime, Literal(self.date_acquired.isoformat(), datatype=XSD.datetime)))
 
             # TODO: represent Public/Private (and other?) access methods in DB, add to terms in vocab?
@@ -759,9 +759,9 @@ class Sample:
             date=self.date_acquired,
             type=self.sample_type,
             format=self.material_type,
-            wkt='wkt',  #'POINT' + self._generate_sample_wkt().split('POINT')[1],  # gml = self._generate_sample_gml()
-            creator='Geoscience Australia',
-            publisher='Geoscience Australia'
+            wkt=self._generate_sample_wkt(),
+            creator='Geoscience Australia ({})'.format(Sample.URI_GA),
+            publisher='Geoscience Australia ({})'.format(Sample.URI_GA),
         )
 
         return template
@@ -777,7 +777,7 @@ class Sample:
             igsn=self.igsn,
             sample_id=self.sample_id,
             description=self.remark,
-            wkt='POINT' + self._generate_sample_wkt().split('POINT')[1],  # gml = self._generate_sample_gml()
+            wkt=self._generate_sample_wkt(),
             sample_type=self.sample_type,
             material_type=self.material_type,
             collection_method=self.method_type,
@@ -799,7 +799,7 @@ class Sample:
             sample_type=self.sample_type,
             material_type=self.material_type,
             method_type=self.method_type,
-            wkt='POINT' + self._generate_sample_wkt().split('POINT')[1],  # kludge to remove EPSG URI,
+            wkt=self._generate_sample_wkt(),
             sample_id=self.sample_id,
             collection_time=self.date_acquired
         )

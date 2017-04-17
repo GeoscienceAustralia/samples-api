@@ -113,7 +113,7 @@ def samples():
 
             # add a link to "next" and "last"
             try:
-                r = requests.get('http://dbforms.ga.gov.au/www_distp/a.igsn_api.get_Number_Modified')
+                r = requests.get(config.XML_API_URL_TOTAL_COUNT)
                 no_of_samples = int(r.content.split('<RECORD_COUNT>')[1].split('</RECORD_COUNT>')[0])
                 last_page_no = int(round(no_of_samples / per_page, 0)) + 1  # same as math.ceil()
 
@@ -140,7 +140,7 @@ def samples():
                 'Link': ', '.join(links)
             }
 
-            return register.RegisterRenderer(request, class_uri, None, page, per_page)\
+            return register.RegisterRenderer(request, class_uri, None, page, per_page, last_page_no)\
                 .render(view, mime_format, extra_headers=headers)
 
     except LdapiParameterError, e:

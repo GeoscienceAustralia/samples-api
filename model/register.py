@@ -9,15 +9,18 @@ import config
 
 
 class RegisterRenderer(Renderer):
-    def __init__(self, request, uri, endpoints, page_no, no_per_page):
+    def __init__(self, request, uri, endpoints, page, per_page, last_page_no):
         Renderer.__init__(self, uri, endpoints)
 
         self.request = request
         self.uri = uri
         self.register = []
         self.g = None
+        self.per_page = per_page
+        self.page = page
+        self.last_page_no = last_page_no
 
-        self._get_details_from_oracle_api(page_no, no_per_page)
+        self._get_details_from_oracle_api(page, per_page)
 
     def render(self, view, mimetype, extra_headers=None):
         if view == 'reg':
@@ -67,15 +70,15 @@ class RegisterRenderer(Renderer):
             print 'not valid xml'
             return False
 
-    def _get_details_from_oracle_api(self, page_no, no_per_page):
+    def _get_details_from_oracle_api(self, page, per_page):
         """
         Populates this instance with data from the Oracle Samples table API
 
-        :param page_no: the page number of the total resultset from the Samples Set API
+        :param page: the page number of the total resultset from the Samples Set API
         :return: None
         """
         #os.environ['NO_PROXY'] = 'ga.gov.au'
-        r = requests.get(config.XML_API_URL_SAMPLESET.format(page_no, no_per_page), timeout=3)
+        r = requests.get(config.XML_API_URL_SAMPLESET.format(page, per_page), timeout=3)
         xml = r.content
 
         if self.validate_xml(xml):
@@ -92,10 +95,34 @@ class RegisterRenderer(Renderer):
             REG = Namespace('http://purl.org/linked-data/registry#')
             self.g.bind('reg', REG)
 
-            self.g.add((URIRef(self.request.url.split('?')[0]), RDF.type, REG.Register))
+            register_uri_str = self.request.base_url
+            if self.per_page is not None:
+                register_uri_str += '?per_page=' + str(self.per_page)
+            else:
+                register_uri_str += '?per_page=100'
+            register_uri_str_no_page_no = register_uri_str + '&page='
+            if self.page is not None:
+                register_uri_str += '&page=' + str(self.page)
+            else:
+                register_uri_str += '&page=1'
+            register_uri = URIRef(register_uri_str)
+
+            self.g.add((register_uri, RDF.type, REG.FederatedRegister))
+            self.g.add((register_uri, RDFS.label, Literal('Samples Register', datatype=XSD.string)))
+
+            # pagination
+            self.g.add((register_uri, REG.firstRegisterPage, URIRef(register_uri_str_no_page_no + '1')))
+            self.g.add((register_uri, REG.lastRegisterPage, URIRef(register_uri_str_no_page_no + str(self.last_page_no))))
+
+            if self.page != 1:
+                self.g.add((register_uri, REG.prevRegisterPage, URIRef(register_uri_str_no_page_no + str(self.page - 1))))
+
+            if self.page != self.last_page_no:
+                self.g.add((register_uri, REG.nextRegisterPage, URIRef(register_uri_str_no_page_no + str(self.page + 1))))
 
             # add all the items
             for item in self.register:
-                self.g.add((URIRef(self.request.base_url + item), RDF.type, URIRef(self.uri)))
-                self.g.add((URIRef(self.request.base_url + item), RDFS.label, Literal(item, datatype=XSD.string)))
-                self.g.add((URIRef(self.request.base_url + item), REG.register, URIRef(self.request.base_url)))
+                item_uri = URIRef(self.request.base_url + item)
+                self.g.add((item_uri, RDF.type, URIRef(self.uri)))
+                self.g.add((item_uri, RDFS.label, Literal('Sample igsn:' + item, datatype=XSD.string)))
+                self.g.add((item_uri, REG.register, register_uri))

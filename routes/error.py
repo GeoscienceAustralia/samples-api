@@ -1,5 +1,3 @@
-
-
 # taken from https://github.com/infrae/pyoai/blob/master/src/oaipmh/datestamp.py
 class ErrorBase(Exception):
     def oainame(self):
