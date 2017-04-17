@@ -12,7 +12,7 @@ class TestSample(unittest.TestCase):
         Tests loading the Sample class instance
         """
         # load
-        s = Sample(None, None, 'sample_eg1.xml')
+        s = Sample(None, 'sample_eg1.xml')
 
         # compare instance variables
         assert s.igsn == 'AU2648696', 'IGSN instance varable not correct'
@@ -25,7 +25,7 @@ class TestSample(unittest.TestCase):
         Tests loading the Sample class instance
         """
         # load
-        s = Sample("http://localhost:8080/oai", 'AU100', None)
+        s = Sample('AU100', None)
 
         # compare instance variables
         assert s.igsn == 'AU100', 'IGSN instance variable not correct'

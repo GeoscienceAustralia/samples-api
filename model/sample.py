@@ -43,7 +43,7 @@ class Sample:
     URI_INAPPLICABLE = 'http://www.opengis.net/def/nil/OGC/0/inapplicable'
     URI_GA = 'http://pid.geoscience.gov.au/org/ga'
 
-    def __init__(self, oracle_api_samples_url, igsn, xml=None):
+    def __init__(self, igsn, xml=None):
         self.igsn = igsn
         self.sample_id = None
         self.sample_type = None
@@ -81,7 +81,7 @@ class Sample:
         self.sample_no = None
 
         if xml is not None:  # even if there are values for Oracle API URI and IGSN, load from XML file if present
-            self._populate_from_xml_file(open(xml).read())
+            self._populate_from_xml_file(xml)
         else:
             self._populate_from_oracle_api()
 
@@ -195,10 +195,7 @@ class Sample:
             self.lith = TERM_LOOKUP['lith'].get(root.ROW.LITHNAME)
             if self.lith is None:
                 self.lith = Sample.URI_MISSSING
-            if root.ROW.ACQUIREDATE != '':
-                self.date_acquired = str2datetime(root.ROW.ACQUIREDATE).date()
-            else:
-                self.date_acquired = datetime(1990, 1, 1).date()
+            self.date_acquired = str2datetime(root.ROW.ACQUIREDATE).date() if root.ROW.ACQUIREDATE != '' else None
             self.entity_uri = 'http://pid.geoscience.gov.au/site/' + str(root.ROW.ENO) if root.ROW.ENO is not None else None
             self.entity_name = root.ROW.ENTITYID
             self.entity_type = TERM_LOOKUP['entity_type'].get(root.ROW.ENTITY_TYPE)
@@ -825,7 +822,7 @@ class Sample:
                 igsn=self.igsn,
                 sample_id=self.sample_id,
                 description=self.remark if self.remark != '' else '-',
-                date_acquired=self.date_acquired if self.date_acquired != datetime(1990, 1, 1).date() else '<a href="{}">{}</a>'.format(Sample.URI_MISSSING, Sample.URI_MISSSING.split('/')[-1]),
+                date_acquired=self.date_acquired if self.date_acquired is not None else '<a href="{}">{}</a>'.format(Sample.URI_MISSSING, Sample.URI_MISSSING.split('/')[-1]),
                 sample_type=self.sample_type,
                 wkt=self._generate_sample_wkt(),
                 sampling_feature=self.entity_type,
@@ -840,7 +837,7 @@ class Sample:
                 'sample_dc.html',
                 identifier=self.igsn,
                 description=self.remark if self.remark != '' else '-',
-                date=self.date_acquired if self.date_acquired != datetime(1990, 1, 1).date() else '<a href="{}">{}</a>'.format(Sample.URI_MISSSING, Sample.URI_MISSSING.split('/')[-1]),
+                date=self.date_acquired if self.date_acquired is not None else '<a href="{}">{}</a>'.format(Sample.URI_MISSSING, Sample.URI_MISSSING.split('/')[-1]),
                 type=self.sample_type,
                 format=self.material_type,
                 wkt=self._generate_sample_wkt(),
@@ -859,7 +856,7 @@ class Sample:
                 prov_turtle=prov_turtle,
             )
 
-        if self.date_acquired != datetime(1990, 1, 1).date():
+        if self.date_acquired is not None:
             year_acquired = '({})'.format(datetime.strftime(self.date_acquired, '%Y'))
         else:
             year_acquired = ''
@@ -880,7 +877,7 @@ class ParameterError(ValueError):
     pass
 
 if __name__ == '__main__':
-    s = Sample(None, None, xml='c:/work/samples-api/test/static_data/AU239.xml')
+    s = Sample(None, xml='c:/work/samples-api/test/static_data/AU239.xml')
     # print s.igsn
     # print s.sample_id
     # print 'sample_type ' + s.sample_type

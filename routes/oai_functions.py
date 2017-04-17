@@ -98,7 +98,7 @@ def validate_oai_parameters(qsa_args):
 
 
 def get_record(identifier):
-    sample = Sample(settings.XML_API_URL_SAMPLE, identifier)
+    sample = Sample(identifier)
 
     return props(sample)
     # try:
@@ -116,7 +116,7 @@ def list_records(metadataPrefix, resumptionToken=None, from_=None, until=None):
         oracle_api_samples_url = settings.XML_API_URL_SAMPLESET.format(page_no, no_per_page)
     else:
         oracle_api_samples_url = create_url_query_token(resumptionToken)
-        [from_,until,batch_num,metadataPrefix] =resumptionToken.split(',')
+        [from_, until, batch_num, metadataPrefix] = resumptionToken.split(',')
     r = requests.get(oracle_api_samples_url)
 
     if "No data" in r.content:
@@ -125,7 +125,7 @@ def list_records(metadataPrefix, resumptionToken=None, from_=None, until=None):
     xml = r.content
     context = etree.iterparse(StringIO(xml), tag='ROW')
     for event, elem in context:
-        samples_dict.append(props(Sample(None, None, StringIO(etree.tostring(elem)))))
+        samples_dict.append(props(Sample(None, '<root>{}</root>'.format(etree.tostring(elem)))))
 
     resumption_token = get_resumption_token(metadataPrefix, resumptionToken, from_, until)
 
@@ -154,8 +154,9 @@ def list_records_xml(metadataPrefix, resumptionToken=None, from_=None, until=Non
 
     for event, elem in context:
         # create a Sample for each XML ROW
-        s = Sample(None, None, StringIO(etree.tostring(elem)))
-        if s.date_acquired != 'http://www.opengis.net/def/nil/OGC/0/missing':
+        print etree.tostring(elem)
+        s = Sample(None, '<root>{}</root>'.format(etree.tostring(elem)))
+        if s.date_acquired is not None:
             datestamp = datetime_to_datestamp(s.date_acquired)
         else:
             datestamp = ''
@@ -347,7 +348,7 @@ if __name__ == '__main__':
         'identifier': 'AU100',
         'metadataPrefix': 'oai_dc'
     }
-    s = Sample(settings.XML_API_URL_SAMPLE, args['identifier'])
+    s = Sample(args['identifier'])
     dc_xml = s.export_dc_xml()
 
 #    print 'valid_oai_args(args[\'verb\'])', valid_oai_args(args['verb'])

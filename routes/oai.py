@@ -56,7 +56,7 @@ def oai():
     if verb == 'GetRecord':
         try:
             from model.sample import Sample
-            s = Sample(settings.XML_API_URL_SAMPLE, request_args['identifier'])
+            s = Sample(request_args['identifier'])
 
             if request_args['metadataPrefix'] == 'oai_dc':
                 record_xml = s.export_dc_xml()
@@ -65,7 +65,7 @@ def oai():
             elif request_args['metadataPrefix'] == 'csirov3':
                 record_xml = s.export_csirov3_xml()
 
-            if s.date_acquired != 'http://www.opengis.net/def/nil/OGC/0/missing':
+            if s.date_acquired is not None:
                 datestamp = datetime_to_datestamp(s.date_acquired)
             else:
                 datestamp = ''

@@ -46,7 +46,7 @@ def sample(igsn):
         else:
             from model.sample import Sample
             try:
-                s = Sample(settings.XML_API_URL_SAMPLE, igsn)
+                s = Sample(igsn)
                 return s.render(view, mimetype)
             except ValueError:
                 return render_template('sample_no_record.html')

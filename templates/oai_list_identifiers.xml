@@ -8,7 +8,7 @@
     <ListIdentifiers>{% for sample in samples %}
         <header>
             <identifier>{{sample['igsn']}}</identifier>
-            <datestamp>{{sample['modified_datestamp']}}</datestamp>
+            <datestamp>{{sample['date_acquired']}}</datestamp>
         </header>{% endfor %}{% if resumptiontoken %}
         <resumptionToken expirationDate="{{resumptiontoken['expiration_date']}}" completeListSize="{{resumptiontoken['complete_list_size']}}" cursor="{{resumptiontoken['cursor']}}">
         {{resumptiontoken['from_']}},{{resumptiontoken['until']}},{{resumptiontoken['cursor_next']}},{{resumptiontoken['metadataPrefix']}}</resumptionToken>{% endif %}
