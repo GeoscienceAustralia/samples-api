@@ -95,34 +95,46 @@ class RegisterRenderer(Renderer):
             REG = Namespace('http://purl.org/linked-data/registry#')
             self.g.bind('reg', REG)
 
-            register_uri_str = self.request.base_url
-            if self.per_page is not None:
-                register_uri_str += '?per_page=' + str(self.per_page)
-            else:
-                register_uri_str += '?per_page=100'
-            register_uri_str_no_page_no = register_uri_str + '&page='
-            if self.page is not None:
-                register_uri_str += '&page=' + str(self.page)
-            else:
-                register_uri_str += '&page=1'
-            register_uri = URIRef(register_uri_str)
+            LDP = Namespace('http://www.w3.org/ns/ldp#')
+            self.g.bind('ldp', LDP)
 
-            self.g.add((register_uri, RDF.type, REG.FederatedRegister))
+            XHV = Namespace('https://www.w3.org/1999/xhtml/vocab#')
+            self.g.bind('xhv', XHV)
+
+            register_uri = URIRef(self.request.base_url)
+            self.g.add((register_uri, RDF.type, REG.Register))
             self.g.add((register_uri, RDFS.label, Literal('Samples Register', datatype=XSD.string)))
 
+            page_uri_str = self.request.base_url
+            if self.per_page is not None:
+                page_uri_str += '?per_page=' + str(self.per_page)
+            else:
+                page_uri_str += '?per_page=100'
+            page_uri_str_no_page_no = page_uri_str + '&page='
+            if self.page is not None:
+                page_uri_str += '&page=' + str(self.page)
+            else:
+                page_uri_str += '&page=1'
+            page_uri = URIRef(page_uri_str)
+
             # pagination
-            self.g.add((register_uri, REG.firstRegisterPage, URIRef(register_uri_str_no_page_no + '1')))
-            self.g.add((register_uri, REG.lastRegisterPage, URIRef(register_uri_str_no_page_no + str(self.last_page_no))))
+            # this page
+            self.g.add((page_uri, RDF.type, LDP.Page))
+            self.g.add((page_uri, LDP.pageOf, register_uri))
+
+            # links to other pages
+            self.g.add((page_uri, XHV.first, URIRef(page_uri_str_no_page_no + '1')))
+            self.g.add((page_uri, XHV.last, URIRef(page_uri_str_no_page_no + str(self.last_page_no))))
 
             if self.page != 1:
-                self.g.add((register_uri, REG.prevRegisterPage, URIRef(register_uri_str_no_page_no + str(self.page - 1))))
+                self.g.add((page_uri, XHV.prev, URIRef(page_uri_str_no_page_no + str(self.page - 1))))
 
             if self.page != self.last_page_no:
-                self.g.add((register_uri, REG.nextRegisterPage, URIRef(register_uri_str_no_page_no + str(self.page + 1))))
+                self.g.add((page_uri, XHV.next, URIRef(page_uri_str_no_page_no + str(self.page + 1))))
 
             # add all the items
             for item in self.register:
                 item_uri = URIRef(self.request.base_url + item)
                 self.g.add((item_uri, RDF.type, URIRef(self.uri)))
                 self.g.add((item_uri, RDFS.label, Literal('Sample igsn:' + item, datatype=XSD.string)))
-                self.g.add((item_uri, REG.register, register_uri))
+                self.g.add((item_uri, REG.register, page_uri))

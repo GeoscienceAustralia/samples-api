@@ -101,6 +101,8 @@ def samples():
                 )
 
             links = []
+            links.append('<http://www.w3.org/ns/ldp#Resource>; rel="type"')
+            links.append('<http://www.w3.org/ns/ldp#Page>; rel="type"')  # signalling that this is, in fact, a resource described in pages
             links.append('<{}?per_page={}>; rel="first"'.format(config.BASE_URI_SAMPLE, per_page))
 
             # if this isn't the first page, add a link to "prev"
