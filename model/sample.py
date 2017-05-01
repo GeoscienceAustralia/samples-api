@@ -123,6 +123,10 @@ class Sample:
             # RDF formats handled by general case
             # only RDF for this view so set the mimetype to our favourite mime format
             return self.export_html(model_view=view)
+        elif view == 'sosa':  # SODA in HTML. Placeholder for now (01/05/2017)
+            # RDF formats handled by general case
+            # only RDF for this view so set the mimetype to our favourite mime format
+            return self.export_html(model_view='igsn-o')
 
     def validate_xml(self, xml):
         parser = etree.XMLParser(dtd_validation=False)
@@ -658,11 +662,7 @@ class Sample:
             # TODO: represent Public/Private (and other?) access methods in DB, add to terms in vocab?
             g.add((this_sample, DCT.accessRights, URIRef(TERM_LOOKUP['access']['Public'])))
             # TODO: make a register of Entities
-            if self.entity_uri != 'http://www.opengis.net/def/nil/OGC/0/missing':
-                this_parent = URIRef(self.entity_uri)
-            else:
-                # TODO: get a real parent URL
-                this_parent = URIRef('http://www.opengis.net/def/nil/OGC/0/missing')
+            this_parent = URIRef(self.entity_uri)
 
             g.add((this_sample, SAMFL.relatedSamplingFeature, this_parent))  # could be OM.featureOfInterest
 
@@ -730,6 +730,75 @@ class Sample:
             g.add((ga, RDF.type, PROV.Agent))
             g.add((this_sample, PROV.wasAttributedTo, ga))
             g.add((ga, RDFS.label, Literal('Geoscience Australia', datatype=XSD.string)))
+        elif model_view == 'sosa':
+            SOSA = Namespace('http://www.w3.org/ns/sosa/')
+            g.bind('sosa', SOSA)
+            # Sample
+            g.add((this_sample, RDF.type, SOSA.Sample))
+
+            #
+            #   Sampling
+            #
+            # Sampling declaration
+            sampling = BNode()
+            g.add((sampling, RDF.type, SOSA.Sampling))
+            if self.date_acquired is not None:
+                g.add((sampling, SOSA.resultTime, Literal(self.date_acquired.isoformat(), datatype=XSD.date)))
+            # associate Sampling
+            g.add((this_sample, SOSA.isResultOf, sampling))
+
+            #
+            #   Sampler
+            #
+            # Sampler declaration
+            sampler = BNode()
+            g.add((sampler, RDF.type, SOSA.Sampler))
+            g.add((sampler, RDF.type, URIRef(self.method_type)))
+            # associate Sampler (with Sampling)
+            g.add((sampling, SOSA.madeBySampler, sampler))
+
+            # #
+            # #   Procedure
+            # #
+            # # Procedure declaration
+            # procedure = BNode()
+            # g.add((procedure, RDF.type, SOSA.Procedure))
+            # # g.add((this_sample, RDF.type, SOSA.Procedure)) # TODO: domsthing about missing if any method info is not known
+            # # associate Procedure
+            # g.add((this_sample, SOSA.usedProcedure, procedure))
+
+            #
+            #   Feature of Interest
+            #
+            # FOI declaration
+            this_parent = URIRef(self.entity_uri)
+            # FOI type
+            # general type
+            g.add((this_parent, RDF.type, SOSA.FeatureOfInterest))
+            # specific type
+            if self.entity_type is not None:
+                g.add((this_parent, RDF.type, URIRef(self.entity_type)))
+            else:
+                g.add((
+                    this_parent,
+                    RDF.type,
+                    URIRef('http://pid.geoscience.gov.au/def/voc/featureofinteresttype/borehole')
+                ))
+            # FOI geometry
+            parent_geometry = BNode()
+            g.add((this_parent, GEOSP.hasGeometry, parent_geometry))
+            g.add((parent_geometry, RDF.type, SAMFL.Point))  # TODO: extend this for other geometry types
+            g.add((parent_geometry, GEOSP.asWKT, Literal(self._generate_parent_wkt(), datatype=GEOSP.wktLiteral)))
+            g.add((parent_geometry, GEOSP.asGML, Literal(self._generate_parent_gml(), datatype=GEOSP.wktLiteral)))
+            # FOI elevation
+            parent_elevation = BNode()
+            g.add((this_parent, SAMFL.samplingElevation, parent_elevation))
+            g.add((parent_elevation, RDF.type, SAMFL.Elevation))
+            g.add((parent_elevation, SAMFL.elevation, Literal(self.z, datatype=XSD.float)))
+            g.add((parent_elevation, SAMFL.verticalDatum,
+                   Literal("http://spatialreference.org/ref/epsg/4283/", datatype=XSD.anyUri)))
+            # associate FOI
+            g.add((this_sample, SOSA.isSampleOf, this_parent))
 
         return g.serialize(format=LDAPI.get_rdf_parser_for_mimetype(rdf_mime))
 

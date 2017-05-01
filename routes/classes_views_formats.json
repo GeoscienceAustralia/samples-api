@@ -14,7 +14,8 @@
     "igsn": ["text/xml"],
     "igsn-dev": ["text/xml"],
     "igsn-o": ["text/html", "text/turtle", "application/rdf+xml", "application/rdf+json"],
-    "prov": ["text/turtle", "application/rdf+xml", "application/rdf+json"]
+    "prov": ["text/turtle", "application/rdf+xml", "application/rdf+json"],
+    "sosa": ["text/html", "text/turtle", "application/rdf+xml", "application/rdf+json"]
   },
   "http://purl.org/linked-data/registry#Register":{
     "renderer": "RegisterRenderer",
