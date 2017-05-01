@@ -11,7 +11,9 @@
                 <identifier>{{ identifier }}</identifier>
                 <datestamp>{{ datestamp }}</datestamp>
             </header>
+            <metadata>
             {{ record_xml|safe }}
+            </metadata>
         </record>
     </GetRecord>
   </OAI-PMH>

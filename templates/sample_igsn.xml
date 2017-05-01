@@ -1,7 +1,7 @@
 <igsn:resource
         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
         xmlns:igsn="http://schema.igsn.org/description/1.0/"
-        xsi:schemaLocation="http://schema.igsn.org/description/1.0 https://raw.githubusercontent.com/IGSN/metadata/dev/description/resource.xsd"
+        xsi:schemaLocation="http://schema.igsn.org/description/1.0 https://raw.githubusercontent.com/IGSN/metadata/master/description/resource.xsd"
         registedObjectType="http://schema.igsn.org/vocab/PhysicalSample">
     <igsn:identifier type="IGSN">{{ igsn }}</igsn:identifier>
     <igsn:identifier type="URL">http://pid.geoscience.gov.au/sample/{{ igsn }}</igsn:identifier>

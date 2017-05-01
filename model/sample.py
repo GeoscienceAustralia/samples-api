@@ -107,6 +107,12 @@ class Sample:
                 '<?xml version="1.0" encoding="utf-8"?>\n' + self.export_igsn_xml(),
                 mimetype='text/xml'
             )
+        elif view == 'igsn-dev':  # the community agreed description metadata schema, dev
+            # only XML for this view
+            return Response(
+                '<?xml version="1.0" encoding="utf-8"?>\n' + self.export_igsn_dev_xml(),
+                mimetype='text/xml'
+            )
         elif view == 'csirov3':
             # only XML for this view
             return Response(
@@ -774,6 +780,26 @@ class Sample:
         """
         template = render_template(
             'sample_igsn.xml',
+            igsn=self.igsn,
+            sample_id=self.sample_id,
+            description=self.remark,
+            wkt=self._generate_sample_wkt(),
+            sample_type=self.sample_type,
+            material_type=self.material_type,
+            collection_method=self.method_type,
+            collection_time=self.date_acquired
+        )
+
+        return template
+
+    def export_igsn_dev_xml(self):
+        """
+        Exports this Sample instance in XML that validates against the IGSN XML Schema
+
+        :return: XML string
+        """
+        template = render_template(
+            'sample_igsn_dev.xml',
             igsn=self.igsn,
             sample_id=self.sample_id,
             description=self.remark,
