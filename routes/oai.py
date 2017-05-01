@@ -62,6 +62,8 @@ def oai():
                 record_xml = s.export_dc_xml()
             elif request_args['metadataPrefix'] == 'igsn':
                 record_xml = s.export_igsn_xml()
+            elif request_args['metadataPrefix'] == 'igsn-dev':
+                record_xml = s.export_igsn_dev_xml()
             elif request_args['metadataPrefix'] == 'csirov3':
                 record_xml = s.export_csirov3_xml()
 
