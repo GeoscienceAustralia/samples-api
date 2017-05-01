@@ -1,0 +1,600 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- edited with XMLSpy v2012 rel. 2 (x64) (http://www.altova.com) by Terry Rankine (CSIRO) -->
+<xs:schema 
+	xmlns:xs="http://www.w3.org/2001/XMLSchema" 
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
+	xmlns="http://schema.igsn.org/description/1.0" 
+	targetNamespace="http://schema.igsn.org/description/1.0" 
+	elementFormDefault="qualified" 
+	version="1.0" 
+	xml:lang="EN">
+	<!--
+	<xs:include schemaLocation="include/accessType.xsd"/>
+	<xs:include schemaLocation="include/contributorType.xsd"/>
+	<xs:include schemaLocation="include/featureType.xsd"/>
+	<xs:include schemaLocation="include/geometryType.xsd"/>
+	<xs:include schemaLocation="include/identifierType.xsd"/>
+	<xs:include schemaLocation="include/materialType.xsd"/>
+	<xs:include schemaLocation="include/methodType.xsd"/>
+	<xs:include schemaLocation="include/relationType.xsd"/>
+	<xs:include schemaLocation="include/registrationType.xsd"/>
+	<xs:include schemaLocation="include/sridType.xsd"/>
+	<xs:include schemaLocation="include/resourceType.xsd"/>
+	-->
+	<xs:annotation>
+		<xs:documentation>
+	International Geo Sample Number (IGSN) Metadata Kernel
+	Description Schema
+	Version 1.0
+        November 15, 2015
+	W3C XML Schema validated by oXygen XML Editor v17.1
+	(c)2011-2016, IGSN e.V.
+        info@igsn.org
+    </xs:documentation>
+	</xs:annotation>
+	
+	<xs:simpleType name="accessType" id="accessType">
+		<xs:restriction base="xs:string">
+			<xs:enumeration value="Public"/>
+			<xs:enumeration value="Private"/>
+		</xs:restriction>
+	</xs:simpleType>
+  
+	<xs:simpleType name="contributorType" id="contributorType">
+		<xs:restriction base="xs:string">
+			<xs:enumeration value="ContactPerson"/>
+			<xs:enumeration value="Distributor"/>
+			<xs:enumeration value="Editor"/>
+			<xs:enumeration value="Funder"/>
+			<xs:enumeration value="HostingInstitution"/>
+			<xs:enumeration value="Other"/>
+			<xs:enumeration value="ProjectLeader"/>
+			<xs:enumeration value="ProjectManager"/>
+			<xs:enumeration value="ProjectMember"/>
+			<xs:enumeration value="RelatedPerson"/>
+			<xs:enumeration value="ResearchGroup"/>
+			<xs:enumeration value="RightsHolder"/>
+			<xs:enumeration value="Researcher"/>
+			<xs:enumeration value="Sponsor"/>
+			<xs:enumeration value="Supervisor"/>
+			<xs:enumeration value="WorkPackageLeader"/>
+		</xs:restriction>
+	</xs:simpleType>
+  
+	<xs:simpleType name="featureType" id="featureType">
+		<xs:restriction base="xs:string">
+			<xs:enumeration value="http://vocabulary.odm2.org/samplingfeaturetype/borehole/"/>
+			<xs:enumeration value="http://vocabulary.odm2.org/samplingfeaturetype/crossSection/"/>
+			<xs:enumeration value="http://vocabulary.odm2.org/samplingfeaturetype/CTD/"/>
+			<xs:enumeration value="http://vocabulary.odm2.org/samplingfeaturetype/depthInterval/"/>
+			<xs:enumeration value="http://vocabulary.odm2.org/samplingfeaturetype/excavation/"/>
+			<xs:enumeration value="http://vocabulary.odm2.org/samplingfeaturetype/fieldArea/"/>
+			<xs:enumeration value="http://vocabulary.odm2.org/samplingfeaturetype/flightline/"/>
+			<xs:enumeration value="http://vocabulary.odm2.org/samplingfeaturetype/interval/"/>
+			<xs:enumeration value="http://vocabulary.odm2.org/samplingfeaturetype/observationWell/"/>
+			<xs:enumeration value="http://vocabulary.odm2.org/samplingfeaturetype/profile/"/>
+			<xs:enumeration value="http://vocabulary.odm2.org/samplingfeaturetype/quadrat/"/>
+			<xs:enumeration value="http://vocabulary.odm2.org/samplingfeaturetype/scene/"/>
+			<xs:enumeration value="http://vocabulary.odm2.org/samplingfeaturetype/shipsTrack/"/>
+			<xs:enumeration value="http://vocabulary.odm2.org/samplingfeaturetype/site/"/>
+			<xs:enumeration value="http://vocabulary.odm2.org/samplingfeaturetype/soilPitSection/"/>
+			<xs:enumeration value="http://vocabulary.odm2.org/samplingfeaturetype/specimen/"/>
+			<xs:enumeration value="http://vocabulary.odm2.org/samplingfeaturetype/streamGage/"/>
+			<xs:enumeration value="http://vocabulary.odm2.org/samplingfeaturetype/trajectory/"/>
+			<xs:enumeration value="http://vocabulary.odm2.org/samplingfeaturetype/transect/"/>
+			<xs:enumeration value="http://vocabulary.odm2.org/samplingfeaturetype/traverse/"/>
+			<xs:enumeration value="http://vocabulary.odm2.org/samplingfeaturetype/waterQualityStation/"/>
+			<xs:enumeration value="http://vocabulary.odm2.org/samplingfeaturetype/weatherStation/"/>
+		</xs:restriction>
+	</xs:simpleType>
+  
+	<xs:simpleType name="geometryType" id="geometryType"> <!-- SFS -->
+		<xs:restriction base="xs:string">
+			<xs:enumeration value="LineString"/>
+			<xs:enumeration value="MultiLineString"/>
+			<xs:enumeration value="Point"/>
+			<xs:enumeration value="MultiPoint"/>
+			<xs:enumeration value="Polygon"/>
+			<xs:enumeration value="MultiPolygon"/>
+		</xs:restriction>
+	</xs:simpleType>
+ 
+ 	<xs:simpleType name="identifierType" id="identifierType">
+		<xs:restriction base="xs:string">
+			<xs:enumeration value="ARK"/>
+			<xs:enumeration value="DOI"/>
+			<xs:enumeration value="Handle"/>
+			<xs:enumeration value="IGSN"/>
+			<xs:enumeration value="ISBN"/>
+			<xs:enumeration value="ISNI"/>
+			<xs:enumeration value="ISSN"/>
+			<xs:enumeration value="LSID"/>
+			<xs:enumeration value="ORCID"/>
+			<xs:enumeration value="PURL"/>
+			<xs:enumeration value="URI"/>
+			<xs:enumeration value="VIAF"/>
+			<xs:enumeration value="arXiv"/>
+			<xs:enumeration value="bibcode"/>
+			<xs:enumeration value="EAN13"/>
+			<xs:enumeration value="EISSN"/>
+			<xs:enumeration value="ISTC"/>
+			<xs:enumeration value="PMID"/>
+			<xs:enumeration value="LISSN"/>
+			<xs:enumeration value="UPC"/>
+		</xs:restriction>
+	</xs:simpleType>
+
+	<xs:simpleType name="materialType" id="materialType">
+		<xs:restriction base="xs:string">
+			<xs:enumeration value="http://vocabulary.odm2.org/medium/air/"/>
+			<xs:enumeration value="http://vocabulary.odm2.org/medium/gas/"/>
+			<xs:enumeration value="http://vocabulary.odm2.org/medium/ice/"/>
+			<xs:enumeration value="http://vocabulary.odm2.org/medium/liquidAqueous/"/>
+			<xs:enumeration value="http://vocabulary.odm2.org/medium/liquidOrganic/"/>
+			<xs:enumeration value="http://vocabulary.odm2.org/medium/mineral/"/>
+			<xs:enumeration value="http://vocabulary.odm2.org/medium/organism/"/>
+			<xs:enumeration value="http://vocabulary.odm2.org/medium/particulate/"/>
+			<xs:enumeration value="http://vocabulary.odm2.org/medium/rock/"/>
+			<xs:enumeration value="http://vocabulary.odm2.org/medium/sediment/"/>
+			<xs:enumeration value="http://vocabulary.odm2.org/medium/snow/"/>
+			<xs:enumeration value="http://vocabulary.odm2.org/medium/soil/"/>
+			<xs:enumeration value="http://vocabulary.odm2.org/medium/tissue/"/>
+			<xs:enumeration value="http://vocabulary.odm2.org/medium/other/"/>
+			<xs:enumeration value="http://vocabulary.odm2.org/medium/unknown/"/>
+		</xs:restriction>
+	</xs:simpleType>
+
+	<xs:simpleType name="methodType" id="MethodType">
+		<xs:restriction base="xs:string">
+			<xs:enumeration value="Blast"/>
+			<xs:enumeration value="Corer"/>
+			<xs:enumeration value="Corer:Box"/>
+			<xs:enumeration value="Corer:Drill"/>
+			<xs:enumeration value="Corer:FreeFall"/>
+			<xs:enumeration value="Corer:Gravity"/>
+			<xs:enumeration value="Corer:Gravity,Giant"/>
+			<xs:enumeration value="Corer:Kastenlot"/>
+			<xs:enumeration value="Corer:Multi"/>
+			<xs:enumeration value="Corer:Piston"/>
+			<xs:enumeration value="Corer:Piston,Giant"/>
+			<xs:enumeration value="Corer:Rock"/>
+			<xs:enumeration value="Corer:SideSaddle"/>
+			<xs:enumeration value="Corer:TriggerWeight"/>
+			<xs:enumeration value="Corer:Vibrating"/>
+			<xs:enumeration value="Dredge"/>
+			<xs:enumeration value="Dredge:ChainBag"/>
+			<xs:enumeration value="Dredge:Scallop"/>
+			<xs:enumeration value="Grab"/>
+			<xs:enumeration value="Hand"/>
+			<xs:enumeration value="Hand:Auger"/>
+			<xs:enumeration value="Hand:Hammer"/>
+			<xs:enumeration value="Hand:Knife"/>
+			<xs:enumeration value="Net"/>
+			<xs:enumeration value="Net:MOCNESS"/>
+			<xs:enumeration value="Probe"/>
+			<xs:enumeration value="Scoop"/>
+			<xs:enumeration value="Trap"/>
+			<xs:enumeration value="Trawl"/>
+			<xs:enumeration value="Other"/>
+			<xs:enumeration value="Unknown"/>
+		</xs:restriction>
+	</xs:simpleType>
+ 
+ 	<xs:simpleType name="registrationType" id="registrationType">
+		<xs:restriction base="xs:anyURI">
+			<xs:enumeration value="http://schema.igsn.org/vocab/PhysicalSample"/>
+			<xs:enumeration value="http://schema.igsn.org/vocab/SampleCollection"/>
+			<xs:enumeration value="http://schema.igsn.org/vocab/SamplingFeature"/>
+		</xs:restriction>
+	</xs:simpleType>
+
+	<xs:simpleType name="relationType" id="relationType">
+		<xs:restriction base="xs:string">
+			<xs:enumeration value="IsDerivedFrom"/>
+			<xs:enumeration value="IsSourceOf"/>
+			<xs:enumeration value="HasSamplingFeature"/>
+			<xs:enumeration value="IsDocumentedBy"/>
+		</xs:restriction>
+	</xs:simpleType>
+
+	<xs:simpleType name="resourceType" id="resourceType">
+		<xs:restriction base="xs:anyURI">
+			<xs:enumeration value="http://vocabulary.odm2.org/specimentype/automated"/>
+			<xs:enumeration value="http://vocabulary.odm2.org/specimentype/core"/>
+			<xs:enumeration value="http://vocabulary.odm2.org/specimentype/coreHalfRound"/>
+			<xs:enumeration value="http://vocabulary.odm2.org/specimentype/corePiece"/>
+			<xs:enumeration value="http://vocabulary.odm2.org/specimentype/coreQuarterRound"/>
+			<xs:enumeration value="http://vocabulary.odm2.org/specimentype/coreSection"/>
+			<xs:enumeration value="http://vocabulary.odm2.org/specimentype/coreSectionHalf"/>
+			<xs:enumeration value="http://vocabulary.odm2.org/specimentype/coreSub-Piece"/>
+			<xs:enumeration value="http://vocabulary.odm2.org/specimentype/coreWholeRound"/>
+			<xs:enumeration value="http://vocabulary.odm2.org/specimentype/cuttings"/>
+			<xs:enumeration value="http://vocabulary.odm2.org/specimentype/dredge"/>
+			<xs:enumeration value="http://vocabulary.odm2.org/specimentype/foliageDigestion"/>
+			<xs:enumeration value="http://vocabulary.odm2.org/specimentype/foliageLeaching"/>
+			<xs:enumeration value="http://vocabulary.odm2.org/specimentype/forestFloorDigestion"/>
+			<xs:enumeration value="http://vocabulary.odm2.org/specimentype/individualSample"/>
+			<xs:enumeration value="http://vocabulary.odm2.org/specimentype/litterFallDigestion"/>
+			<xs:enumeration value="http://vocabulary.odm2.org/specimentype/other"/>
+			<xs:enumeration value="http://vocabulary.odm2.org/specimentype/petriDishDryDeposition"/>
+			<xs:enumeration value="http://vocabulary.odm2.org/specimentype/precipitationBulk"/>
+			<xs:enumeration value="http://vocabulary.odm2.org/specimentype/rockPowder"/>
+			<xs:enumeration value="http://vocabulary.odm2.org/specimentype/standardReferenceSpecimen"/>
+			<xs:enumeration value="http://vocabulary.odm2.org/specimentype/terrestrialSection"/>
+			<xs:enumeration value="http://vocabulary.odm2.org/specimentype/theSpecimenTypeIsUnknown"/>
+			<xs:enumeration value="http://vocabulary.odm2.org/specimentype/thinSection"/>
+			<xs:enumeration value="http://vocabulary.odm2.org/specimentype/orientedCore"/>
+			<xs:enumeration value="http://vocabulary.odm2.org/specimentype/grab"/>
+		</xs:restriction>
+	</xs:simpleType>
+	
+	<xs:simpleType name="sridType" id="sridType"> <!-- EPSG: -->
+		<xs:restriction base="xs:string">
+			<xs:enumeration value="4326"/>
+		</xs:restriction>
+	</xs:simpleType>
+  
+	<xs:element name="resource">
+		<xs:annotation>
+			<xs:appinfo>IGSN "birth certificate" for a physical sample, associated feature, or collection</xs:appinfo>
+		</xs:annotation>
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element name="identifier" minOccurs="1" maxOccurs="1">
+					<xs:annotation>
+						<xs:documentation>(1.) identifier - currently only type=IGSN is supported</xs:documentation>
+					</xs:annotation>
+					<xs:complexType>
+						<xs:simpleContent>
+							<xs:extension base="xs:string">
+								<xs:attribute name="type" type="identifierType" use="required" fixed="IGSN"/>
+							</xs:extension>
+						</xs:simpleContent>
+					</xs:complexType>
+				</xs:element>
+				<!-- identifier -->
+				<xs:element name="title" type="xs:string" minOccurs="1" maxOccurs="1">
+					<xs:annotation>
+						<xs:documentation>(2.) name - the collector or contributor's local/field name; not globally unique but typically unique within a submitted set</xs:documentation>
+					</xs:annotation>
+				</xs:element>
+				<!-- name -->
+				<xs:element name="alternateIdentifiers" minOccurs="0" maxOccurs="1">
+					<xs:annotation>
+						<xs:documentation>(3.) alternateIdentifiers - other formal identifiers for this resource, in addition to the IGSN</xs:documentation>
+					</xs:annotation>
+					<xs:complexType>
+						<xs:sequence>
+							<xs:element name="alternateIdentifier" minOccurs="1" maxOccurs="unbounded">
+								<xs:complexType>
+									<xs:simpleContent>
+										<xs:extension base="xs:string">
+											<xs:attribute name="type" type="identifierType" use="optional"/>
+										</xs:extension>
+									</xs:simpleContent>
+								</xs:complexType>
+							</xs:element>
+							<!-- alternateIdentifiers.alternateIdentifier -->
+						</xs:sequence>
+					</xs:complexType>
+				</xs:element>
+				<!-- alternateIdentifiers -->
+				<!-- parentIdentifier -->
+				<!-- collectionIdentifier -->
+				<xs:element name="relatedResources" minOccurs="0" maxOccurs="1">
+					<xs:annotation>
+						<xs:documentation>(6.) relatedIdentifiers - formal identifiers of resources related to this resource, including the scheme and relationtype for each; here we link to a field expedition, journal article, etc.</xs:documentation>
+					</xs:annotation>
+					<xs:complexType>
+						<xs:sequence>
+							<xs:element name="relatedResource" minOccurs="1" maxOccurs="unbounded">
+								<xs:complexType>
+									<xs:simpleContent>
+										<xs:extension base="xs:string">
+											<xs:attribute name="type" type="identifierType" use="required"/>
+											<xs:attribute name="relationType" type="relationType" use="required"/>
+										</xs:extension>
+									</xs:simpleContent>
+								</xs:complexType>
+							</xs:element>
+							<!-- relatedIdentifiers.relatedIdentifier -->
+						</xs:sequence>
+					</xs:complexType>
+				</xs:element>
+				<!-- relatedIdentifiers -->
+				<xs:element name="description" type="xs:string" minOccurs="0" maxOccurs="1">
+					<xs:annotation>
+						<xs:documentation>(7.) description - free-text description of this resource</xs:documentation>
+					</xs:annotation>
+				</xs:element>
+				<!-- description -->
+				<xs:element name="registrant" minOccurs="0" maxOccurs="1">
+					<xs:annotation>
+						<xs:documentation>(8.) registrant (cf. datacite:publisher) - agent (person or organization) that registered the IGSN for this resource</xs:documentation>
+					</xs:annotation>
+					<xs:complexType>
+						<xs:sequence>
+							<xs:element name="identifier" minOccurs="0" maxOccurs="1">
+								<xs:complexType>
+									<xs:simpleContent>
+										<xs:extension base="xs:string">
+											<xs:attribute name="type" type="identifierType" use="required"/>
+										</xs:extension>
+									</xs:simpleContent>
+								</xs:complexType>
+							</xs:element>
+							<!-- identifier -->
+							<xs:element name="name" type="xs:string" minOccurs="1" maxOccurs="1"/>
+							<xs:element name="affiliation" minOccurs="0" maxOccurs="1">
+								<xs:complexType>
+									<xs:sequence>
+										<xs:element name="identifier" minOccurs="0" maxOccurs="1">
+											<xs:complexType>
+												<xs:simpleContent>
+													<xs:extension base="xs:string">
+														<xs:attribute name="type" type="identifierType" use="required"/>
+													</xs:extension>
+												</xs:simpleContent>
+											</xs:complexType>
+										</xs:element>
+										<!-- registrant.affiliation.identifier -->
+										<xs:element name="name">
+											<xs:simpleType>
+												<xs:restriction base="xs:string"/>
+											</xs:simpleType>
+										</xs:element>
+										<!-- registrant.affiliation.name -->
+									</xs:sequence>
+								</xs:complexType>
+							</xs:element>
+							<!-- registrant.affiliation -->
+						</xs:sequence>
+					</xs:complexType>
+				</xs:element>
+				<!-- registrant -->
+				<!-- collector -->
+				<xs:element name="resourceTypes" minOccurs="0">
+					<xs:annotation>
+						<xs:documentation>(12.) resourceTypes - broad classification of this resource; must provide 1 term from ODM2 vocabulary (specimentype or samplingfeaturetype) plus 0-N additional terms from any vocabulary</xs:documentation>
+					</xs:annotation>
+					<xs:complexType>
+						<xs:sequence>
+							<xs:element name="resourceType" type="resourceType"/>
+							<!-- resourceTypes.resourceType -->
+							<xs:element name="alternateResourceTypes" minOccurs="0">
+								<xs:complexType>
+									<xs:sequence>
+										<xs:element name="alternateResourceType" maxOccurs="unbounded">
+											<xs:simpleType>
+												<xs:union memberTypes="xs:string xs:anyURI"/>
+											</xs:simpleType>
+										</xs:element>
+										<!-- resourceTypes.alternateResourceTypes.alternateResourceType -->
+									</xs:sequence>
+								</xs:complexType>
+							</xs:element>
+							<!-- resourceTypes.alternateResourceTypes -->
+						</xs:sequence>
+					</xs:complexType>
+				</xs:element>
+				<xs:element name="materials" minOccurs="0">
+					<xs:annotation>
+						<xs:documentation>(13.) materials - physical medium of this resource; must provide 1 term from ODM2 vocabulary (medium) plus 0-N additional terms from any vocabulary; typically only used for samples</xs:documentation>
+					</xs:annotation>
+					<xs:complexType>
+						<xs:sequence>
+							<xs:element name="material" type="materialType" maxOccurs="unbounded"/>
+							<xs:element name="alternateMaterials" minOccurs="0">
+								<xs:complexType>
+									<xs:sequence>
+										<xs:element name="alternateMaterial" maxOccurs="unbounded">
+											<xs:simpleType>
+												<xs:union memberTypes="xs:string xs:anyURI"/>
+											</xs:simpleType>
+										</xs:element>
+										<!-- materials.alternateMaterials.alternateMaterial -->
+									</xs:sequence>
+								</xs:complexType>
+							</xs:element>
+							<!-- materials.alternateMaterials -->
+						</xs:sequence>
+					</xs:complexType>
+				</xs:element>
+				<xs:element name="locations" minOccurs="0">
+					<xs:annotation>
+						<xs:documentation>(11.) geoLocations (geometry cf. odm2:samplingfeaturegeotype|toponym) - location of the resource, expressed as 2-D geometry and/or place name(s)</xs:documentation>
+					</xs:annotation>
+					<xs:complexType>
+						<xs:all>
+							<xs:element name="geometry" minOccurs="0">
+								<xs:complexType>
+									<xs:simpleContent>
+										<xs:extension base="xs:string">
+											<xs:attribute name="type" type="geometryType" use="required"/>
+											<xs:attribute name="sridType" type="sridType" use="optional"/>
+										</xs:extension>
+									</xs:simpleContent>
+								</xs:complexType>
+							</xs:element>
+							<!-- geometry -->
+							<xs:element name="toponym" minOccurs="0">
+								<xs:complexType>
+									<xs:sequence>
+										<xs:element name="identifier" minOccurs="0">
+											<xs:complexType>
+												<xs:simpleContent>
+													<xs:extension base="xs:string">
+														<xs:attribute name="type" type="identifierType" use="required"/>
+													</xs:extension>
+												</xs:simpleContent>
+											</xs:complexType>
+										</xs:element>
+										<!-- toponym.identifier -->
+										<xs:element name="name" type="xs:string" minOccurs="0"/>
+										<!-- toponym.name -->
+									</xs:sequence>
+								</xs:complexType>
+							</xs:element>
+							<!-- toponym -->
+							<!-- geoLocation -->
+						</xs:all>
+					</xs:complexType>
+				</xs:element>
+				<xs:element name="date" minOccurs="0">
+					<xs:complexType>
+						<xs:choice>
+							<xs:element name="timeInstant" type="xs:dateTime" minOccurs="0"/>
+							<xs:element name="timePeriod" minOccurs="0">
+								<xs:complexType>
+									<xs:sequence>
+										<xs:element name="start" type="xs:dateTime"/>
+										<xs:element name="end" type="xs:dateTime"/>
+									</xs:sequence>
+								</xs:complexType>
+							</xs:element>
+						</xs:choice>
+					</xs:complexType>
+				</xs:element>
+				<xs:element name="collectionMethods" minOccurs="0">
+					<xs:annotation>
+						<xs:documentation>(14.) collectionMethods - broad classification of instrument/technique used to create or extract this resource - must provide 1 term from SESAR (collectionMethod) vocabulary plus 0-N additional terms from any vocabulary; typically only used for samples</xs:documentation>
+					</xs:annotation>
+					<xs:complexType>
+						<xs:sequence>
+							<xs:element name="collectionMethod" type="methodType"/>
+							<xs:element name="alternateCollectionMethods" minOccurs="0">
+								<xs:complexType>
+									<xs:sequence>
+										<xs:element name="alternateCollectionMethod" maxOccurs="unbounded">
+											<xs:simpleType>
+												<xs:union memberTypes="xs:string xs:anyURI"/>
+											</xs:simpleType>
+										</xs:element>
+										<!-- collectionMethods.alternateCollectionMethods.alternateCollectionMethod -->
+									</xs:sequence>
+								</xs:complexType>
+							</xs:element>
+							<!-- collectionMethod.alternateCollectionMethods -->
+						</xs:sequence>
+					</xs:complexType>
+				</xs:element>
+				<xs:element name="collectors" minOccurs="0">
+					<xs:complexType>
+						<xs:sequence>
+							<xs:element name="collector" maxOccurs="unbounded">
+								<xs:annotation>
+									<xs:documentation>(9.) collector (cf. datacite:creator) - agent (person or organization) that created or extracted this physical specimen; typically only used for samples</xs:documentation>
+								</xs:annotation>
+								<xs:complexType>
+									<xs:sequence>
+										<xs:element name="identifier" minOccurs="0">
+											<xs:complexType>
+												<xs:simpleContent>
+													<xs:extension base="xs:string">
+														<xs:attribute name="type" type="identifierType" use="required"/>
+													</xs:extension>
+												</xs:simpleContent>
+											</xs:complexType>
+										</xs:element>
+										<!-- collector.identifier -->
+										<xs:element name="name" type="xs:string"/>
+										<xs:element name="affiliation" minOccurs="0">
+											<xs:complexType>
+												<xs:sequence>
+													<xs:element name="identifier" minOccurs="0">
+														<xs:complexType>
+															<xs:simpleContent>
+																<xs:extension base="xs:string">
+																	<xs:attribute name="type" type="identifierType" use="required"/>
+																</xs:extension>
+															</xs:simpleContent>
+														</xs:complexType>
+													</xs:element>
+													<!-- collector.affiliation.identifier -->
+													<xs:element name="name">
+														<xs:simpleType>
+															<xs:restriction base="xs:string"/>
+														</xs:simpleType>
+													</xs:element>
+													<!-- collector.affiliation.name -->
+												</xs:sequence>
+											</xs:complexType>
+										</xs:element>
+										<!-- collector.affiliation -->
+									</xs:sequence>
+								</xs:complexType>
+							</xs:element>
+						</xs:sequence>
+					</xs:complexType>
+				</xs:element>
+				<xs:element name="contributors" minOccurs="0" maxOccurs="1">
+					<xs:annotation>
+						<xs:documentation>(10.) contributors - agents (persons or organizations) that contributed to this resource; investigator, funder, technician, etc.</xs:documentation>
+					</xs:annotation>
+					<xs:complexType>
+						<xs:sequence>
+							<xs:element name="contributor" minOccurs="1" maxOccurs="unbounded">
+								<xs:complexType>
+									<xs:sequence>
+										<xs:element name="identifier" minOccurs="0" maxOccurs="1">
+											<xs:complexType>
+												<xs:simpleContent>
+													<xs:extension base="xs:string">
+														<xs:attribute name="type" type="identifierType" use="required"/>
+													</xs:extension>
+												</xs:simpleContent>
+											</xs:complexType>
+										</xs:element>
+										<!-- contributors.contributor.identifier -->
+										<xs:element name="name">
+											<xs:simpleType>
+												<xs:restriction base="xs:string"/>
+											</xs:simpleType>
+										</xs:element>
+										<!-- contributors.contributor.name -->
+									</xs:sequence>
+									<xs:attribute name="type" type="contributorType" use="required"/>
+								</xs:complexType>
+							</xs:element>
+							<!-- contributors.contributor -->
+						</xs:sequence>
+					</xs:complexType>
+				</xs:element>
+				<!-- contributors -->
+				<!-- geoLocations -->
+				<!-- resourceTypes -->
+				<!-- materials -->
+				<!-- collectionMethod -->
+				<!-- collectionTime -->
+				<xs:element name="isMetadataPublic" type="accessType" minOccurs="1" maxOccurs="1">
+					<xs:annotation>
+						<xs:documentation>(16.) sampleAccess - indicates whether this resource is available for reuse beyond the original contributor; typically only used for samples</xs:documentation>
+					</xs:annotation>
+				</xs:element>
+				<!-- sampleAccess -->
+				<xs:element name="supplementalMetadata" minOccurs="0" maxOccurs="1">
+					<xs:annotation>
+						<xs:documentation>(17.) supplementalMetadata - link to any additional documentation, as structured metadata or free text</xs:documentation>
+					</xs:annotation>
+					<xs:complexType>
+						<xs:sequence>
+							<xs:element name="metadata" maxOccurs="unbounded">
+								<xs:complexType>
+									<xs:sequence>
+										<xs:element name="metadataURI" type="xs:anyURI"/>
+										<!-- collectionMethods.alternateCollectionMethods.alternateCollectionMethod -->
+										<xs:element name="metadataTitle" type="xs:string"/>
+									</xs:sequence>
+								</xs:complexType>
+							</xs:element>
+							<!-- collectionMethods.alternateCollectionMethods.alternateCollectionMethod -->
+						</xs:sequence>
+					</xs:complexType>
+				</xs:element>
+				<!-- supplementalMetadata -->
+			</xs:sequence>
+			<xs:attribute name="registedObjectType" type="registrationType" use="required"/>
+		</xs:complexType>
+	</xs:element>
+	<!-- resource -->
+</xs:schema>

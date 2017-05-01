@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="utf-8"?>
+<igsn:resource
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xmlns:igsn="http://schema.igsn.org/description/1.0/"
+        xsi:schemaLocation="http://schema.igsn.org/description/1.0 https://raw.githubusercontent.com/IGSN/metadata/dev/description/resource.xsd"
+        registedObjectType="http://schema.igsn.org/vocab/PhysicalSample">
+    <igsn:identifier type="IGSN">AU10000</igsn:identifier>
+    <igsn:identifier type="URL">http://pid.geoscience.gov.au/sample/AU10000</igsn:identifier>
+
+    <igsn:alternateIdentifiers>
+        <igsn:alternateIdentifier></igsn:alternateIdentifier>
+    </igsn:alternateIdentifiers>
+
+    <igsn:title>Sample igsn:AU10000</igsn:title>
+    <igsn:description></igsn:description>
+    <igsn:registrant>
+        <igsn:name>Geoscience Australia</igsn:name>
+        <igsn:affiliation>
+            <igsn:identifier type="URL">http://pid.geoscience.gov.au/org/ga</igsn:identifier>
+            <igsn:name>Geoscience Australia</igsn:name>
+        </igsn:affiliation>
+    </igsn:registrant>
+    <igsn:contributors>
+        <igsn:contributor type="HostingInstitution">
+            <igsn:identifier type="URL">http://pid.geoscience.gov.au/org/ga</igsn:identifier>
+            <igsn:name>Geoscience Australia</igsn:name>
+        </igsn:contributor>
+    </igsn:contributors>
+    <igsn:geoLocations>
+        <igsn:geoLocation>
+            <igsn:geometry type="Point" sridType="4326">SRID=8311;POINTZ(138.617538846 -18.7814898277 )</igsn:geometry>
+        </igsn:geoLocation>
+    </igsn:geoLocations>
+    <igsn:resourceTypes>
+        <igsn:resourceType>Sample</igsn:resourceType>
+        <igsn:resourceType>http://www.opengis.net/def/nil/OGC/0/missing</igsn:resourceType>
+    </igsn:resourceTypes>
+    <igsn:materials>
+        <igsn:material>http://vocabulary.odm2.org/medium/unknown</igsn:material>
+    </igsn:materials>
+    <igsn:collectionMethods>
+        <igsn:collectionMethod>http://www.opengis.net/def/nil/OGC/0/missing</igsn:collectionMethod>
+    </igsn:collectionMethods>
+
+    <igsn:sampleAccess>Public</igsn:sampleAccess>
+</igsn:resource>
