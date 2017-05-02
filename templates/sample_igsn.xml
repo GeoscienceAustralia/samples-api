@@ -1,16 +1,14 @@
 <igsn:resource
-        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-        xmlns:igsn="http://schema.igsn.org/description/1.0/"
+        xmlns:igsn="http://schema.igsn.org/description/1.0"
         xsi:schemaLocation="http://schema.igsn.org/description/1.0 https://raw.githubusercontent.com/IGSN/metadata/master/description/resource.xsd"
-        registedObjectType="http://schema.igsn.org/vocab/PhysicalSample">
-    <igsn:identifier type="IGSN">{{ igsn }}</igsn:identifier>
-    <igsn:identifier type="URL">http://pid.geoscience.gov.au/sample/{{ igsn }}</igsn:identifier>
+        type="Sample">
+    <igsn:identifier type="IGSN">http://igsn.org/{{ igsn }}</igsn:identifier>
+    <igsn:name>Sample igsn:{{ igsn }}</igsn:name>
     {% if sample_id is not none %}
     <igsn:alternateIdentifiers>
         <igsn:alternateIdentifier>{{ sample_id }}</igsn:alternateIdentifier>
     </igsn:alternateIdentifiers>
     {% endif %}
-    <igsn:name>Sample igsn:{{ igsn }}</igsn:name>
     <igsn:description>{{ description }}</igsn:description>
     <igsn:registrant>
         <igsn:name>Geoscience Australia</igsn:name>
@@ -31,7 +29,6 @@
         </igsn:geoLocation>
     </igsn:geoLocations>
     <igsn:resourceTypes>
-        <igsn:resourceType>Sample</igsn:resourceType>
         <igsn:resourceType>{{ sample_type }}</igsn:resourceType>
     </igsn:resourceTypes>
     <igsn:materials>

@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<OAI-PMH
+        xmlns="http://www.openarchives.org/OAI/2.0/"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://www.openarchives.org/OAI/2.0/ http://www.openarchives.org/OAI/2.0/OAI-PMH.xsd">
+    <responseDate>2017-05-02T13:15:00Z</responseDate>
+    <request verb="GetRecord" identifier="AU239" metadataPrefix="igsn"/>
+    <GetRecord>
+        <record>
+            <header>
+                <identifier>AU239</identifier>
+                <datestamp>1900-01-01</datestamp>
+            </header>
+            <metadata>
+				<igsn:resource
+						xmlns:igsn="http://schema.igsn.org/description/1.0"
+						xsi:schemaLocation="http://schema.igsn.org/description/1.0 https://raw.githubusercontent.com/IGSN/metadata/master/description/resource.xsd"
+						type="Sample">
+                    <igsn:identifier type="IGSN">http://igsn.org/AU239</igsn:identifier>
+                    <igsn:name>Sample igsn:AU239</igsn:name>
+                    <igsn:alternateIdentifiers>
+                        <igsn:alternateIdentifier>2000362089A</igsn:alternateIdentifier>
+                    </igsn:alternateIdentifiers>
+                    <igsn:description/>
+                    <igsn:registrant>
+                        <igsn:name>Geoscience Australia</igsn:name>
+                        <igsn:affiliation>
+                            <igsn:identifier type="URL">http://pid.geoscience.gov.au/org/ga</igsn:identifier>
+                            <igsn:name>Geoscience Australia</igsn:name>
+                        </igsn:affiliation>
+                    </igsn:registrant>
+                    <igsn:contributors>
+                        <igsn:contributor type="HostingInstitution">
+                            <igsn:identifier type="URL">http://pid.geoscience.gov.au/org/ga</igsn:identifier>
+                            <igsn:name>Geoscience Australia</igsn:name>
+                        </igsn:contributor>
+                    </igsn:contributors>
+                    <igsn:geoLocations>
+                        <igsn:geoLocation>
+                            <igsn:geometry type="Point" sridType="4326">SRID=8311;POINTZ(137.8563726 -33.7108293 51)</igsn:geometry>
+                        </igsn:geoLocation>
+                    </igsn:geoLocations>
+                    <igsn:resourceTypes>
+                        <igsn:resourceType>http://vocabulary.odm2.org/specimentype/core/</igsn:resourceType>
+                    </igsn:resourceTypes>
+                    <igsn:materials>
+                        <igsn:material>http://vocabulary.odm2.org/medium/rock/</igsn:material>
+                    </igsn:materials>
+                    <igsn:collectionMethods>
+                        <igsn:collectionMethod>Unknown</igsn:collectionMethod>
+                    </igsn:collectionMethods>
+                    <igsn:sampleAccess>Public</igsn:sampleAccess>
+                </igsn:resource>
+            </metadata>
+        </record>
+    </GetRecord>
+</OAI-PMH>
