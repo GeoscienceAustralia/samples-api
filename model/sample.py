@@ -86,47 +86,41 @@ class Sample:
             self._populate_from_oracle_api()
 
     def render(self, view, mimetype):
-        if mimetype in LDAPI.get_rdf_mimetypes_list():
-            return Response(self.export_rdf(view, mimetype), mimetype=mimetype)
+        if self.sample_no is None:
+            return Response('Sample with IGSN {} not found.'.format(self.igsn), status=404, mimetype='text/plain')
 
-        if view == 'igsn-o':  # the GA IGSN Ontology in RDF or HTML
-            # RDF formats handled by general case
-            # HTML is the only other enabled format for igsn view
-            return self.export_html(model_view=view)
-        elif view == 'dc':  # Dublin Core in RDF or HTML
-            # RDF formats handled by general case
-            if mimetype == 'text/xml':
-                return Response(
-                    '<?xml version="1.0" encoding="utf-8"?>\n' + self.export_dc_xml(),
-                    mimetype='text/xml')
-            else:
+        if view == 'igsn-o':
+            if mimetype == 'text/html':
                 return self.export_html(model_view=view)
-        elif view == 'igsn':  # the community agreed description metadata schema
-            # only XML for this view
+            else:
+                return Response(self.export_rdf(view, mimetype), mimetype=mimetype)
+        elif view == 'dc':
+            if mimetype == 'text/html':
+                return self.export_html(model_view=view)
+            else:
+                return Response(self.export_rdf(view, mimetype), mimetype=mimetype)
+        elif view == 'igsn':  # only XML for this view
             return Response(
                 '<?xml version="1.0" encoding="utf-8"?>\n' + self.export_igsn_xml(),
                 mimetype='text/xml'
             )
-        elif view == 'igsn-dev':  # the community agreed description metadata schema, dev
-            # only XML for this view
+        elif view == 'igsn-dev':  # only XML for this view
             return Response(
                 '<?xml version="1.0" encoding="utf-8"?>\n' + self.export_igsn_dev_xml(),
                 mimetype='text/xml'
             )
-        elif view == 'csirov3':
-            # only XML for this view
+        elif view == 'csirov3':  # only XML for this view
             return Response(
                 '<?xml version="1.0" encoding="utf-8"?>\n' + self.export_csirov3_xml(),
                 mimetype='text/xml'
             )
-        elif view == 'prov':  # PROV-O in RDF (soon or HTML)
-            # RDF formats handled by general case
-            # only RDF for this view so set the mimetype to our favourite mime format
-            return self.export_html(model_view=view)
-        elif view == 'sosa':  # SODA in HTML. Placeholder for now (01/05/2017)
-            # RDF formats handled by general case
-            # only RDF for this view so set the mimetype to our favourite mime format
-            return self.export_html(model_view='igsn-o')
+        elif view == 'prov':
+            if mimetype == 'text/html':
+                return self.export_html(model_view=view)
+            else:
+                return Response(self.export_rdf(view, mimetype), mimetype=mimetype)
+        elif view == 'sosa':  # RDF only for this view
+            return Response(self.export_rdf(view, mimetype), mimetype=mimetype)
 
     def validate_xml(self, xml):
         parser = etree.XMLParser(dtd_validation=False)
