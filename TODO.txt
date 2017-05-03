@@ -8,4 +8,4 @@
     * and ListRecords & GetRecord igsn to print <igsn:collectionTime/> instead of <igsn:collectionTime>1990-01-01</igsn:collectionTime>, like the dc format already does
     * and ListRecords & GetRecord csirov3 to print <cs:logDate eventType="registered"/> not <cs:logDate eventType="registered">1990-01-01</cs:logDate>
 
-* remove redundant RDF namespaces from SOSA RDF view
+* convert to Python 3

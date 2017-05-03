@@ -1,6 +1,6 @@
 from lxml import etree
 from lxml import objectify
-from rdflib import Graph, URIRef, RDF, RDFS, XSD, Namespace, Literal, BNode
+from rdflib import Graph, URIRef, RDF, RDFS, XSD, OWL, Namespace, Literal, BNode
 from StringIO import StringIO
 import requests
 from model.datestamp import *
@@ -583,33 +583,38 @@ class Sample:
 
         # things that are applicable to all model views; the graph and some namespaces
         g = Graph()
-        # DC = Namespace('http://purl.org/dc/elements/1.1/')
-        DCT = Namespace('http://purl.org/dc/terms/')
-        g.bind('dct', DCT)
-
-        SAMFL = Namespace('http://def.seegrid.csiro.au/ontology/om/sam-lite#')
-        g.bind('samfl', SAMFL)
-
-        GEOSP = Namespace('http://www.opengis.net/ont/geosparql#')
-        g.bind('geosp', GEOSP)
-
-        AUROLE = Namespace('http://communications.data.gov.au/def/role/')
-        g.bind('aurole', AUROLE)
-
-        PROV = Namespace('http://www.w3.org/ns/prov#')
-        g.bind('prov', PROV)
 
         # URI for this sample
         base_uri = 'http://pid.geoscience.gov.au/sample/'
         this_sample = URIRef(base_uri + self.igsn)
         g.add((this_sample, RDFS.label, Literal('Sample igsn:' + self.igsn, datatype=XSD.string)))
 
-        # define GA
-        ga = URIRef(Sample.URI_GA)
+        # generate things common to particular views
+        if model_view == 'igsn-o' or model_view == 'dc':
+            # DC = Namespace('http://purl.org/dc/elements/1.1/')
+            DCT = Namespace('http://purl.org/dc/terms/')
+            g.bind('dct', DCT)
 
-        # sample location in GML & WKT, formulation from GeoSPARQL
-        wkt = Literal(self._generate_sample_wkt(), datatype=GEOSP.wktLiteral)
-        gml = Literal(self._generate_sample_gml(), datatype=GEOSP.gmlLiteral)
+        if model_view == 'igsn-o' or model_view == 'sosa':
+            SAMFL = Namespace('http://def.seegrid.csiro.au/ontology/om/sam-lite#')
+            g.bind('samfl', SAMFL)
+
+        if model_view == 'igsn-o' or model_view == 'sosa' or model_view == 'dc':
+            GEOSP = Namespace('http://www.opengis.net/ont/geosparql#')
+            g.bind('geosp', GEOSP)
+
+            # sample location in GML & WKT, formulation from GeoSPARQL
+            wkt = Literal(self._generate_sample_wkt(), datatype=GEOSP.wktLiteral)
+            gml = Literal(self._generate_sample_gml(), datatype=GEOSP.gmlLiteral)
+
+            # define GA
+            ga = URIRef(Sample.URI_GA)
+
+        if model_view == 'igsn-o' or model_view == 'prov':
+            PROV = Namespace('http://www.w3.org/ns/prov#')
+            g.bind('prov', PROV)
+            AUROLE = Namespace('http://communications.data.gov.au/def/role/')
+            g.bind('aurole', AUROLE)
 
         # select model view
         if model_view == 'igsn-o':
@@ -623,9 +628,9 @@ class Sample:
 
             # AlternateIdentifier
             alternate_identifier = BNode()
-            g.add((this_sample, DCT.identifier, alternate_identifier))
-            g.add((alternate_identifier, RDF.type, URIRef('http://pid.geoscience.gov.au/def/voc/igsn-codelists/IGSN')))
-            g.add((alternate_identifier, PROV.value, Literal(self.igsn, datatype=XSD.string)))
+            g.add((this_sample, IGSN.alternateIdentifier, Literal(self.igsn, datatype=IGSN.IGSN)))
+            # g.add((alternate_identifier, RDF.type, URIRef('http://pid.geoscience.gov.au/def/voc/igsn-codelists/IGSN')))
+            # g.add((alternate_identifier, PROV.value, Literal(self.igsn, datatype=XSD.string)))
 
             # Geometry
             geometry = BNode()
@@ -656,33 +661,33 @@ class Sample:
             # TODO: represent Public/Private (and other?) access methods in DB, add to terms in vocab?
             g.add((this_sample, DCT.accessRights, URIRef(TERM_LOOKUP['access']['Public'])))
             # TODO: make a register of Entities
-            this_parent = URIRef(self.entity_uri)
+            site = URIRef(self.entity_uri)
 
-            g.add((this_sample, SAMFL.relatedSamplingFeature, this_parent))  # could be OM.featureOfInterest
+            g.add((this_sample, SAMFL.relatedSamplingFeature, site))  # could be OM.featureOfInterest
 
             # parent
             if self.entity_type is not None:
-                g.add((this_parent, RDF.type, URIRef(self.entity_type)))
+                g.add((site, RDF.type, URIRef(self.entity_type)))
             else:
                 g.add((
-                    this_parent,
+                    site,
                     RDF.type,
                     URIRef('http://pid.geoscience.gov.au/def/voc/featureofinteresttype/borehole')
                 ))
 
-            parent_geometry = BNode()
-            g.add((this_parent, GEOSP.hasGeometry, parent_geometry))
-            g.add((parent_geometry, RDF.type, SAMFL.Point))  # TODO: extend this for other geometry types
-            g.add((parent_geometry, GEOSP.asWKT, Literal(self._generate_parent_wkt(), datatype=GEOSP.wktLiteral)))
-            g.add((parent_geometry, GEOSP.asGML, Literal(self._generate_parent_gml(), datatype=GEOSP.wktLiteral)))
+            site_geometry = BNode()
+            g.add((site, GEOSP.hasGeometry, site_geometry))
+            g.add((site_geometry, RDF.type, SAMFL.Point))  # TODO: extend this for other geometry types
+            g.add((site_geometry, GEOSP.asWKT, Literal(self._generate_parent_wkt(), datatype=GEOSP.wktLiteral)))
+            g.add((site_geometry, GEOSP.asGML, Literal(self._generate_parent_gml(), datatype=GEOSP.wktLiteral)))
 
-            parent_elevation = BNode()
-            g.add((this_parent, SAMFL.samplingElevation, parent_elevation))
-            g.add((parent_elevation, RDF.type, SAMFL.Elevation))
-            g.add((parent_elevation, SAMFL.elevation, Literal(self.z, datatype=XSD.float)))
-            g.add((parent_elevation, SAMFL.verticalDatum,
+            site_elevation = BNode()
+            g.add((site, SAMFL.samplingElevation, site_elevation))
+            g.add((site_elevation, RDF.type, SAMFL.Elevation))
+            g.add((site_elevation, SAMFL.elevation, Literal(self.z, datatype=XSD.float)))
+            g.add((site_elevation, SAMFL.verticalDatum,
                    Literal("http://spatialreference.org/ref/epsg/4283/", datatype=XSD.anyUri)))
-            g.add((this_parent, SAMFL.sampledFeature, this_sample))
+            g.add((site, SAMFL.sampledFeature, this_sample))
 
             # define GA as an PROV Org with an ISO19115 role of Publisher
             g.add((ga, RDF.type, PROV.Org))
@@ -738,8 +743,7 @@ class Sample:
             g.add((sampling, RDF.type, SOSA.Sampling))
             if self.date_acquired is not None:
                 g.add((sampling, SOSA.resultTime, Literal(self.date_acquired.isoformat(), datatype=XSD.date)))
-            # associate Sampling
-            g.add((this_sample, SOSA.isResultOf, sampling))
+            g.add((this_sample, SOSA.isResultOf, sampling))  # associate
 
             #
             #   Sampler
@@ -747,9 +751,9 @@ class Sample:
             # Sampler declaration
             sampler = BNode()
             g.add((sampler, RDF.type, SOSA.Sampler))
-            g.add((sampler, RDF.type, URIRef(self.method_type)))
-            # associate Sampler (with Sampling)
-            g.add((sampling, SOSA.madeBySampler, sampler))
+            if self.method_type != Sample.URI_MISSSING:
+                g.add((sampler, RDF.type, URIRef(self.method_type)))
+            g.add((sampling, SOSA.madeBySampler, sampler))  # associate Sampler (with Sampling)
 
             # #
             # #   Procedure
@@ -757,42 +761,57 @@ class Sample:
             # # Procedure declaration
             # procedure = BNode()
             # g.add((procedure, RDF.type, SOSA.Procedure))
-            # # g.add((this_sample, RDF.type, SOSA.Procedure)) # TODO: domsthing about missing if any method info is not known
+            # # g.add((this_sample, RDF.type, SOSA.Procedure))
+            #  TODO: domsthing about missing if any method info is not known
             # # associate Procedure
             # g.add((this_sample, SOSA.usedProcedure, procedure))
+
+            SAMP = Namespace('http://www.w3.org/ns/sosa/sampling/')
+            g.bind('sampling', SAMP)
+
+            # SampleRelationship to Site
+            site = URIRef(self.entity_uri)
+            sr = BNode()
+            g.add((sr, RDF.type, SAMP.SampleRelationship))
+            g.add((sr, SAMP.relatedSample, site))
+            # TODO: replace with a real Concept URI
+            g.add((sr, SAMP.natureOfRelationship, URIRef('http://example.org/sampling/relationship/subsample')))
+            g.add((this_sample, SAMP.hasSampleRelationship, sr))  # associate
+
+            # Site details
+            g.add((site, RDF.type, OWL.NamedIndividual))
+            # specific type of Site
+            if self.entity_type is not None:
+                site_type = URIRef(self.entity_type)
+            else:
+                site_type = URIRef('http://pid.geoscience.gov.au/def/voc/featureofinteresttype/borehole')
+            g.add((site, RDF.type, site_type))
+            g.add((site_type, RDFS.subClassOf, SOSA.Sample))
+
+            # FOI geometry
+            site_geometry = BNode()
+            g.add((site, GEOSP.hasGeometry, site_geometry))
+            g.add((site_geometry, RDF.type, GEOSP.Geometry))
+            g.add((site_geometry, GEOSP.asWKT, Literal(self._generate_parent_wkt(), datatype=GEOSP.wktLiteral)))
+            # g.add((site_geometry, GEOSP.asGML, Literal(self._generate_parent_gml(), datatype=GEOSP.wktLiteral)))
+            # FOI elevation
+            site_elevation = BNode()
+            g.add((site, SAMFL.samplingElevation, site_elevation))
+            g.add((site_elevation, RDF.type, SAMFL.Elevation))
+            g.add((site_elevation, SAMFL.elevation, Literal(self.z, datatype=XSD.float)))
+            g.add((site_elevation, SAMFL.verticalDatum,
+                   Literal("http://spatialreference.org/ref/epsg/4283/", datatype=XSD.anyUri)))
 
             #
             #   Feature of Interest
             #
-            # FOI declaration
-            this_parent = URIRef(self.entity_uri)
-            # FOI type
-            # general type
-            g.add((this_parent, RDF.type, SOSA.FeatureOfInterest))
-            # specific type
-            if self.entity_type is not None:
-                g.add((this_parent, RDF.type, URIRef(self.entity_type)))
-            else:
-                g.add((
-                    this_parent,
-                    RDF.type,
-                    URIRef('http://pid.geoscience.gov.au/def/voc/featureofinteresttype/borehole')
-                ))
-            # FOI geometry
-            parent_geometry = BNode()
-            g.add((this_parent, GEOSP.hasGeometry, parent_geometry))
-            g.add((parent_geometry, RDF.type, SAMFL.Point))  # TODO: extend this for other geometry types
-            g.add((parent_geometry, GEOSP.asWKT, Literal(self._generate_parent_wkt(), datatype=GEOSP.wktLiteral)))
-            g.add((parent_geometry, GEOSP.asGML, Literal(self._generate_parent_gml(), datatype=GEOSP.wktLiteral)))
-            # FOI elevation
-            parent_elevation = BNode()
-            g.add((this_parent, SAMFL.samplingElevation, parent_elevation))
-            g.add((parent_elevation, RDF.type, SAMFL.Elevation))
-            g.add((parent_elevation, SAMFL.elevation, Literal(self.z, datatype=XSD.float)))
-            g.add((parent_elevation, SAMFL.verticalDatum,
-                   Literal("http://spatialreference.org/ref/epsg/4283/", datatype=XSD.anyUri)))
-            # associate FOI
-            g.add((this_sample, SOSA.isSampleOf, this_parent))
+            # domain feature, same for all Samples
+            domain_feature = URIRef('http://registry.it.csiro.au/sandbox/csiro/oznome/feature/earth-realm/lithosphere')
+            g.add((domain_feature, RDF.type, SOSA.FeatureOfInterest))
+            SKOS = Namespace('http://www.w3.org/2004/02/skos/core#')
+            g.bind('skos', SKOS)
+            g.add((domain_feature, SKOS.exactMatch, URIRef('http://sweet.jpl.nasa.gov/2.3/realmGeol.owl#Lithosphere')))
+            g.add((this_sample, SOSA.isSampleOf, domain_feature))  # associate
 
         return g.serialize(format=LDAPI.get_rdf_parser_for_mimetype(rdf_mime))
 
