@@ -172,7 +172,7 @@ class Sample:
                 self.sample_type = Sample.URI_MISSSING
             self.method_type = TERM_LOOKUP['method_type'].get(root.ROW.SAMPLING_METHOD)
             if self.method_type is None:
-                self.method_type = Sample.URI_MISSSING
+                self.method_type = 'Unknown'
             self.material_type = TERM_LOOKUP['material_type'].get(root.ROW.MATERIAL_CLASS)
             if self.material_type is None:
                 self.material_type = Sample.URI_MISSSING
@@ -860,6 +860,15 @@ class Sample:
 
         :return: XML string
         """
+
+        # acquired date fudge
+        if self.date_acquired is not None:
+            collection_time = datetime_to_datestamp(self.date_acquired)
+        else:
+            collection_time = '1900-01-01T00:00:00'
+
+
+
         template = render_template(
             'sample_igsn.xml',
             igsn=self.igsn,
@@ -869,7 +878,7 @@ class Sample:
             sample_type=self.sample_type,
             material_type=self.material_type,
             collection_method=self.method_type,
-            collection_time=self.date_acquired
+            collection_time=collection_time
         )
 
         return template

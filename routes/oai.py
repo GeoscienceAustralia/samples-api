@@ -70,7 +70,7 @@ def oai():
             if s.date_acquired is not None:
                 datestamp = datetime_to_datestamp(s.date_acquired)
             else:
-                datestamp = ''
+                datestamp = '1900-01-01T00:00:00'
             return Response(
                 render_template(
                     'oai_get_record.xml',

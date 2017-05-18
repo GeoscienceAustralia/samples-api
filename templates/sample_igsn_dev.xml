@@ -18,26 +18,26 @@
             <igsn:name>Geoscience Australia</igsn:name>
         </igsn:affiliation>
     </igsn:registrant>
-    <igsn:locations>
-        <igsn:geometry type="Point" sridType="4326">{{ wkt }}</igsn:geometry>
-    </igsn:locations>
     <igsn:resourceTypes>
         <igsn:resourceType>{{ sample_type }}</igsn:resourceType>
     </igsn:resourceTypes>
     <igsn:materials>
         <igsn:material>{{ material_type }}</igsn:material>
     </igsn:materials>
+    <igsn:locations>
+        <igsn:geometry type="Point" sridType="4326">{{ wkt }}</igsn:geometry>
+    </igsn:locations>
     <igsn:collectionMethods>
         <igsn:collectionMethod>{{ collection_method }}</igsn:collectionMethod>
     </igsn:collectionMethods>
     {% if collection_time is not none %}
     <igsn:collectionTime>{{ collection_time }}</igsn:collectionTime>
     {% endif %}
-    <igsn:isMetadataPublic>Public</igsn:isMetadataPublic>
     <igsn:contributors>
         <igsn:contributor type="HostingInstitution">
             <igsn:identifier type="URI">http://pid.geoscience.gov.au/org/ga</igsn:identifier>
             <igsn:name>Geoscience Australia</igsn:name>
         </igsn:contributor>
     </igsn:contributors>
+    <igsn:isMetadataPublic>Public</igsn:isMetadataPublic>
 </igsn:resource>
