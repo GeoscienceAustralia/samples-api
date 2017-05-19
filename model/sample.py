@@ -77,7 +77,6 @@ class Sample:
         self.hole_lat_min = None
         self.hole_lat_max = None
         self.date_modified = None
-        self.modified_datestamp = None
         self.sample_no = None
 
         if xml is not None:  # even if there are values for Oracle API URI and IGSN, load from XML file if present
@@ -200,6 +199,7 @@ class Sample:
             if self.lith is None:
                 self.lith = Sample.URI_MISSSING
             self.date_acquired = str2datetime(root.ROW.ACQUIREDATE).date() if root.ROW.ACQUIREDATE != '' else None
+            self.date_modified = str2datetime(root.ROW.MODIFIED_DATE) if root.ROW.MODIFIED_DATE != '' else None
             self.entity_uri = 'http://pid.geoscience.gov.au/site/' + str(root.ROW.ENO) if root.ROW.ENO is not None else None
             self.entity_name = root.ROW.ENTITYID
             self.entity_type = TERM_LOOKUP['entity_type'].get(root.ROW.ENTITY_TYPE)
@@ -865,7 +865,7 @@ class Sample:
         if self.date_acquired is not None:
             collection_time = datetime_to_datestamp(self.date_acquired)
         else:
-            collection_time = '1900-01-01T00:00:00'
+            collection_time = '1900-01-01T00:00:00Z'
 
 
 

@@ -67,10 +67,11 @@ def oai():
             elif request_args['metadataPrefix'] == 'csirov3':
                 record_xml = s.export_csirov3_xml()
 
-            if s.date_acquired is not None:
-                datestamp = datetime_to_datestamp(s.date_acquired)
+            if s.date_modified is not None:
+                datestamp = datetime_to_datestamp(s.date_modified)
             else:
-                datestamp = '1900-01-01T00:00:00'
+                datestamp = '1900-01-01T00:00:00Z'
+
             return Response(
                 render_template(
                     'oai_get_record.xml',
