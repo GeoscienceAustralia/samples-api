@@ -118,6 +118,7 @@ def list_records(metadataPrefix, resumptionToken=None, from_=None, until=None):
         [from_, until, batch_num, metadataPrefix] = resumptionToken.split(',')
     r = requests.get(oracle_api_samples_url)
 
+    # TODO: replace this with a check on the HTTP response code where 404 indicates "no data"
     if "No data" in r.content:
         raise ParameterError('No Data')
 
@@ -140,7 +141,7 @@ def list_records_xml(metadataPrefix, resumptionToken=None, from_=None, until=Non
         oracle_api_samples_url = config.XML_API_URL_SAMPLESET.format(page_no, no_per_page)
     else:
         oracle_api_samples_url = create_url_query_token(resumptionToken)
-        [from_,until,batch_num,metadataPrefix] =resumptionToken.split(',')
+        [from_, until, batch_num, metadataPrefix] = resumptionToken.split(',')
 
     r = requests.get(oracle_api_samples_url)
 
@@ -153,26 +154,27 @@ def list_records_xml(metadataPrefix, resumptionToken=None, from_=None, until=Non
 
     for event, elem in context:
         # create a Sample for each XML ROW
-        print etree.tostring(elem)
-        s = Sample(None, '<root>{}</root>'.format(etree.tostring(elem)))
-        if s.date_acquired is not None:
-            datestamp = datetime_to_datestamp(s.date_acquired)
+        sample = Sample(None, '<root>{}</root>'.format(etree.tostring(elem)))
+        if sample.date_modified is not None:
+            datestamp = datetime_to_datestamp(sample.date_modified)
         else:
-            datestamp = ''
+            datestamp = '1900-01-01T00:00:00Z'
 
         # make the record XML using the Sample export
         # for some reason, there's this odd whitespace character in the metadataPrefix
         metadataPrefix = metadataPrefix.replace(u'\u200b', '')
         if metadataPrefix == u'igsn':
-            record_xml = s.export_igsn_xml()
+            record_xml = sample.export_igsn_xml()
+        elif metadataPrefix == u'igsn-dev':
+            record_xml = sample.export_igsn_dev_xml()
         elif metadataPrefix == u'csirov3':
-            record_xml = s.export_csirov3_xml()
+            record_xml = sample.export_csirov3_xml()
         else:  # oai_dc
-            record_xml = s.export_dc_xml()
+            record_xml = sample.export_dc_xml()
 
         # make the full OAI record
         oai_record_vars = {
-            'identifier': s.igsn,
+            'identifier': sample.igsn,
             'datestamp': datestamp,
             'record_xml': record_xml
         }
@@ -211,10 +213,7 @@ def get_resumption_token(metadataPrefix, resumptionToken=None, from_=None, until
     expiration_date = calc_expiration_datestamp()
 
     if resumptionToken:
-        [from_,
-         until,
-         cursor,
-         metadataPrefix] = resumptionToken.split(',')
+        [from_, until, cursor, metadataPrefix] = resumptionToken.split(',')
     else:
         if from_ is None:
             from_ = '2011-06-01T00:00:00Z'
@@ -311,11 +310,13 @@ def create_url_query_token(token):
     """
     no_per_page = config.OAI_BATCH_SIZE
 
-    [from_,until,batch_num,metadataPrefix] =token.split(',')
+    [from_, until, batch_num, metadataPrefix] = token.split(',')
     from_date = convert_datestamp_to_oracle(from_)
     until_date = convert_datestamp_to_oracle(until)
 
-    oracle_api_samples_url = config.XML_API_URL_SAMPLESET_DATE_RANGE.format(batch_num,no_per_page,from_date,until_date)
+    oracle_api_samples_url = config.XML_API_URL_SAMPLESET_DATE_RANGE.format(
+        batch_num, no_per_page, from_date, until_date
+    )
     return oracle_api_samples_url
 
 
