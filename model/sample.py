@@ -589,6 +589,9 @@ class Sample:
         this_sample = URIRef(base_uri + self.igsn)
         g.add((this_sample, RDFS.label, Literal('Sample igsn:' + self.igsn, datatype=XSD.string)))
 
+        # define GA
+        ga = URIRef(Sample.URI_GA)
+
         # generate things common to particular views
         if model_view == 'igsn-o' or model_view == 'dc':
             # DC = Namespace('http://purl.org/dc/elements/1.1/')
@@ -606,9 +609,6 @@ class Sample:
             # sample location in GML & WKT, formulation from GeoSPARQL
             wkt = Literal(self._generate_sample_wkt(), datatype=GEOSP.wktLiteral)
             gml = Literal(self._generate_sample_gml(), datatype=GEOSP.gmlLiteral)
-
-            # define GA
-            ga = URIRef(Sample.URI_GA)
 
         if model_view == 'igsn-o' or model_view == 'prov':
             PROV = Namespace('http://www.w3.org/ns/prov#')
