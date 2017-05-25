@@ -840,11 +840,16 @@ class Sample:
 
         :return: XML string
         """
+
+        if self.date_acquired is None:
+            d = ''
+        else:
+            d = self.date_acquired
         template = render_template(
             'sample_dc.xml',
             identifier=self.igsn,
             description=self.remark,
-            date=self.date_acquired,
+            date=d,
             type=self.sample_type,
             format=self.material_type,
             wkt=self._generate_sample_wkt(),

@@ -4,7 +4,7 @@
         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
         xsi:schemaLocation="http://www.openarchives.org/OAI/2.0/
         http://www.openarchives.org/OAI/2.0/OAI-PMH.xsd">
-    <responseDate>{{values.response_date}}</responseDate>
-    <request>{{values.request_uri}}</request>
+    <responseDate>{{ response_date }}</responseDate>
+    <request>{{ request_uri }}</request>
     <error code="{{values.error_code}}">{{values.error_text}}</error>
 </OAI-PMH>

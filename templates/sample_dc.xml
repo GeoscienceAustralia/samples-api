@@ -10,7 +10,7 @@
     {% if description is not none %}
     <dc:description>{{ description }}</dc:description>
     {% endif %}
-    <dc:date>{{ datestamp }}</dc:date>
+    <dc:date>{{ date }}</dc:date>
     <dc:type>{{ type }}</dc:type>
     <dc:format>{{ format }}</dc:format>
     <dc:coverage>SRID=8311;{{ wkt }}</dc:coverage>

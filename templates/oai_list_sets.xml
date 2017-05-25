@@ -2,9 +2,10 @@
 <OAI-PMH
         xmlns="http://www.openarchives.org/OAI/2.0/"
         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-        xsi:schemaLocation="http://www.openarchives.org/OAI/2.0/ http://www.openarchives.org/OAI/2.0/OAI-PMH.xsd">
-    <responseDate>{{values['response_date']}}</responseDate>
-    <request verb="ListSets">http://an.oa.org/OAI-script</request>
+        xsi:schemaLocation="http://www.openarchives.org/OAI/2.0/
+        http://www.openarchives.org/OAI/2.0/OAI-PMH.xsd">
+    <responseDate>{{ response_date }}</responseDate>
+    <request verb="ListSets">{{ request_uri }}</request>
     <ListSets>
         <!-- We only offer one set for now -->
         <set>

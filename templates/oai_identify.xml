@@ -4,8 +4,8 @@
         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
         xsi:schemaLocation="http://www.openarchives.org/OAI/2.0/
         http://www.openarchives.org/OAI/2.0/OAI-PMH.xsd">
-    <responseDate>{{values.response_date}}</responseDate>
-    <request verb="Identify">{{ values.base_url }}</request>
+    <responseDate>{{ response_date }}</responseDate>
+    <request verb="Identify">{{ request_uri }}</request>
     <Identify>
         <repositoryName>Geoscience Australia's Sample Catalogue</repositoryName>
         <baseURL>{{ values.base_url }}</baseURL>
