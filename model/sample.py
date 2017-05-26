@@ -168,7 +168,7 @@ class Sample:
             self.sample_no = root.ROW.SAMPLENO
             self.sample_type = TERM_LOOKUP['sample_type'].get(root.ROW.SAMPLE_TYPE_NEW)
             if self.sample_type is None:
-                self.sample_type = Sample.URI_MISSSING
+                self.sample_type = 'http://vocabulary.odm2.org/specimentype/theSpecimenTypeIsUnknown/'
             self.method_type = TERM_LOOKUP['method_type'].get(root.ROW.SAMPLING_METHOD)
             if self.method_type is None:
                 self.method_type = 'Unknown'
