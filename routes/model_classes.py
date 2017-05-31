@@ -55,6 +55,24 @@ def sample(igsn):
         return routes_functions.client_error_Response(e)
 
 
+@model_classes.route('/sample/<string:igsn>/pingback', methods=['POST'])
+def sample_pingback(igsn):
+    # TODO: validate the pingback
+    valid = True
+    if valid:
+        return Response(
+            'This is a test response, no action has been taken with the pingback information',
+            status=204,
+            mimetype='text/plain'
+        )
+    else:
+        return Response(
+            'The pingback message submitted is not valid',
+            status=400,
+            mimetype='text/plain'
+        )
+
+
 @model_classes.route('/sample/')
 def samples():
     """

@@ -593,6 +593,11 @@ class Sample:
         # define GA
         ga = URIRef(Sample.URI_GA)
 
+        # pingback endpoint
+        PROV = Namespace('http://www.w3.org/ns/prov#')
+        g.bind('prov', PROV)
+        g.add((this_sample, PROV.pingback, URIRef(base_uri + '/pingback')))
+
         # generate things common to particular views
         if model_view == 'igsn-o' or model_view == 'dc':
             # DC = Namespace('http://purl.org/dc/elements/1.1/')
@@ -612,12 +617,10 @@ class Sample:
             gml = Literal(self._generate_sample_gml(), datatype=GEOSP.gmlLiteral)
 
         if model_view == 'igsn-o' or model_view == 'prov':
-            PROV = Namespace('http://www.w3.org/ns/prov#')
-            g.bind('prov', PROV)
             AUROLE = Namespace('http://communications.data.gov.au/def/role/')
             g.bind('aurole', AUROLE)
 
-        # select model view
+        # select particular model view
         if model_view == 'igsn-o':
             # default model is the IGSN model
             # IGSN model required namespaces
@@ -717,7 +720,6 @@ class Sample:
             # g.add((this_sample, DCT.title, ga)) -- no value at GA
             if self.sample_type is not None:
                 g.add((this_sample, DCT.type, URIRef(self.sample_type)))
-
         elif model_view == 'prov':
             g.add((this_sample, RDF.type, PROV.Entity))
             g.add((ga, RDF.type, PROV.Org))
@@ -985,15 +987,23 @@ class Sample:
         else:
             year_acquired = ''
 
-        return render_template(
-            'page_sample.html',
-            view=model_view,
-            igsn=self.igsn,
-            year_acquired=year_acquired,
-            view_title=view_title,
-            sample_table_html=sample_table_html,
-            date_now=datetime.now().strftime('%d %B %Y'),
-            system_url='http://54.66.133.7'
+        # add in the Pingback header links as they are valid for all HTML views
+        pingback_uri = config.BASE_URI_SAMPLE + self.igsn + "/pingback"
+        headers = {
+            'Link': '<{}>;rel = "http://www.w3.org/ns/prov#pingback"'.format(pingback_uri)
+        }
+        return Response(
+            render_template(
+                'page_sample.html',
+                view=model_view,
+                igsn=self.igsn,
+                year_acquired=year_acquired,
+                view_title=view_title,
+                sample_table_html=sample_table_html,
+                date_now=datetime.now().strftime('%d %B %Y'),
+                system_url='http://54.66.133.7'
+            ),
+            headers=headers
         )
 
 
