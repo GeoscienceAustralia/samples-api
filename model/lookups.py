@@ -22,11 +22,11 @@ def get_feature_of_interest_types():
             terms.append(str(row['o']))
         return sorted(terms)
     else:
-        print r.status_code
+        print(r.status_code)
         return False
 
 if __name__ == '__main__':
-    print get_feature_of_interest_types()
+    print(get_feature_of_interest_types())
 
 TERM_LOOKUP = {
     'access': {

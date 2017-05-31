@@ -1,7 +1,7 @@
 from model import Sample
 import config
 from lxml import etree
-from StringIO import StringIO
+from io import StringIO
 import requests
 from model.datestamp import *
 from datetime import datetime, timedelta

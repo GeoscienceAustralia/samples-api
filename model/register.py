@@ -1,10 +1,10 @@
-from renderer import Renderer
+from .renderer import Renderer
 from flask import Response, render_template
 from rdflib import Graph, URIRef, RDF, RDFS, XSD, Namespace, Literal
-from ldapi import LDAPI
+from ldapi.ldapi import LDAPI
 from lxml import etree
 import requests
-from StringIO import StringIO
+from io import StringIO, BytesIO
 import config
 
 
@@ -49,13 +49,20 @@ class RegisterRenderer(Renderer):
         else:
             return Response('The requested model model is not valid for this class', status=400, mimetype='text/plain')
 
-    def _get_details_from_file(self, xml):
+    def _get_details_from_file(self, file_path=None, xml_content=None):
         """
         Populates this instance with data from an XML file.
 
         :param xml: XML according to GA's Oracle XML API from the Samples DB
         :return: None
         """
+        if file_path is not None:
+            xml = open(file_path, 'rb')
+        elif xml_content is not None:
+            xml = BytesIO(xml_content)
+        else:
+            raise ValueError('You must specify either a file path or file XML contents')
+
         for event, elem in etree.iterparse(xml):
             if elem.tag == "IGSN":
                 self.register.append(elem.text)
@@ -67,7 +74,7 @@ class RegisterRenderer(Renderer):
             etree.fromstring(xml, parser)
             return True
         except Exception:
-            print 'not valid xml'
+            print('not valid xml')
             return False
 
     def _get_details_from_oracle_api(self, page, per_page):
@@ -82,7 +89,7 @@ class RegisterRenderer(Renderer):
         xml = r.content
 
         if self.validate_xml(xml):
-            self._get_details_from_file(StringIO(xml))
+            self._get_details_from_file(xml_content=xml)
             return True
         else:
             return False

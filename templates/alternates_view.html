@@ -8,7 +8,7 @@
     {% endif %}
     <table class="lined">
     <tr><th>View</th><th>Formats</th><th>View Desc.</th><th>View Link</th></tr>
-    {% for v, fs in views_formats.iteritems() %}
+    {% for v, fs in views_formats.items() %}
         {% if v == 'default' %}
             <tr><td>default</td><td><a href="{{ request.base_url }}?_view={{ fs }}">{{ fs }}</a></td><td></td><td></td></tr>
         {% else %}

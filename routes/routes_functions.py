@@ -2,10 +2,10 @@
 A list of functions for use anywhere but particularly in routes.py
 """
 from flask import Response, render_template
-from ldapi import LDAPI
+from ldapi.ldapi import LDAPI
 from rdflib import Graph, Namespace, Literal, URIRef, RDF, XSD, BNode, plugin
 import json
-import urllib
+import urllib.parse as uparse
 
 
 def client_error_Response(error_message):
@@ -28,7 +28,7 @@ def render_alternates_view(class_uri, class_uri_encoded, instance_uri, instance_
         DCT = Namespace('http://purl.org/dc/terms/')
         g.bind('dct', DCT)
 
-        class_uri_ref = URIRef(urllib.unquote_plus(class_uri))
+        class_uri_ref = URIRef(uparse.unquote_plus(class_uri))
 
         if instance_uri:
             instance_uri_ref = URIRef(instance_uri)

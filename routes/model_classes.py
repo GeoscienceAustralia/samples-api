@@ -2,11 +2,11 @@
 This file contains all the HTTP routes for classes from the IGSN model, such as Samples and the Sample Register
 """
 from flask import Blueprint, render_template, request, Response
-import routes_functions
+from .routes_functions import render_alternates_view, client_error_Response
 import config
-from ldapi import LDAPI, LdapiParameterError
+from ldapi.ldapi import LDAPI, LdapiParameterError
 from routes import model_classes_functions
-import urllib
+import urllib.parse as uparse
 import requests
 
 model_classes = Blueprint('model_classes', __name__)
@@ -35,11 +35,11 @@ def sample(igsn):
             class_uri = 'http://pid.geoscience.gov.au/def/ont/igsn#Sample'
             instance_uri = 'http://pid.geoscience.gov.au/sample/' + igsn
             del views_formats['renderer']
-            return routes_functions.render_alternates_view(
+            return render_alternates_view(
                 class_uri,
-                urllib.quote_plus(class_uri),
+                uparse.quote_plus(class_uri),
                 instance_uri,
-                urllib.quote_plus(instance_uri),
+                uparse.quote_plus(instance_uri),
                 views_formats,
                 request.args.get('_format')
             )
@@ -51,7 +51,7 @@ def sample(igsn):
             except ValueError:
                 return render_template('sample_no_record.html')
 
-    except LdapiParameterError, e:
+    except LdapiParameterError as e:
         return routes_functions.client_error_Response(e)
 
 
@@ -78,7 +78,7 @@ def samples():
 
         if view == 'alternates':
             del views_formats['renderer']
-            return routes_functions.render_alternates_view(
+            return render_alternates_view(
                 class_uri,
                 urllib.quote_plus(class_uri),
                 None,
@@ -116,7 +116,7 @@ def samples():
             # add a link to "next" and "last"
             try:
                 r = requests.get(config.XML_API_URL_TOTAL_COUNT)
-                no_of_samples = int(r.content.split('<RECORD_COUNT>')[1].split('</RECORD_COUNT>')[0])
+                no_of_samples = int(r.content.decode('utf-8').split('<RECORD_COUNT>')[1].split('</RECORD_COUNT>')[0])
                 last_page_no = int(round(no_of_samples / per_page, 0)) + 1  # same as math.ceil()
 
                 # if we've gotten the last page value successfully, we can choke if someone enters a larger value
@@ -145,5 +145,5 @@ def samples():
             return register.RegisterRenderer(request, class_uri, None, page, per_page, last_page_no)\
                 .render(view, mime_format, extra_headers=headers)
 
-    except LdapiParameterError, e:
+    except LdapiParameterError as e:
         return routes_functions.client_error_Response(e)

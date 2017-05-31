@@ -4,7 +4,7 @@ This file contains all the HTTP routes for basic pages (usually HTML)
 from flask import Blueprint, Response, request, render_template
 from lxml import etree
 from lxml.builder import ElementMaker
-from ldapi import LDAPI, LdapiParameterError
+from ldapi.ldapi import LDAPI, LdapiParameterError
 from routes import routes_functions
 
 pages = Blueprint('routes', __name__)
@@ -30,7 +30,7 @@ def index():
             request.args.get('_format'),
             views_formats
         )
-    except LdapiParameterError, e:
+    except LdapiParameterError as e:
         return routes_functions.client_error_Response(e)
 
     # select view and format

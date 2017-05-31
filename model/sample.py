@@ -1,13 +1,13 @@
 from lxml import etree
 from lxml import objectify
 from rdflib import Graph, URIRef, RDF, RDFS, XSD, OWL, Namespace, Literal, BNode
-from StringIO import StringIO
+from io import StringIO
 import requests
 from model.datestamp import *
 from datetime import datetime
-from ldapi import LDAPI
+from ldapi.ldapi import LDAPI
 from flask import Response, render_template
-from lookups import TERM_LOOKUP
+from .lookups import TERM_LOOKUP
 import config
 
 
@@ -96,6 +96,8 @@ class Sample:
         elif view == 'dc':
             if mimetype == 'text/html':
                 return self.export_html(model_view=view)
+            elif mimetype == 'text/xml':
+                return Response(self.export_dc_xml(), mimetype=mimetype)
             else:
                 return Response(self.export_rdf(view, mimetype), mimetype=mimetype)
         elif view == 'igsn':  # only XML for this view
@@ -128,7 +130,7 @@ class Sample:
             etree.fromstring(xml, parser)
             return True
         except Exception:
-            print 'not valid xml'
+            print('not valid xml')
             return False
 
     def _populate_from_oracle_api(self):
@@ -143,8 +145,7 @@ class Sample:
         # os.environ['NO_PROXY'] = 'ga.gov.au'
         # call API
         r = requests.get(config.XML_API_URL_SAMPLE.format(self.igsn))
-        # deal with missing XML declaration
-        if "No data" in r.content:
+        if "No data" in r.content.decode('utf-8'):
             raise ParameterError('No Data')
 
         if self.validate_xml(r.content):
@@ -716,6 +717,7 @@ class Sample:
             # g.add((this_sample, DCT.title, ga)) -- no value at GA
             if self.sample_type is not None:
                 g.add((this_sample, DCT.type, URIRef(self.sample_type)))
+
         elif model_view == 'prov':
             g.add((this_sample, RDF.type, PROV.Entity))
             g.add((ga, RDF.type, PROV.Org))

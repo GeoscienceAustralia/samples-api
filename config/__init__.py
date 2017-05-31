@@ -1,6 +1,6 @@
-APP_DIR = 'c:/work/samples-api/'
+import os
+APP_DIR = os.path.dirname(os.path.realpath(__file__))
 LOGFILE = APP_DIR + 'samples-api.log'
-PORT = 8080
 DEBUG = True
 
 # Internal Oracle URL
@@ -23,4 +23,4 @@ ADMIN_EMAIL = 'data@ga.gov.au'
 BASE_URI_SAMPLE = 'http://pid.geoscience.gov.au/sample/'
 BASE_URI_OAI = 'http://pid.geoscience.gov.au/oai'
 
-OAI_BATCH_SIZE =10
+OAI_BATCH_SIZE = 10

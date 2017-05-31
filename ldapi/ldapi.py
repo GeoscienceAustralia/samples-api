@@ -81,7 +81,7 @@ class LDAPI:
         :return: model name (string) or False
         """
         if view is not None:
-            if view in views_formats.iterkeys():
+            if view in views_formats.keys():
                 return view
             else:
                 raise LdapiParameterError(
