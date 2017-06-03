@@ -1,14 +1,16 @@
+from datetime import datetime
+from io import StringIO
+
+import requests
+from flask import Response, render_template
 from lxml import etree
 from lxml import objectify
 from rdflib import Graph, URIRef, RDF, RDFS, XSD, OWL, Namespace, Literal, BNode
-from io import StringIO
-import requests
-from model.datestamp import *
-from datetime import datetime
-from ldapi.ldapi import LDAPI
-from flask import Response, render_template
-from .lookups import TERM_LOOKUP
+
 import config
+from ldapi.ldapi import LDAPI
+from routes.datestamp import *
+from .lookups import TERM_LOOKUP
 
 
 class Sample:

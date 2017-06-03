@@ -1,7 +1,7 @@
 import unittest
 import requests
 from lxml import etree
-from StringIO import StringIO
+from io import StringIO
 from routes.oai_functions import valid_oai_args, validate_oai_parameters, ParameterError
 import os
 
@@ -27,7 +27,6 @@ class TestFunctionsOAI(unittest.TestCase):
             'identifier': 'AU100',
             'metadataPrefix': 'oai_dc'}
 
-        self.assertRaises(ParameterError, valid_oai_args, args['verb'])
         self.assertRaises(ParameterError, validate_oai_parameters, args)
 
     def test_missing_required(self):

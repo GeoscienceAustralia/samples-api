@@ -6,5 +6,5 @@
         http://www.openarchives.org/OAI/2.0/OAI-PMH.xsd">
     <responseDate>{{ response_date }}</responseDate>
     <request>{{ request_uri }}</request>
-    <error code="{{values.error_code}}">{{values.error_text}}</error>
+    <error code="{{ oai_code }}">{{ message }}</error>
 </OAI-PMH>

@@ -1,5 +1,5 @@
 # taken from https://github.com/infrae/pyoai/blob/master/src/oaipmh/datestamp.py
-class ErrorBase(Exception):
+class OaiError(Exception):
     def oainame(self):
         name = self.__class__.__name__
         # strip off 'Error' part
@@ -9,39 +9,39 @@ class ErrorBase(Exception):
         return name
 
 
-class BadArgumentError(ErrorBase):
+class BadArgumentError(OaiError):
     pass
 
 
-class BadVerbError(ErrorBase):
+class BadVerbError(OaiError):
     pass
 
 
-class BadResumptionTokenError(ErrorBase):
+class BadResumptionTokenError(OaiError):
     pass
 
 
-class CannotDisseminateFormatError(ErrorBase):
+class CannotDisseminateFormatError(OaiError):
     pass
 
 
-class IdDoesNotExistError(ErrorBase):
+class IdDoesNotExistError(OaiError):
     pass
 
 
-class NoRecordsMatchError(ErrorBase):
+class NoRecordsMatchError(OaiError):
     pass
 
 
-class NoMetadataFormatsError(ErrorBase):
+class NoMetadataFormatsError(OaiError):
     pass
 
 
-class NoSetHierarchyError(ErrorBase):
+class NoSetHierarchyError(OaiError):
     pass
 
 
-class UnknownError(ErrorBase):
+class UnknownError(OaiError):
     pass
 
 
