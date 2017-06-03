@@ -50,7 +50,6 @@ OAI_ARGS = {
 
 
 def validate_oai_parameters(qsa_args):
-    # TODO: return differentiated error messages. See OAI spec
     oai_args = OAI_ARGS.get(qsa_args['verb'])
 
     # check the verb
@@ -101,7 +100,6 @@ def list_records(metadataPrefix, resumptionToken=None, from_=None, until=None):
         [from_, until, batch_num, metadataPrefix] = resumptionToken.split(',')
     r = requests.get(oracle_api_samples_url)
 
-    # TODO: replace this with a check on the HTTP response code where 404 indicates "no data"
     if "No data" in r.content.decode('utf-8'):
         raise NoRecordsMatchError('No Data')
 
@@ -127,7 +125,6 @@ def list_records_xml(metadataPrefix, resumptionToken=None, from_=None, until=Non
 
     r = requests.get(oracle_api_samples_url)
 
-    # TODO: replace this with a check on the HTTP response code where 404 indicates "no data"
     if "No data" in r.content.decode('utf-8'):
         raise NoRecordsMatchError(
             'The combination of the values of the from, until, '
