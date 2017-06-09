@@ -92,7 +92,7 @@ TERM_LOOKUP = {
         'trap': 'http://pid.geoscience.gov.au/def/voc/igsn-codelists/Trap',
         'trawl': 'http://pid.geoscience.gov.au/def/voc/igsn-codelists/Trawl',
         'triggerweight': 'http://pid.geoscience.gov.au/def/voc/igsn-codelists/TriggerWeight',
-        'unknown': 'http://pid.geoscience.gov.au/def/voc/igsn-codelists/UnknownMethod',
+        'unknown': 'http://pid.geoscience.gov.au/def/voc/igsn-codelists/Unknown',
         'vibrating': 'http://pid.geoscience.gov.au/def/voc/igsn-codelists/Vibrating'
     },
     'material_type': {
