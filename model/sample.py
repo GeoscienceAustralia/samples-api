@@ -1,16 +1,14 @@
 from datetime import datetime
 from io import StringIO
-
 import requests
 from flask import Response, render_template
 from lxml import etree
 from lxml import objectify
 from rdflib import Graph, URIRef, RDF, RDFS, XSD, OWL, Namespace, Literal, BNode
-
 import config
 from ldapi.ldapi import LDAPI
 from routes.datestamp import *
-from .lookups import TERM_LOOKUP
+from model.lookups import TERM_LOOKUP
 
 
 class Sample:
@@ -171,13 +169,13 @@ class Sample:
             self.sample_no = root.ROW.SAMPLENO
             self.sample_type = TERM_LOOKUP['sample_type'].get(root.ROW.SAMPLE_TYPE_NEW)
             if self.sample_type is None:
-                self.sample_type = 'http://vocabulary.odm2.org/specimentype/theSpecimenTypeIsUnknown'
+                self.sample_type = TERM_LOOKUP['sample_type']['unknown']
             self.method_type = TERM_LOOKUP['method_type'].get(root.ROW.SAMPLING_METHOD)
             if self.method_type is None:
-                self.method_type = 'http://pid.geoscience.gov.au/def/voc/igsn-codelists/UnknownMethod'
+                self.method_type = TERM_LOOKUP['method_type']['unknown']
             self.material_type = TERM_LOOKUP['material_type'].get(root.ROW.MATERIAL_CLASS)
             if self.material_type is None:
-                self.material_type = 'http://vocabulary.odm2.org/medium/unknown/'
+                self.material_type = TERM_LOOKUP['material_type']['unknown']
             # self.long_min = root.ROW.SAMPLE_MIN_LONGITUDE
             # self.long_max = root.ROW.SAMPLE_MAX_LONGITUDE
             # self.lat_min = root.ROW.SAMPLE_MIN_LATITUDE
@@ -216,166 +214,6 @@ class Sample:
             # self.wkt = self._generate_sample_wkt()
         except Exception as e:
             print(e)
-
-        # # iterate through the elements in the XML element tree and handle each
-        # for event, elem in etree.iterparse(xml):
-        #     '''
-        #     <ROWSET>
-        #      <ROW>
-        #       <IGSN>AU2648696</IGSN>
-        #       <SAMPLEID>1905_50252</SAMPLEID>
-        #       <SAMPLE_TYPE_NEW/>
-        #       <SAMPLING_METHOD/>
-        #       <MATERIAL_CLASS/>
-        #       <SAMPLE_MIN_LONGITUDE/>
-        #       <SAMPLE_MAX_LONGITUDE/>
-        #       <SAMPLE_MIN_LATITUDE/>
-        #       <SAMPLE_MAX_LATITUDE/>
-        #       <GEOM>
-        #        <SDO_GTYPE>3001</SDO_GTYPE>
-        #        <SDO_SRID>8311</SDO_SRID>
-        #        <SDO_POINT>
-        #         <X>143.43508333</X>
-        #         <Y>-26.94486389</Y>
-        #         <Z>219.453</Z>
-        #        </SDO_POINT>
-        #        <SDO_ELEM_INFO/>
-        #        <SDO_ORDINATES/>
-        #       </GEOM>
-        #       <STATEID>QLD</STATEID>
-        #       <COUNTRY>AUS</COUNTRY>
-        #       <TOP_DEPTH>843</TOP_DEPTH>
-        #       <BASE_DEPTH>868</BASE_DEPTH>
-        #       <STRATNAME/>
-        #       <AGE/>
-        #       <REMARK/>
-        #       <LITHNAME/>
-        #       <ACQUIREDATE/>
-        #       <ENTITY_TYPE>BOREHOLE</ENTITY_TYPE>
-        #       <ENTITYID>TALGEBERRY 4</ENTITYID>
-        #       <HOLE_MIN_LONGITUDE>143.43508333</HOLE_MIN_LONGITUDE>
-        #       <HOLE_MAX_LONGITUDE/>
-        #       <HOLE_MIN_LATITUDE>-26.94486389</HOLE_MIN_LATITUDE>
-        #       <HOLE_MAX_LATITUDE/>
-        #       <LOADEDDATE>10-NOV-16</LOADEDDATE>
-        #       <SAMPLENO>2648696</SAMPLENO>
-        #       <ENO>15846</ENO>
-        #      </ROW>
-        #     </ROWSET>
-        #     '''
-        #     if elem.tag == "IGSN":
-        #         self.igsn = elem.text
-        #     elif elem.tag == "SAMPLEID":
-        #         self.sample_id = elem.text
-        #     elif elem.tag == "SAMPLE_TYPE_NEW":
-        #         if elem.text is not None:
-        #             self.sample_type = TERM_LOOKUP['sample_type'].get(elem.text)
-        #             if self.sample_type is None:
-        #                 self.sample_type = Sample.URI_MISSSING
-        #     elif elem.tag == "SAMPLING_METHOD":
-        #         if elem.text is not None:
-        #             self.method_type = TERM_LOOKUP['method_type'].get(elem.text)
-        #             if self.method_type is None:
-        #                 self.method_type = Sample.URI_MISSSING
-        #     elif elem.tag == "MATERIAL_CLASS":
-        #         if elem.text is not None:
-        #             self.material_type = TERM_LOOKUP['material_type'].get(elem.text)
-        #             if self.material_type is None:
-        #                 self.material_type = Sample.URI_MISSSING
-        #     elif elem.tag == "SAMPLE_MIN_LONGITUDE":
-        #         if elem.text is not None:
-        #             self.long_min = elem.text
-        #     elif elem.tag == "SAMPLE_MAX_LONGITUDE":
-        #         if elem.text is not None:
-        #             self.long_max = elem.text
-        #     elif elem.tag == "SAMPLE_MIN_LATITUDE":
-        #         if elem.text is not None:
-        #             self.lat_min = elem.text
-        #     elif elem.tag == "SAMPLE_MAX_LATITUDE":
-        #         if elem.text is not None:
-        #             self.lat_max = elem.text
-        #     elif elem.tag == "SDO_GTYPE":
-        #         if elem.text is not None:
-        #             self.gtype = elem.text
-        #     elif elem.tag == "SDO_SRID":
-        #         if elem.text is not None:
-        #             self.srid = elem.text
-        #     elif elem.tag == "X":
-        #         if elem.text is not None:
-        #             self.x = elem.text
-        #     elif elem.tag == "Y":
-        #         if elem.text is not None:
-        #             self.y = elem.text
-        #     elif elem.tag == "Z":
-        #         if elem.text is not None:
-        #             self.z = elem.text
-        #     elif elem.tag == "SDO_ELEM_INFO":
-        #         if elem.text is not None:
-        #             self.elem_info = elem.text
-        #     elif elem.tag == "SDO_ORDINATES":
-        #         if elem.text is not None:
-        #             self.ordinates = elem.text
-        #     elif elem.tag == "STATEID":
-        #         if elem.text is not None:
-        #             self.state = TERM_LOOKUP['state'].get(elem.text)
-        #             if self.state is None:
-        #                 self.state = Sample.URI_MISSSING
-        #     elif elem.tag == "COUNTRY":
-        #         if elem.text is not None:
-        #             self.country = TERM_LOOKUP['country'].get(elem.text)
-        #             if self.country is None:
-        #                 self.country = Sample.URI_MISSSING
-        #     elif elem.tag == "TOP_DEPTH":
-        #         if elem.text is not None:
-        #             self.depth_top = elem.text
-        #     elif elem.tag == "BASE_DEPTH":
-        #         if elem.text is not None:
-        #             self.depth_base = elem.text
-        #     elif elem.tag == "STRATNAME":
-        #         if elem.text is not None:
-        #             self.strath = elem.text
-        #     elif elem.tag == "AGE":
-        #         if elem.text is not None:
-        #             self.age = elem.text
-        #     elif elem.tag == "REMARK":
-        #         if elem.text:
-        #             self.remark = elem.text
-        #     elif elem.tag == "LITHNAME":
-        #         if elem.text is not None:
-        #             self.lith = TERM_LOOKUP['lith'].get(elem.text)
-        #             if self.lith is None:
-        #                 self.lith = Sample.URI_MISSSING
-        #     elif elem.tag == "ACQUIREDATE":
-        #         if elem.text is not None:
-        #             self.date_acquired = str2datetime(elem.text)
-        #         else:
-        #             self.date_acquired = Sample.URI_MISSSING
-        #     elif elem.tag == "ENO":
-        #         if elem.text is not None:
-        #             self.entity_uri = 'http://pid.geoscience.gov.au/site/' + elem.text
-        #     elif elem.tag == "ENTITYID":
-        #         if elem.text is not None:
-        #             self.entity_name = elem.text
-        #     elif elem.tag == "ENTITY_TYPE":
-        #         if elem.text is not None:
-        #             self.entity_type = elem.text
-        #     elif elem.tag == "HOLE_MIN_LONGITUDE":
-        #         if elem.text is not None:
-        #             self.hole_long_min = elem.text
-        #     elif elem.tag == "HOLE_MAX_LONGITUDE":
-        #         if elem.text is not None:
-        #             self.hole_long_max = elem.text
-        #     elif elem.tag == "HOLE_MIN_LATITUDE":
-        #         if elem.text is not None:
-        #             self.hole_lat_min = elem.text
-        #     elif elem.tag == "HOLE_MAX_LATITUDE":
-        #         if elem.text is not None:
-        #             self.hole_lat_max = elem.text
-        #     # elif elem.tag == "MODIFIED_DATE":
-        #     #     self.date_modified = str2datetime(elem.text)
-        #     # elif elem.tag == "SAMPLENO":
-        #     #     if elem.text is not None:
-        #     #         self.sample_no = elem.text
 
         return True
 
@@ -755,8 +593,7 @@ class Sample:
             # Sampler declaration
             sampler = BNode()
             g.add((sampler, RDF.type, SOSA.Sampler))
-            if self.method_type != Sample.URI_MISSSING:
-                g.add((sampler, RDF.type, URIRef(self.method_type)))
+            g.add((sampler, RDF.type, URIRef(self.method_type)))
             g.add((sampling, SOSA.madeBySampler, sampler))  # associate Sampler (with Sampling)
 
             # #
@@ -1044,3 +881,11 @@ if __name__ == '__main__':
 
     # print s.is_xml_export_valid(open('../test/sample_eg3_IGSN_schema.xml').read())
     # print s.export_as_igsn_xml()
+
+    from model.lookups import TERM_LOOKUP
+
+    print(TERM_LOOKUP['sample_type']['unknown'])
+
+    print(TERM_LOOKUP['method_type']['unknown'])
+
+    print(TERM_LOOKUP['material_type']['unknown'])

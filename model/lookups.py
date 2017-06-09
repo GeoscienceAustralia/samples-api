@@ -67,7 +67,7 @@ TERM_LOOKUP = {
         'Box': 'http://pid.geoscience.gov.au/def/voc/igsn-codelists/Box',
         'ChainBag': 'http://pid.geoscience.gov.au/def/voc/igsn-codelists/ChainBag',
         'Corer': 'http://pid.geoscience.gov.au/def/voc/igsn-codelists/Corer',
-        'CoreDiamond': 'http://pid.geoscience.gov.au/def/voc/igsn-codelists/CoreDiamons',  # TODO: add this to vocab
+        'CoreDiamond': 'http://pid.geoscience.gov.au/def/voc/igsn-codelists/CoreDiamond',  # TODO: add this to vocab
         'Dredge': 'http://pid.geoscience.gov.au/def/voc/igsn-codelists/Dredge',
         'Drill': 'http://pid.geoscience.gov.au/def/voc/igsn-codelists/Drill',
         'FreeFall': 'http://pid.geoscience.gov.au/def/voc/igsn-codelists/FreeFall',
@@ -92,7 +92,7 @@ TERM_LOOKUP = {
         'trap': 'http://pid.geoscience.gov.au/def/voc/igsn-codelists/Trap',
         'trawl': 'http://pid.geoscience.gov.au/def/voc/igsn-codelists/Trawl',
         'triggerweight': 'http://pid.geoscience.gov.au/def/voc/igsn-codelists/TriggerWeight',
-        'unknownmethod': 'http://pid.geoscience.gov.au/def/voc/igsn-codelists/UnknownMethod',
+        'unknown': 'http://pid.geoscience.gov.au/def/voc/igsn-codelists/UnknownMethod',
         'vibrating': 'http://pid.geoscience.gov.au/def/voc/igsn-codelists/Vibrating'
     },
     'material_type': {
