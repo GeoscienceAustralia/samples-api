@@ -172,7 +172,7 @@ class Sample:
                 self.sample_type = TERM_LOOKUP['sample_type']['unknown']
             self.method_type = TERM_LOOKUP['method_type'].get(root.ROW.SAMPLING_METHOD)
             if self.method_type is None:
-                self.method_type = TERM_LOOKUP['method_type']['unknown']
+                self.method_type = TERM_LOOKUP['method_type']['Unknown']
             self.material_type = TERM_LOOKUP['material_type'].get(root.ROW.MATERIAL_CLASS)
             if self.material_type is None:
                 self.material_type = TERM_LOOKUP['material_type']['unknown']
@@ -886,6 +886,6 @@ if __name__ == '__main__':
 
     print(TERM_LOOKUP['sample_type']['unknown'])
 
-    print(TERM_LOOKUP['method_type']['unknown'])
+    print(TERM_LOOKUP['method_type']['Unknown'])
 
     print(TERM_LOOKUP['material_type']['unknown'])
