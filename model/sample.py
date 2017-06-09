@@ -8,7 +8,7 @@ from rdflib import Graph, URIRef, RDF, RDFS, XSD, OWL, Namespace, Literal, BNode
 import config
 from ldapi.ldapi import LDAPI
 from routes.datestamp import *
-import model.lookups
+from model.lookups import TERM_LOOKUP
 
 
 class Sample:
