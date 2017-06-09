@@ -8,7 +8,7 @@ from rdflib import Graph, URIRef, RDF, RDFS, XSD, OWL, Namespace, Literal, BNode
 import config
 from ldapi.ldapi import LDAPI
 from routes.datestamp import *
-from model.lookups import TERM_LOOKUP
+import model.lookups
 
 
 class Sample:
@@ -107,7 +107,7 @@ class Sample:
             )
         elif view == 'igsn-r1':  # only XML for this view
             return Response(
-                '<?xml version="1.0" encoding="utf-8"?>\n' + self.export_igsn_dev_xml(),
+                '<?xml version="1.0" encoding="utf-8"?>\n' + self.export_igsn_r1_xml(),
                 mimetype='text/xml'
             )
         elif view == 'csirov3':  # only XML for this view
@@ -729,7 +729,7 @@ class Sample:
 
         return template
 
-    def export_igsn_dev_xml(self):
+    def export_igsn_r1_xml(self):
         """
         Exports this Sample instance in XML that validates against the IGSN XML Schema
 

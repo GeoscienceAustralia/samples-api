@@ -147,7 +147,7 @@ def list_records_xml(metadataPrefix, resumptionToken=None, from_=None, until=Non
         if metadataPrefix == 'igsn':
             record_xml = sample.export_igsn_xml()
         elif metadataPrefix == 'igsn-r1':
-            record_xml = sample.export_igsn_dev_xml()
+            record_xml = sample.export_igsn_r1_xml()
         elif metadataPrefix == 'csirov3':
             record_xml = sample.export_csirov3_xml()
         else:  # oai_dc
