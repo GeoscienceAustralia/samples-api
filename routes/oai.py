@@ -30,6 +30,14 @@ def oai():
         validate_oai_parameters(request.values)
     except OaiError as e:
         return render_error(response_date, request.base_url, e.oainame(), e)
+    except Exception as e:  # manual fallback in case no request parameters at all are present
+        return render_error(
+            response_date,
+            request.base_url,
+            "badVerb",
+            "The OAI verb is not correct. Must be one of GetRecord, GetMetadata, Identify, ListIdentifiers, "
+            "ListMetadataFormats, ListRecords, ListSets"
+        )
 
     # call underlying implementation, based on the verb, since all parameters are valid
     if request.values.get('verb') == 'GetRecord':
