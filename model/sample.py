@@ -437,12 +437,12 @@ class Sample:
                 'lat_max': self.hole_lat_max
             }
             gml = '<ogc:BBOX>'\
-                    '<ogc:PropertyName>ows:BoundingBox</ogc:PropertyName>'\
-                    '<gml:Envelope srsName="https://epsg.io/{srid}">' \
-                        '<gml:upperCorner>{long_min} {lat_max}</gml:upperCorner>' \
-                            '<gml:lowerCorner>{long_max} {lat_min}</gml:lowerCorner>'\
-                    '</gml:Envelope>'\
-                '</ogc:BBOX>'.format(**coordinates)
+                  '<ogc:PropertyName>ows:BoundingBox</ogc:PropertyName>'\
+                  '<gml:Envelope srsName="https://epsg.io/{srid}">' \
+                  '<gml:upperCorner>{long_min} {lat_max}</gml:upperCorner>' \
+                  '<gml:lowerCorner>{long_max} {lat_min}</gml:lowerCorner>'\
+                  '</gml:Envelope>'\
+                  '</ogc:BBOX>'.format(**coordinates)
         elif self.hole_long_min is not None:
             coordinates = {
                 'srid': self.srid,
@@ -450,7 +450,7 @@ class Sample:
                 'lat_min': self.hole_lat_min
             }
             gml = '<gml:Point srsDimension="2" srsName="https://epsg.io/{srid}">' \
-                    '<gml:pos>{long_min} {lat_min}</gml:pos>' \
+                  '<gml:pos>{long_min} {lat_min}</gml:pos>' \
                   '</gml:Point>'.format(**coordinates)
         else:
             gml = ''
@@ -955,22 +955,6 @@ class Sample:
                 method_type=self.method_type,
                 material_type=self.material_type
             )
-
-        elif model_view == 'dc':
-            view_title = 'Dublin Core view'
-
-            sample_table_html = render_template(
-                'sample_dc.html',
-                identifier=self.igsn,
-                description=self.remark if self.remark != '' else '-',
-                date=self.date_acquired if self.date_acquired is not None else '<a href="{}">{}</a>'.format(Sample.URI_MISSSING, Sample.URI_MISSSING.split('/')[-1]),
-                type=self.sample_type,
-                format=self.material_type,
-                wkt=self._generate_sample_wkt(),
-                creator='<a href="{}">Geoscience Australia</a>'.format(Sample.URI_GA),
-                publisher='<a href="{}">Geoscience Australia</a>'.format(Sample.URI_GA),
-            )
-
         elif model_view == 'prov':
             view_title = 'PROV Ontology view'
             prov_turtle = self.export_rdf('prov', 'text/turtle')
@@ -981,9 +965,24 @@ class Sample:
                 visjs=self._make_vsjs(g),
                 prov_turtle=prov_turtle,
             )
+        else:  # elif model_view == 'dc':
+            view_title = 'Dublin Core view'
+
+            sample_table_html = render_template(
+                'sample_dc.html',
+                identifier=self.igsn,
+                description=self.remark if self.remark != '' else '-',
+                date=self.date_acquired if self.date_acquired is not None else '<a href="{}">{}</a>'.format(
+                    Sample.URI_MISSSING, Sample.URI_MISSSING.split('/')[-1]),
+                type=self.sample_type,
+                format=self.material_type,
+                wkt=self._generate_sample_wkt(),
+                creator='<a href="{}">Geoscience Australia</a>'.format(Sample.URI_GA),
+                publisher='<a href="{}">Geoscience Australia</a>'.format(Sample.URI_GA),
+            )
 
         if self.date_acquired is not None:
-            year_acquired = '({})'.format(datetime.strftime(self.date_acquired, '%Y'))
+            year_acquired = '({})'.format(datetime.datetime.strftime(self.date_acquired, '%Y'))
         else:
             year_acquired = ''
 
@@ -994,13 +993,14 @@ class Sample:
             year_acquired=year_acquired,
             view_title=view_title,
             sample_table_html=sample_table_html,
-            date_now=datetime.now().strftime('%d %B %Y'),
+            date_now=datetime.datetime.now().strftime('%d %B %Y'),
             system_url='http://54.66.133.7'
         )
 
 
 class ParameterError(ValueError):
     pass
+
 
 if __name__ == '__main__':
     s = Sample(None, xml='c:/work/samples-api/test/static_data/AU239.xml')
