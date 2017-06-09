@@ -5,7 +5,7 @@
         xsi:schemaLocation="http://www.openarchives.org/OAI/2.0/ http://www.openarchives.org/OAI/2.0/OAI-PMH.xsd"
         >
     <responseDate>2017-05-02T12:16:20Z</responseDate>
-    <request verb="GetRecord" identifier="AU239" metadataPrefix="igsn-dev"/>
+    <request verb="GetRecord" identifier="AU239" metadataPrefix="igsn-r1"/>
     <GetRecord>
         <record>
             <header>

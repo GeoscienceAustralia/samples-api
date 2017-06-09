@@ -59,7 +59,7 @@ TERM_LOOKUP = {
         'standardReferenceSpecimen': 'http://vocabulary.odm2.org/specimentype/standardReferenceSpecimen',
         'terrestrialSection': 'http://vocabulary.odm2.org/specimentype/terrestrialSection',
         'thinSection': 'http://vocabulary.odm2.org/specimentype/thinSection',
-        'unknown': 'http://vocabulary.odm2.org/specimentype/unknown'
+        'unknown': 'http://vocabulary.odm2.org/specimentype/theSpecimenTypeIsUnknown'
     },
     'method_type': {
         'Auger': 'http://pid.geoscience.gov.au/def/voc/igsn-codelists/Auger',

@@ -145,7 +145,7 @@ def list_records_xml(metadataPrefix, resumptionToken=None, from_=None, until=Non
         metadataPrefix = metadataPrefix.replace(u'\u200b', '')
         if metadataPrefix == 'igsn':
             record_xml = sample.export_igsn_xml()
-        elif metadataPrefix == 'igsn-dev':
+        elif metadataPrefix == 'igsn-r1':
             record_xml = sample.export_igsn_dev_xml()
         elif metadataPrefix == 'csirov3':
             record_xml = sample.export_csirov3_xml()

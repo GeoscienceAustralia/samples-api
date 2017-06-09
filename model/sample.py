@@ -107,7 +107,7 @@ class Sample:
                 '<?xml version="1.0" encoding="utf-8"?>\n' + self.export_igsn_xml(),
                 mimetype='text/xml'
             )
-        elif view == 'igsn-dev':  # only XML for this view
+        elif view == 'igsn-r1':  # only XML for this view
             return Response(
                 '<?xml version="1.0" encoding="utf-8"?>\n' + self.export_igsn_dev_xml(),
                 mimetype='text/xml'
@@ -174,10 +174,10 @@ class Sample:
                 self.sample_type = 'http://vocabulary.odm2.org/specimentype/theSpecimenTypeIsUnknown'
             self.method_type = TERM_LOOKUP['method_type'].get(root.ROW.SAMPLING_METHOD)
             if self.method_type is None:
-                self.method_type = 'Unknown'
+                self.method_type = 'http://pid.geoscience.gov.au/def/voc/igsn-codelists/UnknownMethod'
             self.material_type = TERM_LOOKUP['material_type'].get(root.ROW.MATERIAL_CLASS)
             if self.material_type is None:
-                self.material_type = Sample.URI_MISSSING
+                self.material_type = 'http://vocabulary.odm2.org/medium/unknown/'
             # self.long_min = root.ROW.SAMPLE_MIN_LONGITUDE
             # self.long_max = root.ROW.SAMPLE_MAX_LONGITUDE
             # self.lat_min = root.ROW.SAMPLE_MIN_LATITUDE
@@ -899,7 +899,7 @@ class Sample:
         :return: XML string
         """
         template = render_template(
-            'sample_igsn_dev.xml',
+            'sample_igsn_r1.xml',
             igsn=self.igsn,
             sample_id=self.sample_id,
             description=self.remark,

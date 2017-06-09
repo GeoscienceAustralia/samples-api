@@ -44,7 +44,7 @@ def oai():
 
             if request.values.get('metadataPrefix') == 'igsn':
                 record_xml = s.export_igsn_xml()
-            elif request.values.get('metadataPrefix') == 'igsn-dev':
+            elif request.values.get('metadataPrefix') == 'igsn-r1':
                 record_xml = s.export_igsn_dev_xml()
             elif request.values.get('metadataPrefix') == 'csirov3':
                 record_xml = s.export_csirov3_xml()

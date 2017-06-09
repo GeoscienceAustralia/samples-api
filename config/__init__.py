@@ -23,4 +23,4 @@ ADMIN_EMAIL = 'dataman@ga.gov.au'
 BASE_URI_SAMPLE = 'http://localhost:5000/sample/'
 BASE_URI_OAI = 'http://pid.geoscience.gov.au/oai'
 
-OAI_BATCH_SIZE = 10
+OAI_BATCH_SIZE = 100

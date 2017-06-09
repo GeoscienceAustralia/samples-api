@@ -1,7 +1,7 @@
 <igsn:resource
         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
         xmlns:igsn="http://schema.igsn.org/description/1.0"
-        xsi:schemaLocation="http://schema.igsn.org/description/1.0 https://raw.githubusercontent.com/IGSN/metadata/dev/description/resource.xsd"
+        xsi:schemaLocation="http://schema.igsn.org/description/1.0 https://raw.githubusercontent.com/IGSN/metadata/r1/description/resource.xsd"
         registedObjectType="http://schema.igsn.org/vocab/PhysicalSample">
     <igsn:identifier type="IGSN">http://igsn.org/{{ igsn }}</igsn:identifier>
     <igsn:title>Sample igsn:{{ igsn }}</igsn:title>
@@ -30,9 +30,6 @@
     <igsn:collectionMethods>
         <igsn:collectionMethod>{{ collection_method }}</igsn:collectionMethod>
     </igsn:collectionMethods>
-    {% if collection_time is not none %}
-    <igsn:collectionTime>{{ collection_time }}</igsn:collectionTime>
-    {% endif %}
     <igsn:contributors>
         <igsn:contributor type="HostingInstitution">
             <igsn:identifier type="URI">http://pid.geoscience.gov.au/org/ga</igsn:identifier>
