@@ -50,28 +50,29 @@ OAI_ARGS = {
 
 
 def validate_oai_parameters(qsa_args):
-    oai_args = OAI_ARGS.get(qsa_args['verb'])
+    expected_oai_args = OAI_ARGS.get(qsa_args['verb'])
 
     # check the verb
-    if oai_args is None:
+    if expected_oai_args is None:
         raise BadVerbError('The OAI verb is not correct. Must be one of {}'.format(', '.join(OAI_ARGS.keys())))
 
+    # check of we have exclusive arguments available for this verb
     exclusive = None
-    for arg_name, arg_type in list(oai_args.items()):
+    for arg_name, arg_type in list(expected_oai_args.items()):
         if arg_type == 'exclusive':
             exclusive = arg_name
 
     # check if we have unknown arguments
     for key, value in list(qsa_args.items()):
-        if key != 'verb' and key not in oai_args:
+        if key != 'verb' and key not in expected_oai_args:
             raise BadArgumentError("Unknown argument: {}".format(key))
 
-    # first investigate if we have exclusive argument
+    # first investigate if we have exclusive argument and other QSA args other than the verb
     if exclusive in qsa_args and len(qsa_args) > 2:  # verb + exclusive
         raise BadArgumentError("Exclusive argument {} is used but other arguments found.".format(exclusive))
 
-    # if not exclusive, check for required
-    for arg_name, arg_type in list(oai_args.items()):
+    # if not exclusive, check for required args
+    for arg_name, arg_type in list(expected_oai_args.items()):
         if arg_name != 'verb':
             if arg_type == 'required' and arg_name not in qsa_args and exclusive is None:
                 raise BadArgumentError("Argument required but not found: {}".format(arg_name))
