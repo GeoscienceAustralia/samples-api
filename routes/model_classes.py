@@ -52,7 +52,7 @@ def sample(igsn):
                 return render_template('sample_no_record.html')
 
     except LdapiParameterError as e:
-        return routes_functions.client_error_Response(e)
+        return client_error_Response(e)
 
 
 @model_classes.route('/sample/')
@@ -80,7 +80,7 @@ def samples():
             del views_formats['renderer']
             return render_alternates_view(
                 class_uri,
-                urllib.quote_plus(class_uri),
+                uparse.quote_plus(class_uri),
                 None,
                 None,
                 views_formats,
@@ -100,9 +100,10 @@ def samples():
                     mimetype='text/plain'
                 )
 
-            links = []
+            links = list()
             links.append('<http://www.w3.org/ns/ldp#Resource>; rel="type"')
-            links.append('<http://www.w3.org/ns/ldp#Page>; rel="type"')  # signalling that this is, in fact, a resource described in pages
+            # signalling that this is, in fact, a resource described in pages
+            links.append('<http://www.w3.org/ns/ldp#Page>; rel="type"')
             links.append('<{}?per_page={}>; rel="first"'.format(config.BASE_URI_SAMPLE, per_page))
 
             # if this isn't the first page, add a link to "prev"
@@ -123,20 +124,23 @@ def samples():
                 if page > last_page_no:
                     return Response(
                         'You must enter either no value for page or an integer <= {} which is the last page number.'
-                            .format(last_page_no),
+                        .format(last_page_no),
                         status=400,
                         mimetype='text/plain'
                     )
 
                 # add a link to "next"
                 if page != last_page_no:
-                    links.append('<{}?per_page={}&page={}>; rel="next"'.format(config.BASE_URI_SAMPLE, per_page, (page + 1)))
+                    links.append('<{}?per_page={}&page={}>; rel="next"'
+                                 .format(config.BASE_URI_SAMPLE, per_page, (page + 1)))
 
                 # add a link to "last"
-                links.append('<{}?per_page={}&page={}>; rel="last"'.format(config.BASE_URI_SAMPLE, per_page, last_page_no))
+                links.append('<{}?per_page={}&page={}>; rel="last"'
+                             .format(config.BASE_URI_SAMPLE, per_page, last_page_no))
             except:
                 # if there's some error in getting the no of samples, add the "next" link but not the "last" link
-                links.append('<{}?per_page={}&page={}>; rel="next"'.format(config.BASE_URI_SAMPLE, per_page, (page + 1)))
+                links.append('<{}?per_page={}&page={}>; rel="next"'
+                             .format(config.BASE_URI_SAMPLE, per_page, (page + 1)))
 
             headers = {
                 'Link': ', '.join(links)
@@ -146,4 +150,4 @@ def samples():
                 .render(view, mime_format, extra_headers=headers)
 
     except LdapiParameterError as e:
-        return routes_functions.client_error_Response(e)
+        return client_error_Response(e)

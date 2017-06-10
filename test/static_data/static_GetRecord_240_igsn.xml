@@ -1,29 +1,63 @@
-<?xml version='1.0' encoding='UTF-8'?>
-<cs:resources xmlns:cs="https://igsn.csiro.au/schemas/3.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="https://igsn.csiro.au/schemas/3.0 igsn-csiro-v3.0.xsd">
-  <cs:resource registrationType="http://pid.geoscience.gov.au/def/voc/igsn-codelists/SampleResource">
-    <cs:resourceIdentifier>AU240</cs:resourceIdentifier>
-    <cs:landingPage>https://pid.geoscience.gov.au/sample/AU240</cs:landingPage>
-    <cs:resourceTitle>Sample igsn:AU240</cs:resourceTitle>
-    <cs:resourceTypes>
-      <cs:resourceType>http://vocabulary.odm2.org/specimentype/core</cs:resourceType>
-    </cs:resourceTypes>
-    <cs:materialTypes>
-      <cs:materialType>http://vocabulary.odm2.org/medium/rock</cs:materialType>
-    </cs:materialTypes>
-    <cs:method>http://www.opengis.net/def/nil/OGC/0/missing</cs:method>
-    <cs:location>
-      <cs:geometry srid="https://epsg.io/8311" verticalDatum="https://epsg.io/4283">POINTZ(137.6284422 -34.2186182 103)</cs:geometry>
-    </cs:location>
-    <cs:curationDetails>
-      <cs:curation>
-        <cs:curator>Geoscience Australia</cs:curator>
-        <cs:curationDate>2017</cs:curationDate>
-        <cs:curationLocation>Geoscience Australia, Jerrabomberra Ave, Symonston, ACT, Australia</cs:curationLocation>
-        <cs:curatingInstitution institutionURI="http://pid.geoscience.gov.au/org/ga"/>
-      </cs:curation>
-    </cs:curationDetails>
-    <cs:alternateIdentifiers>
-      <cs:alternateIdentifiers>240</cs:alternateIdentifiers>
-    </cs:alternateIdentifiers>
-  </cs:resource>
-</cs:resources>
+<?xml version="1.0" encoding="UTF-8" ?>
+<OAI-PMH
+        xmlns="http://www.openarchives.org/OAI/2.0/"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://www.openarchives.org/OAI/2.0/
+        http://www.openarchives.org/OAI/2.0/OAI-PMH.xsd">
+    <responseDate>2017-06-10T11:24:35Z</responseDate>
+    <request verb="GetRecord" identifier="AU240" metadataPrefix="igsn">http://localhost:5000/oai</request>
+    <GetRecord>
+        <record>
+            <header>
+                <identifier>AU240</identifier>
+                <datestamp>2017-04-24T14:23:08Z</datestamp>
+            </header>
+            <metadata>
+            <igsn:resource
+        xmlns:igsn="http://schema.igsn.org/description/1.0"
+        xsi:schemaLocation="http://schema.igsn.org/description/1.0 https://raw.githubusercontent.com/IGSN/metadata/master/description/resource.xsd"
+        type="Sample">
+    <igsn:identifier type="IGSN">http://igsn.org/AU240</igsn:identifier>
+    <igsn:name>Sample igsn:AU240</igsn:name>
+
+    <igsn:alternateIdentifiers>
+        <igsn:alternateIdentifier>2000362090B</igsn:alternateIdentifier>
+    </igsn:alternateIdentifiers>
+
+    <igsn:description></igsn:description>
+    <igsn:registrant>
+        <igsn:name>Geoscience Australia</igsn:name>
+        <igsn:affiliation>
+            <igsn:identifier type="URL">http://pid.geoscience.gov.au/org/ga</igsn:identifier>
+            <igsn:name>Geoscience Australia</igsn:name>
+        </igsn:affiliation>
+    </igsn:registrant>
+    <igsn:contributors>
+        <igsn:contributor type="HostingInstitution">
+            <igsn:identifier type="URL">http://pid.geoscience.gov.au/org/ga</igsn:identifier>
+            <igsn:name>Geoscience Australia</igsn:name>
+        </igsn:contributor>
+    </igsn:contributors>
+    <igsn:geoLocations>
+        <igsn:geoLocation>
+            <igsn:geometry type="Point" sridType="4326">SRID=8311;POINTZ(137.6284422 -34.2186182 103)</igsn:geometry>
+        </igsn:geoLocation>
+    </igsn:geoLocations>
+    <igsn:resourceTypes>
+        <igsn:resourceType>http://vocabulary.odm2.org/specimentype/core</igsn:resourceType>
+    </igsn:resourceTypes>
+    <igsn:materials>
+        <igsn:material>http://vocabulary.odm2.org/medium/rock/</igsn:material>
+    </igsn:materials>
+    <igsn:collectionMethods>
+        <igsn:collectionMethod>Unknown</igsn:collectionMethod>
+    </igsn:collectionMethods>
+
+    <igsn:collectionTime>1900-01-01T00:00:00Z</igsn:collectionTime>
+
+    <igsn:sampleAccess>Public</igsn:sampleAccess>
+</igsn:resource>
+            </metadata>
+        </record>
+    </GetRecord>
+  </OAI-PMH>

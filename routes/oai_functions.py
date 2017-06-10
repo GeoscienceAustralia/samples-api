@@ -50,55 +50,52 @@ OAI_ARGS = {
 
 
 def validate_oai_parameters(qsa_args):
+    """
+    Validates GET or POST arguments against the OAI_ARGS dict
+
+    :param qsa_args: query string or form parameters from a GET or POST request
+    :return: True if valie, else raises a BadVerb or BadArgument error
+    """
     expected_oai_args = OAI_ARGS.get(qsa_args['verb'])
 
     # check the verb
     if expected_oai_args is None:
         raise BadVerbError('The OAI verb is not correct. Must be one of {}'.format(', '.join(OAI_ARGS.keys())))
 
-    # check of we have exclusive arguments available for this verb
-    exclusive = None
-    for arg_name, arg_type in list(expected_oai_args.items()):
-        if arg_type == 'exclusive':
-            exclusive = arg_name
-
-    # check if we have unknown arguments
+    # check if we have any unknown args given
     for key, value in list(qsa_args.items()):
         if key != 'verb' and key not in expected_oai_args:
             raise BadArgumentError("Unknown argument: {}".format(key))
 
-    # first investigate if we have exclusive argument and other QSA args other than the verb
-    if exclusive in qsa_args and len(qsa_args) > 2:  # verb + exclusive
-        raise BadArgumentError("Exclusive argument {} is used but other arguments found.".format(exclusive))
-
-    # if not exclusive, check for required args
+    # check if we have any exclusive args given and any other args, apart from the verb
+    exclusive_possible = None
     for arg_name, arg_type in list(expected_oai_args.items()):
-        if arg_name != 'verb':
-            if arg_type == 'required' and arg_name not in qsa_args and exclusive is None:
-                raise BadArgumentError("Argument required but not found: {}".format(arg_name))
+        if arg_type == 'exclusive':
+            exclusive_possible = arg_name
+    exclusive_present = False
+    for key, value in list(qsa_args.items()):
+        if key == exclusive_possible:
+            exclusive_present = True
+    if exclusive_present and len(qsa_args) > 2:  # verb + exclusive
+        raise BadArgumentError("Exclusive argument {} is used but other arguments found.".format(exclusive_possible))
 
+    # if no exclusive present, check for required args
+    if not exclusive_present:
+        for arg_name, arg_type in list(expected_oai_args.items()):
+            if arg_name != 'verb':
+                if arg_type == 'required' and arg_name not in qsa_args:
+                    raise BadArgumentError("Argument required but not found: {}".format(arg_name))
     return True
 
 
-def get_record(identifier):
-    sample = Sample(identifier)
-
-    return props(sample)
-    # try:
-    #
-    # except ValueError:
-    #     raise ValueError
-
-
 def list_records(metadataPrefix, resumptionToken=None, from_=None, until=None):
-    no_per_page = config.OAI_BATCH_SIZE
-    page_no = 1
-
+    # if we don't have a resumption token, start at the beginning
     if resumptionToken is None:
-        oracle_api_samples_url = config.XML_API_URL_SAMPLESET.format(page_no, no_per_page)
+        oracle_api_samples_url = config.XML_API_URL_SAMPLESET.format(1, config.OAI_BATCH_SIZE)
     else:
         oracle_api_samples_url = create_url_query_token(resumptionToken)
         [from_, until, batch_num, metadataPrefix] = resumptionToken.split(',')
+
     r = requests.get(oracle_api_samples_url)
 
     if "No data" in r.content.decode('utf-8'):
@@ -237,10 +234,7 @@ def get_earliest_date():
     for event, elem in context:
         str_min_date = elem.text
 
-    min_date = str2datetime(str_min_date)
-#    min_date = datetime.strptime(str_min_date, '%Y-%m-%dT%H:%M:%S')
-
-    return min_date
+    return str2datetime(str_min_date)
 
 
 def get_earliest_datestamp():

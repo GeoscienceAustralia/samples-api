@@ -2,51 +2,412 @@
 <OAI-PMH
         xmlns="http://www.openarchives.org/OAI/2.0/"
         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-        xsi:schemaLocation="http://www.openarchives.org/OAI/2.0/ http://www.openarchives.org/OAI/2.0/OAI-PMH.xsd">
-    <responseDate>2017-03-30T18:51:05Z</responseDate>
-    <request verb= "ListIdentifiers" metadataPrefix="oai_dc">http://pid.geoscience.gov.au/oai</request>
+        xsi:schemaLocation="http://www.openarchives.org/OAI/2.0/
+        http://www.openarchives.org/OAI/2.0/OAI-PMH.xsd">
+    <responseDate>2017-06-10T11:29:52Z</responseDate>
+    <request verb="ListIdentifiers" metadataPrefix="igsn">http://localhost:5000/oai</request>
     <ListIdentifiers>
         <header>
             <identifier>AU1</identifier>
-            <datestamp>2017-03-09T16:14:52Z</datestamp>
+            <datestamp>None</datestamp>
         </header>
         <header>
             <identifier>AU10</identifier>
-            <datestamp>2017-03-09T16:14:53Z</datestamp>
+            <datestamp>None</datestamp>
         </header>
         <header>
             <identifier>AU100</identifier>
-            <datestamp>2017-03-09T16:14:52Z</datestamp>
+            <datestamp>None</datestamp>
         </header>
         <header>
             <identifier>AU1000</identifier>
-            <datestamp>2017-03-09T16:14:50Z</datestamp>
+            <datestamp>None</datestamp>
         </header>
         <header>
             <identifier>AU10000</identifier>
-            <datestamp>2016-10-25T16:42:57Z</datestamp>
+            <datestamp>None</datestamp>
         </header>
         <header>
             <identifier>AU100000</identifier>
-            <datestamp>2016-10-25T16:42:51Z</datestamp>
+            <datestamp>None</datestamp>
         </header>
         <header>
             <identifier>AU1000000</identifier>
-            <datestamp>2017-03-21T14:46:50Z</datestamp>
+            <datestamp>None</datestamp>
         </header>
         <header>
             <identifier>AU1000001</identifier>
-            <datestamp>2017-03-21T14:46:50Z</datestamp>
+            <datestamp>None</datestamp>
         </header>
         <header>
             <identifier>AU1000002</identifier>
-            <datestamp>2017-03-21T14:46:50Z</datestamp>
+            <datestamp>None</datestamp>
         </header>
         <header>
             <identifier>AU1000003</identifier>
-            <datestamp>2017-03-21T14:46:50Z</datestamp>
+            <datestamp>None</datestamp>
         </header>
-        <resumptionToken expirationDate="2017-03-30T19:51:06Z" completeListSize="1966542" cursor="0">
-        2011-06-01T00:00:00Z,9999-12-31T23:59:59Z,10,oai_dc</resumptionToken>
+        <header>
+            <identifier>AU1000004</identifier>
+            <datestamp>None</datestamp>
+        </header>
+        <header>
+            <identifier>AU1000005</identifier>
+            <datestamp>None</datestamp>
+        </header>
+        <header>
+            <identifier>AU1000006</identifier>
+            <datestamp>None</datestamp>
+        </header>
+        <header>
+            <identifier>AU1000007</identifier>
+            <datestamp>None</datestamp>
+        </header>
+        <header>
+            <identifier>AU1000008</identifier>
+            <datestamp>None</datestamp>
+        </header>
+        <header>
+            <identifier>AU1000009</identifier>
+            <datestamp>None</datestamp>
+        </header>
+        <header>
+            <identifier>AU100001</identifier>
+            <datestamp>None</datestamp>
+        </header>
+        <header>
+            <identifier>AU1000010</identifier>
+            <datestamp>None</datestamp>
+        </header>
+        <header>
+            <identifier>AU1000011</identifier>
+            <datestamp>None</datestamp>
+        </header>
+        <header>
+            <identifier>AU1000012</identifier>
+            <datestamp>None</datestamp>
+        </header>
+        <header>
+            <identifier>AU1000013</identifier>
+            <datestamp>None</datestamp>
+        </header>
+        <header>
+            <identifier>AU1000014</identifier>
+            <datestamp>None</datestamp>
+        </header>
+        <header>
+            <identifier>AU1000015</identifier>
+            <datestamp>None</datestamp>
+        </header>
+        <header>
+            <identifier>AU1000016</identifier>
+            <datestamp>None</datestamp>
+        </header>
+        <header>
+            <identifier>AU1000017</identifier>
+            <datestamp>None</datestamp>
+        </header>
+        <header>
+            <identifier>AU1000018</identifier>
+            <datestamp>None</datestamp>
+        </header>
+        <header>
+            <identifier>AU1000019</identifier>
+            <datestamp>None</datestamp>
+        </header>
+        <header>
+            <identifier>AU100002</identifier>
+            <datestamp>None</datestamp>
+        </header>
+        <header>
+            <identifier>AU1000020</identifier>
+            <datestamp>None</datestamp>
+        </header>
+        <header>
+            <identifier>AU1000021</identifier>
+            <datestamp>None</datestamp>
+        </header>
+        <header>
+            <identifier>AU1000022</identifier>
+            <datestamp>None</datestamp>
+        </header>
+        <header>
+            <identifier>AU1000023</identifier>
+            <datestamp>None</datestamp>
+        </header>
+        <header>
+            <identifier>AU1000024</identifier>
+            <datestamp>None</datestamp>
+        </header>
+        <header>
+            <identifier>AU1000025</identifier>
+            <datestamp>None</datestamp>
+        </header>
+        <header>
+            <identifier>AU1000026</identifier>
+            <datestamp>None</datestamp>
+        </header>
+        <header>
+            <identifier>AU1000027</identifier>
+            <datestamp>None</datestamp>
+        </header>
+        <header>
+            <identifier>AU1000028</identifier>
+            <datestamp>None</datestamp>
+        </header>
+        <header>
+            <identifier>AU1000029</identifier>
+            <datestamp>None</datestamp>
+        </header>
+        <header>
+            <identifier>AU100003</identifier>
+            <datestamp>None</datestamp>
+        </header>
+        <header>
+            <identifier>AU1000030</identifier>
+            <datestamp>None</datestamp>
+        </header>
+        <header>
+            <identifier>AU1000031</identifier>
+            <datestamp>None</datestamp>
+        </header>
+        <header>
+            <identifier>AU1000032</identifier>
+            <datestamp>None</datestamp>
+        </header>
+        <header>
+            <identifier>AU1000033</identifier>
+            <datestamp>None</datestamp>
+        </header>
+        <header>
+            <identifier>AU1000034</identifier>
+            <datestamp>None</datestamp>
+        </header>
+        <header>
+            <identifier>AU1000035</identifier>
+            <datestamp>None</datestamp>
+        </header>
+        <header>
+            <identifier>AU1000036</identifier>
+            <datestamp>None</datestamp>
+        </header>
+        <header>
+            <identifier>AU1000037</identifier>
+            <datestamp>None</datestamp>
+        </header>
+        <header>
+            <identifier>AU1000038</identifier>
+            <datestamp>None</datestamp>
+        </header>
+        <header>
+            <identifier>AU1000039</identifier>
+            <datestamp>None</datestamp>
+        </header>
+        <header>
+            <identifier>AU100004</identifier>
+            <datestamp>None</datestamp>
+        </header>
+        <header>
+            <identifier>AU1000040</identifier>
+            <datestamp>None</datestamp>
+        </header>
+        <header>
+            <identifier>AU1000041</identifier>
+            <datestamp>None</datestamp>
+        </header>
+        <header>
+            <identifier>AU1000042</identifier>
+            <datestamp>None</datestamp>
+        </header>
+        <header>
+            <identifier>AU1000043</identifier>
+            <datestamp>None</datestamp>
+        </header>
+        <header>
+            <identifier>AU1000044</identifier>
+            <datestamp>None</datestamp>
+        </header>
+        <header>
+            <identifier>AU1000045</identifier>
+            <datestamp>None</datestamp>
+        </header>
+        <header>
+            <identifier>AU1000046</identifier>
+            <datestamp>None</datestamp>
+        </header>
+        <header>
+            <identifier>AU1000047</identifier>
+            <datestamp>None</datestamp>
+        </header>
+        <header>
+            <identifier>AU1000048</identifier>
+            <datestamp>None</datestamp>
+        </header>
+        <header>
+            <identifier>AU1000049</identifier>
+            <datestamp>None</datestamp>
+        </header>
+        <header>
+            <identifier>AU100005</identifier>
+            <datestamp>None</datestamp>
+        </header>
+        <header>
+            <identifier>AU1000050</identifier>
+            <datestamp>None</datestamp>
+        </header>
+        <header>
+            <identifier>AU1000051</identifier>
+            <datestamp>None</datestamp>
+        </header>
+        <header>
+            <identifier>AU1000052</identifier>
+            <datestamp>None</datestamp>
+        </header>
+        <header>
+            <identifier>AU1000053</identifier>
+            <datestamp>None</datestamp>
+        </header>
+        <header>
+            <identifier>AU1000054</identifier>
+            <datestamp>None</datestamp>
+        </header>
+        <header>
+            <identifier>AU1000055</identifier>
+            <datestamp>None</datestamp>
+        </header>
+        <header>
+            <identifier>AU1000056</identifier>
+            <datestamp>None</datestamp>
+        </header>
+        <header>
+            <identifier>AU1000057</identifier>
+            <datestamp>None</datestamp>
+        </header>
+        <header>
+            <identifier>AU1000058</identifier>
+            <datestamp>None</datestamp>
+        </header>
+        <header>
+            <identifier>AU1000059</identifier>
+            <datestamp>None</datestamp>
+        </header>
+        <header>
+            <identifier>AU100006</identifier>
+            <datestamp>None</datestamp>
+        </header>
+        <header>
+            <identifier>AU1000060</identifier>
+            <datestamp>None</datestamp>
+        </header>
+        <header>
+            <identifier>AU1000061</identifier>
+            <datestamp>None</datestamp>
+        </header>
+        <header>
+            <identifier>AU1000062</identifier>
+            <datestamp>None</datestamp>
+        </header>
+        <header>
+            <identifier>AU1000063</identifier>
+            <datestamp>None</datestamp>
+        </header>
+        <header>
+            <identifier>AU1000064</identifier>
+            <datestamp>None</datestamp>
+        </header>
+        <header>
+            <identifier>AU1000065</identifier>
+            <datestamp>None</datestamp>
+        </header>
+        <header>
+            <identifier>AU1000066</identifier>
+            <datestamp>None</datestamp>
+        </header>
+        <header>
+            <identifier>AU1000067</identifier>
+            <datestamp>None</datestamp>
+        </header>
+        <header>
+            <identifier>AU1000068</identifier>
+            <datestamp>None</datestamp>
+        </header>
+        <header>
+            <identifier>AU1000069</identifier>
+            <datestamp>None</datestamp>
+        </header>
+        <header>
+            <identifier>AU100007</identifier>
+            <datestamp>None</datestamp>
+        </header>
+        <header>
+            <identifier>AU1000070</identifier>
+            <datestamp>None</datestamp>
+        </header>
+        <header>
+            <identifier>AU1000071</identifier>
+            <datestamp>None</datestamp>
+        </header>
+        <header>
+            <identifier>AU1000072</identifier>
+            <datestamp>None</datestamp>
+        </header>
+        <header>
+            <identifier>AU1000073</identifier>
+            <datestamp>None</datestamp>
+        </header>
+        <header>
+            <identifier>AU1000074</identifier>
+            <datestamp>None</datestamp>
+        </header>
+        <header>
+            <identifier>AU1000075</identifier>
+            <datestamp>None</datestamp>
+        </header>
+        <header>
+            <identifier>AU1000076</identifier>
+            <datestamp>None</datestamp>
+        </header>
+        <header>
+            <identifier>AU1000077</identifier>
+            <datestamp>None</datestamp>
+        </header>
+        <header>
+            <identifier>AU1000078</identifier>
+            <datestamp>None</datestamp>
+        </header>
+        <header>
+            <identifier>AU1000079</identifier>
+            <datestamp>None</datestamp>
+        </header>
+        <header>
+            <identifier>AU100008</identifier>
+            <datestamp>None</datestamp>
+        </header>
+        <header>
+            <identifier>AU1000080</identifier>
+            <datestamp>None</datestamp>
+        </header>
+        <header>
+            <identifier>AU1000081</identifier>
+            <datestamp>None</datestamp>
+        </header>
+        <header>
+            <identifier>AU1000082</identifier>
+            <datestamp>None</datestamp>
+        </header>
+        <header>
+            <identifier>AU1000083</identifier>
+            <datestamp>None</datestamp>
+        </header>
+        <header>
+            <identifier>AU1000084</identifier>
+            <datestamp>None</datestamp>
+        </header>
+        <header>
+            <identifier>AU1000085</identifier>
+            <datestamp>None</datestamp>
+        </header>
+        <resumptionToken expirationDate="2017-06-10T12:29:53Z" completeListSize="1966951" cursor="0">
+        2011-06-01T00:00:00Z,9999-12-31T23:59:59Z,100,igsn</resumptionToken>
     </ListIdentifiers>
 </OAI-PMH>
