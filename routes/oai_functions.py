@@ -6,6 +6,7 @@ import config
 from model import Sample
 from routes.datestamp import *
 from routes.oai_errors import *
+import math
 
 
 # https://www.openarchives.org/OAI/openarchivesprotocol.html, 3.6 Error and Exception Conditions
@@ -104,7 +105,7 @@ def list_records(metadataPrefix, resumptionToken=None, from_=None, until=None):
     samples = []
 
     for event, elem in etree.iterparse(BytesIO(r.content), tag='ROW'):
-        samples.append(props(Sample(None, '<root>{}</root>'.format(etree.tostring(elem)))))
+        samples.append(get_obj_vars_as_dict(Sample(None, '<root>{}</root>'.format(etree.tostring(elem)))))
 
     resumption_token = get_resumption_token(metadataPrefix, resumptionToken, from_, until)
 
@@ -121,6 +122,7 @@ def list_records_xml(metadataPrefix, resumptionToken=None, from_=None, until=Non
         oracle_api_samples_url = create_url_query_token(resumptionToken)
         [from_, until, batch_num, metadataPrefix] = resumptionToken.split(',')
 
+    print(oracle_api_samples_url)
     r = requests.get(oracle_api_samples_url)
 
     if "No data" in r.content.decode('utf-8'):
@@ -156,17 +158,28 @@ def list_records_xml(metadataPrefix, resumptionToken=None, from_=None, until=Non
             'datestamp': datestamp,
             'record_xml': record_xml
         }
-        oai_record = '''
-        <record>
-            <header>
-                <identifier>{identifier}</identifier>
-                <datestamp>{datestamp}</datestamp>
-            </header>
-            <metadata>
+        if metadataPrefix == 'oai_dc':
+            oai_record = '''
+            <record>
+                <header>
+                    <identifier>{identifier}</identifier>
+                    <datestamp>{datestamp}</datestamp>
+                </header>
                 {record_xml}
-            </metadata>
-        </record>
-                '''.format(**oai_record_vars)
+            </record>
+                    '''.format(**oai_record_vars)
+        else:
+            oai_record = '''
+            <record>
+                <header>
+                    <identifier>{identifier}</identifier>
+                    <datestamp>{datestamp}</datestamp>
+                </header>
+                <metadata>
+                    {record_xml}
+                </metadata>
+            </record>
+                    '''.format(**oai_record_vars)
 
         # add the OAI record to the list of samples
         samples.append(oai_record)
@@ -200,6 +213,7 @@ def get_resumption_token(metadataPrefix, resumptionToken=None, from_=None, until
             until = '9999-12-31T23:59:59Z'
 
         cursor = 0
+
     complete_list_size = get_complete_list_size(from_, until)
     cursor_next = int(cursor) + config.OAI_BATCH_SIZE
     if cursor_next >= complete_list_size:
@@ -284,17 +298,19 @@ def create_url_query_token(token):
     """
     no_per_page = config.OAI_BATCH_SIZE
 
-    [from_, until, batch_num, metadataPrefix] = token.split(',')
+    [from_, until, cursor, metadataPrefix] = token.split(',')
     from_date = convert_datestamp_to_oracle(from_)
     until_date = convert_datestamp_to_oracle(until)
 
+    page_no = str(math.floor(int(cursor) / int(no_per_page)))
+
     oracle_api_samples_url = config.XML_API_URL_SAMPLESET_DATE_RANGE.format(
-        batch_num, no_per_page, from_date, until_date
+        page_no, no_per_page, from_date, until_date
     )
     return oracle_api_samples_url
 
 
-def props(x):
+def get_obj_vars_as_dict(x):
     return dict((key, getattr(x, key)) for key in dir(x) if key not in dir(x.__class__))
 
 
@@ -317,13 +333,4 @@ class ParameterError(ValueError):
 
 
 if __name__ == '__main__':
-    args = {
-        'verb': 'GetRecord',
-        'identifier': 'AU100',
-        'metadataPrefix': 'oai_dc'
-    }
-    s = Sample(args['identifier'])
-    dc_xml = s.export_dc_xml()
-
-#    print 'valid_oai_args(args[\'verb\'])', valid_oai_args(args['verb'])
-#    print 'validate_oai_parameters(args)', validate_oai_parameters(args)
+    pass
