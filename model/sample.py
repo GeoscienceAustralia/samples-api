@@ -8,7 +8,6 @@ from rdflib import Graph, URIRef, RDF, RDFS, XSD, OWL, Namespace, Literal, BNode
 import config
 from ldapi.ldapi import LDAPI
 from routes.datestamp import *
-from model.lookups import TERM_LOOKUP
 
 
 class Sample:
@@ -433,6 +432,11 @@ class Sample:
         # define GA
         ga = URIRef(Sample.URI_GA)
 
+        # pingback endpoint
+        PROV = Namespace('http://www.w3.org/ns/prov#')
+        g.bind('prov', PROV)
+        g.add((this_sample, PROV.pingback, URIRef(base_uri + '/pingback')))
+
         # generate things common to particular views
         if model_view == 'igsn-o' or model_view == 'dc':
             # DC = Namespace('http://purl.org/dc/elements/1.1/')
@@ -823,15 +827,24 @@ class Sample:
         else:
             year_acquired = ''
 
-        return render_template(
-            'page_sample.html',
-            view=model_view,
-            igsn=self.igsn,
-            year_acquired=year_acquired,
-            view_title=view_title,
-            sample_table_html=sample_table_html,
-            date_now=datetime.datetime.now().strftime('%d %B %Y'),
-            system_url='http://54.66.133.7'
+        # add in the Pingback header links as they are valid for all HTML views
+        pingback_uri = config.BASE_URI_SAMPLE + self.igsn + "/pingback"
+        headers = {
+            'Link': '<{}>;rel = "http://www.w3.org/ns/prov#pingback"'.format(pingback_uri)
+        }
+
+        return Response(
+            render_template(
+                'page_sample.html',
+                view=model_view,
+                igsn=self.igsn,
+                year_acquired=year_acquired,
+                view_title=view_title,
+                sample_table_html=sample_table_html,
+                date_now=datetime.datetime.now().strftime('%d %B %Y'),
+                system_url='http://54.66.133.7'
+            ),
+            headers=headers
         )
 
 
