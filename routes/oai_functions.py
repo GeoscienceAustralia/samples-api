@@ -1,12 +1,15 @@
-from model import Sample
-import config
-from lxml import etree
-from io import StringIO
-import requests
-from model.datestamp import *
 from datetime import datetime, timedelta
+from io import BytesIO
+import requests
+from lxml import etree
+import config
+from model import Sample
+from routes.datestamp import *
+from routes.oai_errors import *
+import math
 
 
+# https://www.openarchives.org/OAI/openarchivesprotocol.html, 3.6 Error and Exception Conditions
 OAI_ARGS = {
     'GetRecord': {
         'identifier': 'required',
@@ -46,94 +49,70 @@ OAI_ARGS = {
     },
 }
 
-# https://www.openarchives.org/OAI/openarchivesprotocol.html, 3.6 Error and Exception Conditions
-OAI_ERRORS = {
-    'badArgument': 'Value of the verb argument is not a legal OAI-PMH verb, the verb argument is missing, or the verb '\
-                   'argument is repeated.',
-}
-
-
-def valid_oai_args(verb):
-    argspec = OAI_ARGS.get(verb)
-    if argspec is None:
-        raise ParameterError('The OAI verb is not correct. Must be one of {0}'.format(', '.join(OAI_ARGS.iterkeys())))
-
-    return True
-
 
 def validate_oai_parameters(qsa_args):
-    # TODO: return differentiated error messages. See OAI spec
-    argspec = OAI_ARGS.get(qsa_args['verb'])
-    if argspec is None:
-        raise ParameterError('The OAI verb is not correct. Must be one of {0}'.format(', '.join(OAI_ARGS.iterkeys())))
+    """
+    Validates GET or POST arguments against the OAI_ARGS dict
 
-    exclusive = None
-    for arg_name, arg_type in list(argspec.items()):
-        if arg_type == 'exclusive':
-            exclusive = arg_name
+    :param qsa_args: query string or form parameters from a GET or POST request
+    :return: True if valie, else raises a BadVerb or BadArgument error
+    """
+    expected_oai_args = OAI_ARGS.get(qsa_args['verb'])
 
-    # check if we have unknown arguments
+    # check the verb
+    if expected_oai_args is None:
+        raise BadVerbError('The OAI verb is not correct. Must be one of {}'.format(', '.join(OAI_ARGS.keys())))
+
+    # check if we have any unknown args given
     for key, value in list(qsa_args.items()):
-        if key != 'verb':
-            if key not in argspec:
-                msg = "Unknown argument: %s" % key
-                raise ParameterError(msg)
-    # first investigate if we have exclusive argument
-    if exclusive in qsa_args:
-        if len(qsa_args) > 2:  # verb + exclusive
-            msg = ("Exclusive argument %s is used but other "
-                   "arguments found." % exclusive)
-            raise ParameterError(msg)
-        return
-    # if not exclusive, check for required
-    for arg_name, arg_type in list(argspec.items()):
-        if arg_name != 'verb':
-            if arg_type == 'required':
-                msg = "Argument required but not found: %s" % arg_name
-                if arg_name not in qsa_args:
-                    raise ParameterError(msg)
+        if key != 'verb' and key not in expected_oai_args:
+            raise BadArgumentError("Unknown argument: {}".format(key))
 
+    # check if we have any exclusive args given and any other args, apart from the verb
+    exclusive_possible = None
+    for arg_name, arg_type in list(expected_oai_args.items()):
+        if arg_type == 'exclusive':
+            exclusive_possible = arg_name
+    exclusive_present = False
+    for key, value in list(qsa_args.items()):
+        if key == exclusive_possible:
+            exclusive_present = True
+    if exclusive_present and len(qsa_args) > 2:  # verb + exclusive
+        raise BadArgumentError("Exclusive argument {} is used but other arguments found.".format(exclusive_possible))
+
+    # if no exclusive present, check for required args
+    if not exclusive_present:
+        for arg_name, arg_type in list(expected_oai_args.items()):
+            if arg_name != 'verb':
+                if arg_type == 'required' and arg_name not in qsa_args:
+                    raise BadArgumentError("Argument required but not found: {}".format(arg_name))
     return True
-
-
-def get_record(identifier):
-    sample = Sample(identifier)
-
-    return props(sample)
-    # try:
-    #
-    # except ValueError:
-    #     raise ValueError
 
 
 def list_records(metadataPrefix, resumptionToken=None, from_=None, until=None):
-    samples_dict = []
-    no_per_page = config.OAI_BATCH_SIZE
-    page_no = 1
-
+    # if we don't have a resumption token, start at the beginning
     if resumptionToken is None:
-        oracle_api_samples_url = config.XML_API_URL_SAMPLESET.format(page_no, no_per_page)
+        oracle_api_samples_url = config.XML_API_URL_SAMPLESET.format(1, config.OAI_BATCH_SIZE)
     else:
         oracle_api_samples_url = create_url_query_token(resumptionToken)
         [from_, until, batch_num, metadataPrefix] = resumptionToken.split(',')
+
     r = requests.get(oracle_api_samples_url)
 
-    # TODO: replace this with a check on the HTTP response code where 404 indicates "no data"
-    if "No data" in r.content:
-        raise ParameterError('No Data')
+    if "No data" in r.content.decode('utf-8'):
+        raise NoRecordsMatchError('No Data')
 
-    xml = r.content
-    context = etree.iterparse(StringIO(xml), tag='ROW')
-    for event, elem in context:
-        samples_dict.append(props(Sample(None, '<root>{}</root>'.format(etree.tostring(elem)))))
+    samples = []
+
+    for event, elem in etree.iterparse(BytesIO(r.content), tag='ROW'):
+        samples.append(get_obj_vars_as_dict(Sample(None, '<root>{}</root>'.format(etree.tostring(elem)))))
 
     resumption_token = get_resumption_token(metadataPrefix, resumptionToken, from_, until)
 
-    return samples_dict, resumption_token
+    return samples, resumption_token
 
 
 def list_records_xml(metadataPrefix, resumptionToken=None, from_=None, until=None):
-
     no_per_page = config.OAI_BATCH_SIZE
     page_no = 1
 
@@ -143,16 +122,17 @@ def list_records_xml(metadataPrefix, resumptionToken=None, from_=None, until=Non
         oracle_api_samples_url = create_url_query_token(resumptionToken)
         [from_, until, batch_num, metadataPrefix] = resumptionToken.split(',')
 
+    print(oracle_api_samples_url)
     r = requests.get(oracle_api_samples_url)
 
-    if "No data" in r.content:
-        raise ParameterError('No Data')
+    if "No data" in r.content.decode('utf-8'):
+        raise NoRecordsMatchError(
+            'The combination of the values of the from, until, '
+            'set and metadataPrefix arguments results in an empty list.')
 
-    xml = r.content
-    context = etree.iterparse(StringIO(xml), tag='ROW')
     samples = []
 
-    for event, elem in context:
+    for event, elem in etree.iterparse(BytesIO(r.content), tag='ROW'):
         # create a Sample for each XML ROW
         sample = Sample(None, '<root>{}</root>'.format(etree.tostring(elem)))
         if sample.date_modified is not None:
@@ -163,11 +143,11 @@ def list_records_xml(metadataPrefix, resumptionToken=None, from_=None, until=Non
         # make the record XML using the Sample export
         # for some reason, there's this odd whitespace character in the metadataPrefix
         metadataPrefix = metadataPrefix.replace(u'\u200b', '')
-        if metadataPrefix == u'igsn':
+        if metadataPrefix == 'igsn':
             record_xml = sample.export_igsn_xml()
-        elif metadataPrefix == u'igsn-dev':
-            record_xml = sample.export_igsn_dev_xml()
-        elif metadataPrefix == u'csirov3':
+        elif metadataPrefix == 'igsn-r1':
+            record_xml = sample.export_igsn_r1_xml()
+        elif metadataPrefix == 'csirov3':
             record_xml = sample.export_csirov3_xml()
         else:  # oai_dc
             record_xml = sample.export_dc_xml()
@@ -178,17 +158,28 @@ def list_records_xml(metadataPrefix, resumptionToken=None, from_=None, until=Non
             'datestamp': datestamp,
             'record_xml': record_xml
         }
-        oai_record = '''
-        <record>
-            <header>
-                <identifier>{identifier}</identifier>
-                <datestamp>{datestamp}</datestamp>
-            </header>
-            <metadata>
+        if metadataPrefix == 'oai_dc':
+            oai_record = '''
+            <record>
+                <header>
+                    <identifier>{identifier}</identifier>
+                    <datestamp>{datestamp}</datestamp>
+                </header>
                 {record_xml}
-            </metadata>
-        </record>
-                '''.format(**oai_record_vars)
+            </record>
+                    '''.format(**oai_record_vars)
+        else:
+            oai_record = '''
+            <record>
+                <header>
+                    <identifier>{identifier}</identifier>
+                    <datestamp>{datestamp}</datestamp>
+                </header>
+                <metadata>
+                    {record_xml}
+                </metadata>
+            </record>
+                    '''.format(**oai_record_vars)
 
         # add the OAI record to the list of samples
         samples.append(oai_record)
@@ -222,18 +213,21 @@ def get_resumption_token(metadataPrefix, resumptionToken=None, from_=None, until
             until = '9999-12-31T23:59:59Z'
 
         cursor = 0
+
     complete_list_size = get_complete_list_size(from_, until)
     cursor_next = int(cursor) + config.OAI_BATCH_SIZE
     if cursor_next >= complete_list_size:
         next_resumption_token = None
     else:
-        next_resumption_token = {'expiration_date': expiration_date,
-                                 'complete_list_size': complete_list_size,
-                                 'cursor': cursor,
-                                 'from_': from_,
-                                 'until': until,
-                                 'cursor_next': cursor_next,
-                                 'metadataPrefix': metadataPrefix}
+        next_resumption_token = {
+            'expiration_date': expiration_date,
+            'complete_list_size': complete_list_size,
+            'cursor': cursor,
+            'from_': from_,
+            'until': until,
+            'cursor_next': cursor_next,
+            'metadataPrefix': metadataPrefix
+        }
 
     return next_resumption_token
 
@@ -246,18 +240,15 @@ def get_earliest_date():
     """
     r = requests.get(config.XML_API_URL_MIN_DATE)
 
-    if "No data" in r.content:
-        raise ParameterError('No Data')
+    if "No data" in r.content.decode('utf-8'):
+        raise NoRecordsMatchError('No Data')
 
     xml = r.content
-    context = etree.iterparse(StringIO(xml), tag='EARLIEST_MODIFIED_DATE')
+    context = etree.iterparse(BytesIO(xml), tag='EARLIEST_MODIFIED_DATE')
     for event, elem in context:
         str_min_date = elem.text
 
-    min_date = str2datetime(str_min_date)
-#    min_date = datetime.strptime(str_min_date, '%Y-%m-%dT%H:%M:%S')
-
-    return min_date
+    return str2datetime(str_min_date)
 
 
 def get_earliest_datestamp():
@@ -288,17 +279,14 @@ def get_complete_list_size(str_from_date=None, str_until_date=None):
 
     r = requests.get(config.XML_API_URL_TOTAL_COUNT_DATE_RANGE.format(str_from_date, str_until_date))
 
-    if "No data" in r.content:
-        raise ParameterError('No Data')
+    if "No data" in r.content.decode('utf-8'):
+        raise NoRecordsMatchError('No Data')
 
-    xml = r.content
-
-    context = etree.iterparse(StringIO(xml), tag='RECORD_COUNT')
+    context = etree.iterparse(BytesIO(r.content), tag='RECORD_COUNT')
     for event, elem in context:
         str_record_count = elem.text
 
-
-    return str_record_count
+    return int(str_record_count)
 
 
 def create_url_query_token(token):
@@ -310,17 +298,19 @@ def create_url_query_token(token):
     """
     no_per_page = config.OAI_BATCH_SIZE
 
-    [from_, until, batch_num, metadataPrefix] = token.split(',')
+    [from_, until, cursor, metadataPrefix] = token.split(',')
     from_date = convert_datestamp_to_oracle(from_)
     until_date = convert_datestamp_to_oracle(until)
 
+    page_no = str(math.floor(int(cursor) / int(no_per_page)))
+
     oracle_api_samples_url = config.XML_API_URL_SAMPLESET_DATE_RANGE.format(
-        batch_num, no_per_page, from_date, until_date
+        page_no, no_per_page, from_date, until_date
     )
     return oracle_api_samples_url
 
 
-def props(x):
+def get_obj_vars_as_dict(x):
     return dict((key, getattr(x, key)) for key in dir(x) if key not in dir(x.__class__))
 
 
@@ -329,7 +319,7 @@ def calc_expiration_datestamp():
     responseDate = 2017-02-08T06:01:12Z
     expirationDate=2017-02-08T07:01:13Z
     """
-    dt = datetime.now()
+    dt = datetime.datetime.now()
     request_datestamp = datetime_to_datestamp(dt)
     request_date = datestamp_to_datetime(request_datestamp)
     expiration_date = request_date + timedelta(hours=1)
@@ -343,13 +333,4 @@ class ParameterError(ValueError):
 
 
 if __name__ == '__main__':
-    args = {
-        'verb': 'GetRecord',
-        'identifier': 'AU100',
-        'metadataPrefix': 'oai_dc'
-    }
-    s = Sample(args['identifier'])
-    dc_xml = s.export_dc_xml()
-
-#    print 'valid_oai_args(args[\'verb\'])', valid_oai_args(args['verb'])
-#    print 'validate_oai_parameters(args)', validate_oai_parameters(args)
+    pass

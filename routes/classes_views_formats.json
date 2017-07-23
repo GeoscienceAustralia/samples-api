@@ -12,7 +12,7 @@
     "csirov3": ["text/xml"],
     "dc": ["text/html", "text/xml", "text/turtle", "application/rdf+xml"],
     "igsn": ["text/xml"],
-    "igsn-dev": ["text/xml"],
+    "igsn-r1": ["text/xml"],
     "igsn-o": ["text/html", "text/turtle", "application/rdf+xml", "application/rdf+json"],
     "prov": ["text/html", "text/turtle", "application/rdf+xml", "application/rdf+json"],
     "sosa": ["text/turtle", "application/rdf+xml", "application/rdf+json"]

@@ -22,8 +22,8 @@
             <metadataNamespace>http://schema.igsn.org/description/1.0</metadataNamespace>
         </metadataFormat>
         <metadataFormat>
-            <metadataPrefix>igsn-dev</metadataPrefix>
-            <schema>https://github.com/IGSN/metadata/blob/dev/description/resource.xsd</schema>
+            <metadataPrefix>igsn-r1</metadataPrefix>
+            <schema>https://github.com/IGSN/metadata/blob/r1/description/resource.xsd</schema>
             <metadataNamespace>http://schema.igsn.org/description/1.0</metadataNamespace>
         </metadataFormat>
         <metadataFormat>

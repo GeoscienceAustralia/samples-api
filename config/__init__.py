@@ -9,18 +9,19 @@ XML_API_URL_SAMPLESET = 'http://dbforms.ga.gov.au/www_distp/a.igsn_api.get_igsnS
                         '?pOrder=IGSN&pPageNo={0}&pNoOfLinesPerPage={1}'
 XML_API_URL_SAMPLE = 'http://dbforms.ga.gov.au/www_distp/a.igsn_api.get_igsnSample?pIGSN={0}'
 
-XML_API_URL_SAMPLESET_DATE_RANGE = 'http://dbforms.ga.gov.au/www_distp/a.igsn_api.get_igsnSampleSet' \
-                        '?pOrder=IGSN&pPageNo={0}&pNoOfLinesPerPage={1}&pModifiedFromDate={2}' \
-                                   '&pModifiedToDate={3}'
+XML_API_URL_SAMPLESET_DATE_RANGE = \
+    'http://dbforms.ga.gov.au/www_distp/a.igsn_api.get_igsnSampleSet' \
+    '?pOrder=IGSN&pPageNo={0}&pNoOfLinesPerPage={1}&pModifiedFromDate={2}' \
+    '&pModifiedToDate={3}'
 
 XML_API_URL_MIN_DATE = 'http://dbforms.ga.gov.au/www_distp/a.igsn_api.get_Earliest_Date_Modified'
 XML_API_URL_TOTAL_COUNT = 'http://dbforms.ga.gov.au/www_distp/a.igsn_api.get_Number_Modified'
 XML_API_URL_TOTAL_COUNT_DATE_RANGE = 'http://dbforms.ga.gov.au/www_distp/a.igsn_api.get_Number_Modified'\
-                                        '?pModifiedFromDate={0}&pModifiedToDate={1}'
+                                     '?pModifiedFromDate={0}&pModifiedToDate={1}'
 
-ADMIN_EMAIL = 'data@ga.gov.au'
+ADMIN_EMAIL = 'dataman@ga.gov.au'
 
-BASE_URI_SAMPLE = 'http://pid.geoscience.gov.au/sample/'
+BASE_URI_SAMPLE = 'http://localhost:5000/sample/'
 BASE_URI_OAI = 'http://pid.geoscience.gov.au/oai'
 
-OAI_BATCH_SIZE = 10
+OAI_BATCH_SIZE = 100
