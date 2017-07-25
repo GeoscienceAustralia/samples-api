@@ -162,6 +162,7 @@ class Sample:
         """
         try:
             root = objectify.fromstring(xml)
+            from .lookups import TERM_LOOKUP
 
             self.igsn = root.ROW.IGSN
             self.sample_id = root.ROW.SAMPLEID
