@@ -55,8 +55,15 @@ def sample(igsn):
         return client_error_Response(e)
 
 
-@model_classes.route('/sample/<string:igsn>/pingback', methods=['POST'])
+@model_classes.route('/sample/<string:igsn>/pingback', methods=['GET', 'POST'])
 def sample_pingback(igsn):
+    if request.method == 'GET':
+        return Response(
+            'This endpoint is the individual PROV "pingback" endpoint for Sample {}. It is expected to be used in '
+            'accordance with the PROV-AQ Working Group Note (https://www.w3.org/TR/prov-aq/).'.format(igsn),
+            mimetype='text/plain'
+        )
+
     # TODO: validate the pingback
     valid = True
     if valid:
