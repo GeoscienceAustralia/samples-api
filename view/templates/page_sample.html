@@ -1,14 +1,13 @@
-{% extends "layout.html" %}
+{% extends "page_layout.html" %}
 
 {% block content %}
     <h1>Sample</h1>
     <h2>{{ view_title }}</h2>
-    <p><a href="{{ url_for('model_classes.sample', igsn=igsn) }}">html</a> | <a href="{{ url_for('model_classes.sample', igsn=igsn) }}?_view={{ view }}&_format=text/turtle">rdf/turtle</a></p>
 
     {{ sample_table_html|safe }}
 
     <h2>Other views</h2>
-    <p>Other views of this Sample are listed in the <a href="{{ url_for('model_classes.sample', igsn=igsn) }}?_view=alternates">Alternates View</a>.</p>
+    <p>Other views of this Sample are listed in the <a href="{{ url_for('classes.sample', igsn=igsn) }}?_view=alternates">Alternates View</a>.</p>
     <h2>Citation</h2>
     <p>If you wish to cite this sample as you would a publication, please use the following format:</p>
     <code style="display:block; margin: 0 5em 0 5em;">

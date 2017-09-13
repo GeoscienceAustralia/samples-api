@@ -9,7 +9,7 @@ import _config
 
 
 class RegisterRenderer(Renderer):
-    def __init__(self, request, uri, endpoints, page, per_page, last_page_no):
+    def __init__(self, request, uri, endpoints, page, per_page, prev_page, next_page, last_page):
         Renderer.__init__(self, uri, endpoints)
 
         self.request = request
@@ -18,7 +18,9 @@ class RegisterRenderer(Renderer):
         self.g = None
         self.per_page = per_page
         self.page = page
-        self.last_page_no = last_page_no
+        self.prev_page = prev_page
+        self.next_page = next_page
+        self.last_page = last_page
 
         self._get_details_from_oracle_api(page, per_page)
 
@@ -41,7 +43,11 @@ class RegisterRenderer(Renderer):
                         'class_register.html',
                         class_name=self.uri,
                         register=self.register,
-                        system_url='http://54.66.133.7'
+                        page=self.page,
+                        per_page=self.per_page,
+                        prev_page=self.prev_page,
+                        next_page=self.next_page,
+                        last_page=self.last_page
                     ),
                     mimetype='text/html',
                     headers=extra_headers
@@ -131,12 +137,12 @@ class RegisterRenderer(Renderer):
 
             # links to other pages
             self.g.add((page_uri, XHV.first, URIRef(page_uri_str_no_page_no + '1')))
-            self.g.add((page_uri, XHV.last, URIRef(page_uri_str_no_page_no + str(self.last_page_no))))
+            self.g.add((page_uri, XHV.last, URIRef(page_uri_str_no_page_no + str(self.last_page))))
 
             if self.page != 1:
                 self.g.add((page_uri, XHV.prev, URIRef(page_uri_str_no_page_no + str(self.page - 1))))
 
-            if self.page != self.last_page_no:
+            if self.page != self.last_page:
                 self.g.add((page_uri, XHV.next, URIRef(page_uri_str_no_page_no + str(self.page + 1))))
 
             # add all the items

@@ -1,26 +1,89 @@
 {
-  "_comment": [
-    "For every class in the provenance DB, we will have the following model views:",
-    "   default     -- any one of the provided views for the class, chosen as the default - usually the igsn",
-    "   alternates  -- a list of all available views and formats",
-    "   igsn  -- the igsn-specific view based on the IGSN Ontology",
-    ""],
-  "http://pid.geoscience.gov.au/def/ont/igsn#Sample": {
-    "renderer": "Sample",
-    "default": "igsn-o",
-    "alternates": ["text/html", "text/turtle", "application/rdf+xml", "application/rdf+json", "application/json"],
-    "csirov3": ["text/xml"],
-    "dc": ["text/html", "text/xml", "text/turtle", "application/rdf+xml"],
-    "igsn": ["text/xml"],
-    "igsn-r1": ["text/xml"],
-    "igsn-o": ["text/html", "text/turtle", "application/rdf+xml", "application/rdf+json"],
-    "prov": ["text/html", "text/turtle", "application/rdf+xml", "application/rdf+json"],
-    "sosa": ["text/turtle", "application/rdf+xml", "application/rdf+json"]
-  },
-  "http://purl.org/linked-data/registry#Register":{
-    "renderer": "RegisterRenderer",
-    "default": "reg",
-    "alternates": ["text/html", "text/turtle", "application/rdf+xml", "application/rdf+json", "application/json"],
-    "reg": ["text/html", "text/turtle", "application/rdf+xml", "application/rdf+json"]
-  }
+	"_comment": [
+		"See the views_formats_example.json in _docs for an example of what this file should look like"
+	],
+	"http://pid.geoscience.gov.au/def/ont/ga/igsn#Sample": {
+		"renderer": "SampleRenderer",
+		"default": "igsn-o",
+		"alternates": {
+			"mimetypes": [
+				"text/html",
+				"text/turtle",
+				"application/rdf+xml",
+				"application/rdf+json",
+				"application/json"
+
+			],
+			"default_mimetype": "text/html",
+			"namespace": "http://www.w3.org/ns/ldp#Alternates",
+			"description": "The view listing all other views of this class of object"
+		},
+		"csirov3": {
+			"mimetypes": [
+				"text/xml"
+			],
+			"default_mimetype": "text/xml",
+			"namespace": "https://confluence.csiro.au/display/AusIGSN/CSIRO+IGSN+IMPLEMENTATION",
+			"description": "An XML-only metadata schema for descriptive elements of IGSNs"
+		},
+		"dct": {
+			"mimetypes": [
+				"text/html",
+				"text/turtle",
+				"application/rdf+xml",
+				"application/rdf+json",
+				"application/xml",
+				"text/xml"
+			],
+			"default_mimetype": "text/turtle",
+			"namespace": "http://purl.org/dc/terms/",
+			"description": "Dublin Core Terms from the Dublin Core Metadata Initiative"
+		},
+		"igsn": {
+			"mimetypes": ["text/xml"],
+			"default_mimetype": "text/xml",
+			"namespace": "http://schema.igsn.org/description/",
+			"description": "The official IGSN XML schema"
+		},
+		"igsn-r1": {
+			"mimetypes": ["text/xml"],
+			"default_mimetype": "text/xml",
+			"namespace": "http://schema.igsn.org/description/1.0",
+            "description": "Version 1 of the official IGSN XML schema"
+		},
+		"igsn-o": {
+			"mimetypes": ["text/html", "text/turtle", "application/rdf+xml", "application/rdf+json"],
+			"default_mimetype": "text/html",
+			"namespace": "http://pid.geoscience.gov.au/def/ont/ga/igsn",
+			"description": "An OWL ontology of Samples based on CSIRO's XML-based IGSN schema"
+		},
+		"prov": {
+			"mimetypes": ["text/html", "text/turtle", "application/rdf+xml", "application/rdf+json"],
+			"default_mimetype": "text/turtle",
+			"namespace": "http://www.w3.org/ns/prov/",
+			"description": "The W3C's provenance data model, PROV"
+		},
+		"sosa": {
+			"mimetypes": ["text/turtle", "application/rdf+xml", "application/rdf+json"],
+			"default_mimetype": "text/turtle",
+			"namespace": "http://www.w3.org/ns/sosa/",
+			"description": "The W3C's Sensor, Observation, Sample, and Actuator ontology within the Semantic Sensor Networks ontology"
+		}
+	},
+	"http://purl.org/linked-data/registry#Register": {
+		"renderer": "RegisterRenderer",
+		"default": "reg",
+		"alternates": {
+			"mimetypes": ["text/html", "text/turtle", "application/rdf+xml", "application/rdf+json"],
+			"default_mimetype": "text/html",
+			"namespace": "http://www.w3.org/ns/ldp#Alternates",
+			"description": "The view listing all other views of this class of object"
+		},
+		"reg": {
+			"mimetypes": ["text/html", "text/turtle", "application/rdf+xml", "application/rdf+json"],
+			"default_mimetype": "text/html",
+			"namespace": "http://purl.org/linked-data/registry#",
+			"description": "The Registry Ontology. Core ontology for linked data registry services. Based on ISO19135 but heavily modified to suit Linked Data representations and applications"
+		}
+	}
 }

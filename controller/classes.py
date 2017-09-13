@@ -2,17 +2,17 @@
 This file contains all the HTTP routes for classes from the IGSN model, such as Samples and the Sample Register
 """
 from flask import Blueprint, render_template, request, Response
-from .routes_functions import render_alternates_view, client_error_Response
-import _config
+from .functions import render_alternates_view, client_error_Response
+import _config as config
 from _ldapi.__init__ import LDAPI, LdapiParameterError
-from controller import model_classes_functions
+from controller import classes_functions
 import urllib.parse as uparse
 import requests
 
-model_classes = Blueprint('model_classes', __name__)
+classes = Blueprint('classes', __name__)
 
 
-@model_classes.route('/sample/<string:igsn>')
+@classes.route('/sample/<string:igsn>')
 def sample(igsn):
     """
     A single Sample
@@ -20,8 +20,8 @@ def sample(igsn):
     :return: HTTP Response
     """
     # lists the views and formats available for a Sample
-    views_formats = model_classes_functions.get_classes_views_formats() \
-        .get('http://pid.geoscience.gov.au/def/ont/igsn#Sample')
+    c = config.URI_SAMPLE_CLASS
+    views_formats = LDAPI.get_classes_views_formats().get(c)
 
     try:
         view, mimetype = LDAPI.get_valid_view_and_format(
@@ -49,13 +49,13 @@ def sample(igsn):
                 s = Sample(igsn)
                 return s.render(view, mimetype)
             except ValueError:
-                return render_template('sample_no_record.html')
+                return render_template('class_sample_no_record.html')
 
     except LdapiParameterError as e:
         return client_error_Response(e)
 
 
-@model_classes.route('/sample/<string:igsn>/pingback', methods=['GET', 'POST'])
+@classes.route('/sample/<string:igsn>/pingback', methods=['GET', 'POST'])
 def sample_pingback(igsn):
     if request.method == 'GET':
         return Response(
@@ -80,7 +80,7 @@ def sample_pingback(igsn):
         )
 
 
-@model_classes.route('/sample/')
+@classes.route('/sample/')
 def samples():
     """
     The Register of Samples
@@ -88,7 +88,7 @@ def samples():
     :return: HTTP Response
     """
     # lists the views and formats available for a Sample
-    views_formats = model_classes_functions.get_classes_views_formats() \
+    views_formats = classes_functions.get_classes_views_formats() \
         .get('http://purl.org/linked-data/registry#Register')
 
     try:
@@ -129,49 +129,65 @@ def samples():
             links.append('<http://www.w3.org/ns/ldp#Resource>; rel="type"')
             # signalling that this is, in fact, a resource described in pages
             links.append('<http://www.w3.org/ns/ldp#Page>; rel="type"')
-            links.append('<{}?per_page={}>; rel="first"'.format(_config.BASE_URI_SAMPLE, per_page))
+            links.append('<{}?per_page={}>; rel="first"'.format(config.URI_SAMPLE_INSTANCE_BASE, per_page))
 
             # if this isn't the first page, add a link to "prev"
             if page != 1:
                 links.append('<{}?per_page={}&page={}>; rel="prev"'.format(
-                    _config.BASE_URI_SAMPLE,
+                    config.URI_SAMPLE_INSTANCE_BASE,
                     per_page,
                     (page - 1)
                 ))
 
+            # if this isn't the first page, add a link to "prev"
+            if page != 1:
+                prev_page = page - 1
+                links.append('<{}?per_page={}&page={}>; rel="prev"'.format(
+                    config.URI_SAMPLE_INSTANCE_BASE,
+                    per_page,
+                    prev_page
+                ))
+            else:
+                prev_page = None
+
             # add a link to "next" and "last"
             try:
-                r = requests.get(_config.XML_API_URL_TOTAL_COUNT)
+                r = requests.get(config.XML_API_URL_TOTAL_COUNT)
                 no_of_samples = int(r.content.decode('utf-8').split('<RECORD_COUNT>')[1].split('</RECORD_COUNT>')[0])
-                last_page_no = int(round(no_of_samples / per_page, 0)) + 1  # same as math.ceil()
+                last_page = int(round(no_of_samples / per_page, 0)) + 1  # same as math.ceil()
 
                 # if we've gotten the last page value successfully, we can choke if someone enters a larger value
-                if page > last_page_no:
+                if page > last_page:
                     return Response(
                         'You must enter either no value for page or an integer <= {} which is the last page number.'
-                        .format(last_page_no),
+                        .format(last_page),
                         status=400,
                         mimetype='text/plain'
                     )
 
                 # add a link to "next"
-                if page != last_page_no:
+                if page != last_page:
+                    next_page = page + 1
                     links.append('<{}?per_page={}&page={}>; rel="next"'
-                                 .format(_config.BASE_URI_SAMPLE, per_page, (page + 1)))
+                                 .format(config.URI_SAMPLE_INSTANCE_BASE, per_page, (page + 1)))
+                else:
+                    next_page = None
 
                 # add a link to "last"
                 links.append('<{}?per_page={}&page={}>; rel="last"'
-                             .format(_config.BASE_URI_SAMPLE, per_page, last_page_no))
+                             .format(config.URI_SAMPLE_INSTANCE_BASE, per_page, last_page))
             except:
                 # if there's some error in getting the no of samples, add the "next" link but not the "last" link
+                next_page = page + 1
                 links.append('<{}?per_page={}&page={}>; rel="next"'
-                             .format(_config.BASE_URI_SAMPLE, per_page, (page + 1)))
+                             .format(config.URI_SAMPLE_INSTANCE_BASE, per_page, (page + 1)))
 
             headers = {
                 'Link': ', '.join(links)
             }
 
-            return register.RegisterRenderer(request, class_uri, None, page, per_page, last_page_no)\
+            class_uri_of_register_items = 'http://pid.geoscience.gov.au/def/ont/igsn#Sample'  # 'http://def.seegrid.csiro.au/ontology/om/sam-lite#Specimen'
+            return register.RegisterRenderer(request, class_uri_of_register_items, None, page, per_page, prev_page, next_page, last_page) \
                 .render(view, mime_format, extra_headers=headers)
 
     except LdapiParameterError as e:

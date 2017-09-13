@@ -693,7 +693,7 @@ class Sample:
         else:
             d = self.date_acquired
         template = render_template(
-            'sample_dc.xml',
+            'class_sample_dc.xml',
             identifier=self.igsn,
             description=self.remark,
             date=d,
@@ -722,7 +722,7 @@ class Sample:
 
 
         template = render_template(
-            'sample_igsn.xml',
+            'class_sample_igsn.xml',
             igsn=self.igsn,
             sample_id=self.sample_id,
             description=self.remark,
@@ -742,7 +742,7 @@ class Sample:
         :return: XML string
         """
         template = render_template(
-            'sample_igsn_r1.xml',
+            'class_sample_igsn_r1.xml',
             igsn=self.igsn,
             sample_id=self.sample_id,
             description=self.remark,
@@ -763,7 +763,7 @@ class Sample:
         """
         # sample location in GML & WKT, formulation from GeoSPARQL
         template = render_template(
-            'sample_csirov3.xml',
+            'class_sample_csirov3.xml',
             igsn=self.igsn,
             sample_type=self.sample_type,
             material_type=self.material_type,
@@ -787,7 +787,7 @@ class Sample:
             view_title = 'IGSN Ontology view'
 
             sample_table_html = render_template(
-                'sample_igsn-o.html',
+                'class_sample_igsn-o.html',
                 igsn=self.igsn,
                 sample_id=self.sample_id,
                 description=self.remark if self.remark != '' else '-',
@@ -804,7 +804,7 @@ class Sample:
             g = Graph().parse(data=prov_turtle, format='turtle')
 
             sample_table_html = render_template(
-                'sample_prov.html',
+                'class_sample_prov.html',
                 visjs=self._make_vsjs(g),
                 prov_turtle=prov_turtle,
             )
@@ -812,7 +812,7 @@ class Sample:
             view_title = 'Dublin Core view'
 
             sample_table_html = render_template(
-                'sample_dc.html',
+                'class_sample_dc.html',
                 identifier=self.igsn,
                 description=self.remark if self.remark != '' else '-',
                 date=self.date_acquired if self.date_acquired is not None else '<a href="{}">{}</a>'.format(
@@ -830,7 +830,7 @@ class Sample:
             year_acquired = ''
 
         # add in the Pingback header links as they are valid for all HTML views
-        pingback_uri = _config.BASE_URI_SAMPLE + self.igsn + "/pingback"
+        pingback_uri = _config.URI_SAMPLE_INSTANCE_BASE + self.igsn + "/pingback"
         headers = {
             'Link': '<{}>;rel = "http://www.w3.org/ns/prov#pingback"'.format(pingback_uri)
         }
@@ -843,8 +843,7 @@ class Sample:
                 year_acquired=year_acquired,
                 view_title=view_title,
                 sample_table_html=sample_table_html,
-                date_now=datetime.datetime.now().strftime('%d %B %Y'),
-                system_url='http://54.66.133.7'
+                date_now=datetime.datetime.now().strftime('%d %B %Y')
             ),
             headers=headers
         )

@@ -81,7 +81,7 @@ def render_alternates_view(class_uri, class_uri_encoded, instance_uri, instance_
         return Response(g.serialize(format=rdflib_format), status=200, mimetype=mimetype)
     else:  # HTML
         return render_template(
-            'alternates_view.html',
+            'alternates.html',
             class_uri=class_uri,
             class_uri_encoded=class_uri_encoded,
             instance_uri=instance_uri,

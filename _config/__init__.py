@@ -24,7 +24,8 @@ XML_API_URL_TOTAL_COUNT_DATE_RANGE = 'http://dbforms.ga.gov.au/www_distp/a.igsn_
 
 ADMIN_EMAIL = 'dataman@ga.gov.au'
 
-BASE_URI_SAMPLE = 'http://localhost:5000/sample/'
+URI_SAMPLE_CLASS = 'http://pid.geoscience.gov.au/def/ont/ga/igsn#Sample'
+URI_SAMPLE_INSTANCE_BASE = 'http://pid.geoscience.gov.au/id/sample/'
 BASE_URI_OAI = 'http://pid.geoscience.gov.au/oai'
 
 OAI_BATCH_SIZE = 100

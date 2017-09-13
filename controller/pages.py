@@ -5,7 +5,7 @@ from flask import Blueprint, Response, request, render_template
 from lxml import etree
 from lxml.builder import ElementMaker
 from _ldapi.__init__ import LDAPI, LdapiParameterError
-from controller import routes_functions
+from controller import functions
 
 pages = Blueprint('controller', __name__)
 
@@ -31,15 +31,14 @@ def index():
             views_formats
         )
     except LdapiParameterError as e:
-        return routes_functions.client_error_Response(e)
+        return functions.client_error_Response(e)
 
     # select view and format
 
     if view != 'getcapabilities':
         if mime_format == 'text/html':
             return render_template(
-                'page_index.html',
-                system_url='http://54.66.133.7'
+                'page_index.html'
             )
         else:
             return Response(
@@ -157,6 +156,5 @@ def index():
 @pages.route('/page/about')
 def about():
     return render_template(
-        'page_about.html',
-        system_url='http://54.66.133.7'
+        'page_about.html'
     )
