@@ -2,7 +2,7 @@
 A list of functions for use anywhere but particularly in routes.py
 """
 from flask import Response, render_template
-from ldapi.ldapi import LDAPI
+from _ldapi.__init__ import LDAPI
 from rdflib import Graph, Namespace, Literal, URIRef, RDF, XSD, BNode, plugin
 import json
 import urllib.parse as uparse
@@ -23,8 +23,8 @@ def render_alternates_view(class_uri, class_uri_encoded, instance_uri, instance_
         return Response(json.dumps(views_formats), status=200, mimetype='application/json')
     elif mimetype in LDAPI.get_rdf_mimetypes_list():
         g = Graph()
-        LDAPI_O = Namespace('http://promsns.org/def/ldapi#')
-        g.bind('ldapi', LDAPI_O)
+        LDAPI_O = Namespace('http://promsns.org/def/_ldapi#')
+        g.bind('_ldapi', LDAPI_O)
         DCT = Namespace('http://purl.org/dc/terms/')
         g.bind('dct', DCT)
 

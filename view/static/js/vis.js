@@ -3438,7 +3438,7 @@ return /******/ (function(modules) { // webpackBootstrap
           if (hasOwnProp(parentConfig, prop) &&
                   !hasOwnProp(childConfig, prop) &&
                   isObject(parentConfig[prop])) {
-              // make sure changes to properties don't modify parent config
+              // make sure changes to properties don't modify parent _config
               res[prop] = extend({}, res[prop]);
           }
       }
@@ -4831,7 +4831,7 @@ return /******/ (function(modules) { // webpackBootstrap
       meridiemParse: defaultLocaleMeridiemParse
   };
 
-  // internal storage for locale config files
+  // internal storage for locale _config files
   var locales = {};
   var localeFamilies = {};
   var globalLocale;
@@ -4911,9 +4911,9 @@ return /******/ (function(modules) { // webpackBootstrap
           config.abbr = name;
           if (locales[name] != null) {
               deprecateSimple('defineLocaleOverride',
-                      'use moment.updateLocale(localeName, config) to change ' +
+                      'use moment.updateLocale(localeName, _config) to change ' +
                       'an existing locale. moment.defineLocale(localeName, ' +
-                      'config) should only be used for creating a new locale ' +
+                      '_config) should only be used for creating a new locale ' +
                       'See http://momentjs.com/guides/#/warnings/define-locale/ for more info.');
               parentConfig = locales[name]._config;
           } else if (config.parentLocale != null) {
@@ -4967,7 +4967,7 @@ return /******/ (function(modules) { // webpackBootstrap
           // backwards compat for now: also set the locale
           getSetGlobalLocale(name);
       } else {
-          // pass null for config to unupdate, useful for tests
+          // pass null for _config to unupdate, useful for tests
           if (locales[name] != null) {
               if (locales[name].parentLocale != null) {
                   locales[name] = locales[name].parentLocale;
@@ -5249,7 +5249,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
           // TODO: We need to take the current isoWeekYear, but that depends on
           // how we interpret now (local, utc, fixed offset). So create
-          // a now version of current config (take local/utc/offset flags, and
+          // a now version of current _config (take local/utc/offset flags, and
           // create now).
           weekYear = defaults(w.GG, config._a[YEAR], weekOfYear(createLocal(), 1, 4).year);
           week = defaults(w.W, 1);
@@ -5322,7 +5322,7 @@ return /******/ (function(modules) { // webpackBootstrap
           token = tokens[i];
           parsedInput = (string.match(getParseRegexForToken(token, config)) || [])[0];
           // console.log('token', token, 'parsedInput', parsedInput,
-          //         'regex', getParseRegexForToken(token, config));
+          //         'regex', getParseRegexForToken(token, _config));
           if (parsedInput) {
               skipped = string.substr(0, string.indexOf(parsedInput));
               if (skipped.length > 0) {
@@ -9056,7 +9056,7 @@ return /******/ (function(modules) { // webpackBootstrap
     this.setData(data);
   }
 
-  // TODO: implement a function .config() to dynamically update things like configured filter
+  // TODO: implement a function ._config() to dynamically update things like configured filter
   // and trigger changes accordingly
 
   /**
@@ -17417,20 +17417,20 @@ return /******/ (function(modules) { // webpackBootstrap
         if (this.options.showButton === true) {
           (function () {
             var generateButton = document.createElement('div');
-            generateButton.className = 'vis-configuration vis-config-button';
+            generateButton.className = 'vis-configuration vis-_config-button';
             generateButton.innerHTML = 'generate options';
             generateButton.onclick = function () {
               _this._printOptions();
             };
             generateButton.onmouseover = function () {
-              generateButton.className = 'vis-configuration vis-config-button hover';
+              generateButton.className = 'vis-configuration vis-_config-button hover';
             };
             generateButton.onmouseout = function () {
-              generateButton.className = 'vis-configuration vis-config-button';
+              generateButton.className = 'vis-configuration vis-_config-button';
             };
 
             _this.optionsContainer = document.createElement('div');
-            _this.optionsContainer.className = 'vis-configuration vis-config-option-container';
+            _this.optionsContainer.className = 'vis-configuration vis-_config-option-container';
 
             _this.domElements.push(_this.optionsContainer);
             _this.domElements.push(generateButton);
@@ -17520,7 +17520,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
           var _ret2 = function () {
             var item = document.createElement('div');
-            item.className = 'vis-configuration vis-config-item vis-config-s' + path.length;
+            item.className = 'vis-configuration vis-_config-item vis-_config-s' + path.length;
 
             for (_len = _arguments.length, domElements = Array(_len > 1 ? _len - 1 : 0), _key = 1; _key < _len; _key++) {
               domElements[_key - 1] = _arguments[_key];
@@ -17550,7 +17550,7 @@ return /******/ (function(modules) { // webpackBootstrap
       key: '_makeHeader',
       value: function _makeHeader(name) {
         var div = document.createElement('div');
-        div.className = 'vis-configuration vis-config-header';
+        div.className = 'vis-configuration vis-_config-header';
         div.innerHTML = name;
         this._makeItem([], div);
       }
@@ -17570,7 +17570,7 @@ return /******/ (function(modules) { // webpackBootstrap
         var objectLabel = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : false;
 
         var div = document.createElement('div');
-        div.className = 'vis-configuration vis-config-label vis-config-s' + path.length;
+        div.className = 'vis-configuration vis-_config-label vis-_config-s' + path.length;
         if (objectLabel === true) {
           div.innerHTML = '<i><b>' + name + ':</b></i>';
         } else {
@@ -17591,7 +17591,7 @@ return /******/ (function(modules) { // webpackBootstrap
       key: '_makeDropdown',
       value: function _makeDropdown(arr, value, path) {
         var select = document.createElement('select');
-        select.className = 'vis-configuration vis-config-select';
+        select.className = 'vis-configuration vis-_config-select';
         var selectedValue = 0;
         if (value !== undefined) {
           if (arr.indexOf(value) !== -1) {
@@ -17634,7 +17634,7 @@ return /******/ (function(modules) { // webpackBootstrap
         var max = arr[2];
         var step = arr[3];
         var range = document.createElement('input');
-        range.className = 'vis-configuration vis-config-range';
+        range.className = 'vis-configuration vis-_config-range';
         try {
           range.type = 'range'; // not supported on IE9
           range.min = min;
@@ -17668,7 +17668,7 @@ return /******/ (function(modules) { // webpackBootstrap
         }
 
         var input = document.createElement('input');
-        input.className = 'vis-configuration vis-config-rangeinput';
+        input.className = 'vis-configuration vis-_config-rangeinput';
         input.value = range.value;
 
         var me = this;
@@ -17768,7 +17768,7 @@ return /******/ (function(modules) { // webpackBootstrap
       value: function _makeCheckbox(defaultValue, value, path) {
         var checkbox = document.createElement('input');
         checkbox.type = 'checkbox';
-        checkbox.className = 'vis-configuration vis-config-checkbox';
+        checkbox.className = 'vis-configuration vis-_config-checkbox';
         checkbox.checked = defaultValue;
         if (value !== undefined) {
           checkbox.checked = value;
@@ -17805,7 +17805,7 @@ return /******/ (function(modules) { // webpackBootstrap
       value: function _makeTextInput(defaultValue, value, path) {
         var checkbox = document.createElement('input');
         checkbox.type = 'text';
-        checkbox.className = 'vis-configuration vis-config-text';
+        checkbox.className = 'vis-configuration vis-_config-text';
         checkbox.value = value;
         if (value !== defaultValue) {
           this.changedOptions.push({ path: path, value: value });
@@ -17838,10 +17838,10 @@ return /******/ (function(modules) { // webpackBootstrap
         value = value === undefined ? defaultColor : value;
 
         if (value !== 'none') {
-          div.className = 'vis-configuration vis-config-colorBlock';
+          div.className = 'vis-configuration vis-_config-colorBlock';
           div.style.backgroundColor = value;
         } else {
-          div.className = 'vis-configuration vis-config-colorBlock none';
+          div.className = 'vis-configuration vis-_config-colorBlock none';
         }
 
         value = value === undefined ? defaultColor : value;
@@ -32733,7 +32733,7 @@ return /******/ (function(modules) { // webpackBootstrap
         this.configurator.setOptions(options.configure);
       }
 
-      // if the configuration system is enabled, copy all options and put them into the config system
+      // if the configuration system is enabled, copy all options and put them into the _config system
       if (this.configurator && this.configurator.options.enabled === true) {
         var networkOptions = { nodes: {}, edges: {}, layout: {}, interaction: {}, manipulation: {}, physics: {}, global: {} };
         util.deepExtend(networkOptions.nodes, this.nodesHandler.options);

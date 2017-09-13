@@ -1,4 +1,7 @@
 from flask import Response
+import json
+from os.path import join, dirname
+from werkzeug.contrib.cache import SimpleCache
 
 
 class LDAPI:
@@ -7,7 +10,7 @@ class LDAPI:
 
     This class is issued as a Python file, rather than a Git submodule so check the version number before use!
 
-    Version 1.0
+    Version 2.1
     """
 
     # maps HTTP MIMETYPES to rdflib's RDF parsing formats
@@ -52,6 +55,8 @@ class LDAPI:
             'application/rdf+json': '.json',
             'application/xml': '.xml',
             'text/xml': '.xml',
+            'text/nt': '.nt',
+            'text/n3': '.n3',
         }
 
         return file_extension[mimetype]
@@ -86,7 +91,7 @@ class LDAPI:
             else:
                 raise LdapiParameterError(
                     'The _view parameter is invalid. For this object, it must be one of {0}.'
-                    .format(', '.join(views_formats.iterkeys()))
+                    .format(', '.join(views_formats.keys()))
                 )
         else:
             # views_formats will give us the default model
@@ -100,12 +105,12 @@ class LDAPI:
         :return: model name (string) or False
         """
         if format is not None:
-            if format.replace(' ', '+') in views_formats[view]:
+            if format.replace(' ', '+') in views_formats.get(view)['mimetypes']:
                 return format.replace(' ', '+')
             else:
                 raise LdapiParameterError(
-                    'The _format parameter is invalid. For this model model, format should be one of {0}.'
-                        .format(', '.join(views_formats[view]))
+                    'The _format parameter is invalid. For this model view, format should be one of {0}.'
+                        .format(', '.join(views_formats.get(view)['mimetypes']))
                 )
         else:
             # HTML is default
@@ -115,13 +120,19 @@ class LDAPI:
     def get_valid_view_and_format(view, format, views_formats):
         """
         If both the model and the format are valid, return them
+
+        If a view is given but no format, return the default format for that view
         :param view: the model model parameter
         :param format: the MIMETYPE format parameter
         :param views_formats: the allowed model and their formats in this instance
         :return: valid model and format
         """
         view = LDAPI.valid_view(view, views_formats)
-        format = LDAPI.valid_format(format, view, views_formats)
+        if format is not None:
+            format = LDAPI.valid_format(format, view, views_formats)
+        else:
+            format = views_formats[view]['default_mimetype']
+
         if view and format:
             # return valid model and format
             return view, format
@@ -181,6 +192,25 @@ class LDAPI:
         )
         return re.match(URL_REGEX, uri_candidate)
 
+    @staticmethod
+    def get_classes_views_formats():
+        """
+        Caches the graph_classes JSON file in memory
+        :return: a Python object parsed from the views_formats.json file
+        """
+        cache = SimpleCache()
+        cvf = cache.get('classes_views_formats')
+        if cvf is None:
+            cvf = json.load(open(join(dirname(dirname(__file__)), 'controller', 'views_formats.json')))
+            # times out never (i.e. on app startup/shutdown)
+            cache.set('classes_views_formats', cvf)
+        return cvf
+
 
 class LdapiParameterError(ValueError):
     pass
+
+
+if __name__ == '__main__':
+    vfs = LDAPI.get_classes_views_formats().get('http://reference.data.gov.au/def/dataset#Dataset')
+    print(LDAPI.get_valid_view_and_format('dataset', 'text/turtle', vfs))

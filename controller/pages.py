@@ -4,10 +4,10 @@ This file contains all the HTTP routes for basic pages (usually HTML)
 from flask import Blueprint, Response, request, render_template
 from lxml import etree
 from lxml.builder import ElementMaker
-from ldapi.ldapi import LDAPI, LdapiParameterError
-from routes import routes_functions
+from _ldapi.__init__ import LDAPI, LdapiParameterError
+from controller import routes_functions
 
-pages = Blueprint('routes', __name__)
+pages = Blueprint('controller', __name__)
 
 
 @pages.route('/')
@@ -50,13 +50,13 @@ def index():
         # move GetCapabilities response formulation to a Renderer class
         # only a single format for this view
         em = ElementMaker(
-            namespace="http://fake.com/ldapi",
+            namespace="http://fake.com/_ldapi",
             nsmap={
-                'ldapi': "http://fake.com/ldapi"
+                '_ldapi': "http://fake.com/_ldapi"
              }
         )
         onl = ElementMaker(
-            namespace="http://fake.com/ldapi",
+            namespace="http://fake.com/_ldapi",
             nsmap={
                 'xlink': "http://www.w3.org/1999/xlink",
             }

@@ -3,9 +3,9 @@ This file contains all the HTTP routes for classes from the IGSN model, such as 
 """
 from flask import Blueprint, render_template, request, Response
 from .routes_functions import render_alternates_view, client_error_Response
-import config
-from ldapi.ldapi import LDAPI, LdapiParameterError
-from routes import model_classes_functions
+import _config
+from _ldapi.__init__ import LDAPI, LdapiParameterError
+from controller import model_classes_functions
 import urllib.parse as uparse
 import requests
 
@@ -129,19 +129,19 @@ def samples():
             links.append('<http://www.w3.org/ns/ldp#Resource>; rel="type"')
             # signalling that this is, in fact, a resource described in pages
             links.append('<http://www.w3.org/ns/ldp#Page>; rel="type"')
-            links.append('<{}?per_page={}>; rel="first"'.format(config.BASE_URI_SAMPLE, per_page))
+            links.append('<{}?per_page={}>; rel="first"'.format(_config.BASE_URI_SAMPLE, per_page))
 
             # if this isn't the first page, add a link to "prev"
             if page != 1:
                 links.append('<{}?per_page={}&page={}>; rel="prev"'.format(
-                    config.BASE_URI_SAMPLE,
+                    _config.BASE_URI_SAMPLE,
                     per_page,
                     (page - 1)
                 ))
 
             # add a link to "next" and "last"
             try:
-                r = requests.get(config.XML_API_URL_TOTAL_COUNT)
+                r = requests.get(_config.XML_API_URL_TOTAL_COUNT)
                 no_of_samples = int(r.content.decode('utf-8').split('<RECORD_COUNT>')[1].split('</RECORD_COUNT>')[0])
                 last_page_no = int(round(no_of_samples / per_page, 0)) + 1  # same as math.ceil()
 
@@ -157,15 +157,15 @@ def samples():
                 # add a link to "next"
                 if page != last_page_no:
                     links.append('<{}?per_page={}&page={}>; rel="next"'
-                                 .format(config.BASE_URI_SAMPLE, per_page, (page + 1)))
+                                 .format(_config.BASE_URI_SAMPLE, per_page, (page + 1)))
 
                 # add a link to "last"
                 links.append('<{}?per_page={}&page={}>; rel="last"'
-                             .format(config.BASE_URI_SAMPLE, per_page, last_page_no))
+                             .format(_config.BASE_URI_SAMPLE, per_page, last_page_no))
             except:
                 # if there's some error in getting the no of samples, add the "next" link but not the "last" link
                 links.append('<{}?per_page={}&page={}>; rel="next"'
-                             .format(config.BASE_URI_SAMPLE, per_page, (page + 1)))
+                             .format(_config.BASE_URI_SAMPLE, per_page, (page + 1)))
 
             headers = {
                 'Link': ', '.join(links)

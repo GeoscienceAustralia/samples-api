@@ -2,10 +2,10 @@ from datetime import datetime, timedelta
 from io import BytesIO
 import requests
 from lxml import etree
-import config
+import _config
 from model import Sample
-from routes.datestamp import *
-from routes.oai_errors import *
+from controller.datestamp import *
+from controller.oai_errors import *
 import math
 
 
@@ -92,7 +92,7 @@ def validate_oai_parameters(qsa_args):
 def list_records(metadataPrefix, resumptionToken=None, from_=None, until=None):
     # if we don't have a resumption token, start at the beginning
     if resumptionToken is None:
-        oracle_api_samples_url = config.XML_API_URL_SAMPLESET.format(1, config.OAI_BATCH_SIZE)
+        oracle_api_samples_url = _config.XML_API_URL_SAMPLESET.format(1, _config.OAI_BATCH_SIZE)
     else:
         oracle_api_samples_url = create_url_query_token(resumptionToken)
         [from_, until, batch_num, metadataPrefix] = resumptionToken.split(',')
@@ -113,11 +113,11 @@ def list_records(metadataPrefix, resumptionToken=None, from_=None, until=None):
 
 
 def list_records_xml(metadataPrefix, resumptionToken=None, from_=None, until=None):
-    no_per_page = config.OAI_BATCH_SIZE
+    no_per_page = _config.OAI_BATCH_SIZE
     page_no = 1
 
     if resumptionToken is None:
-        oracle_api_samples_url = config.XML_API_URL_SAMPLESET.format(page_no, no_per_page)
+        oracle_api_samples_url = _config.XML_API_URL_SAMPLESET.format(page_no, no_per_page)
     else:
         oracle_api_samples_url = create_url_query_token(resumptionToken)
         [from_, until, batch_num, metadataPrefix] = resumptionToken.split(',')
@@ -215,7 +215,7 @@ def get_resumption_token(metadataPrefix, resumptionToken=None, from_=None, until
         cursor = 0
 
     complete_list_size = get_complete_list_size(from_, until)
-    cursor_next = int(cursor) + config.OAI_BATCH_SIZE
+    cursor_next = int(cursor) + _config.OAI_BATCH_SIZE
     if cursor_next >= complete_list_size:
         next_resumption_token = None
     else:
@@ -238,7 +238,7 @@ def get_earliest_date():
     date from the samples table.
     :return: a date object
     """
-    r = requests.get(config.XML_API_URL_MIN_DATE)
+    r = requests.get(_config.XML_API_URL_MIN_DATE)
 
     if "No data" in r.content.decode('utf-8'):
         raise NoRecordsMatchError('No Data')
@@ -277,7 +277,7 @@ def get_complete_list_size(str_from_date=None, str_until_date=None):
     else:
         str_until_date = convert_datestamp_to_oracle(str_until_date)
 
-    r = requests.get(config.XML_API_URL_TOTAL_COUNT_DATE_RANGE.format(str_from_date, str_until_date))
+    r = requests.get(_config.XML_API_URL_TOTAL_COUNT_DATE_RANGE.format(str_from_date, str_until_date))
 
     if "No data" in r.content.decode('utf-8'):
         raise NoRecordsMatchError('No Data')
@@ -296,7 +296,7 @@ def create_url_query_token(token):
     :param token: a resumption token
     :return: A url for querying the samples DB
     """
-    no_per_page = config.OAI_BATCH_SIZE
+    no_per_page = _config.OAI_BATCH_SIZE
 
     [from_, until, cursor, metadataPrefix] = token.split(',')
     from_date = convert_datestamp_to_oracle(from_)
@@ -304,7 +304,7 @@ def create_url_query_token(token):
 
     page_no = str(math.floor(int(cursor) / int(no_per_page)))
 
-    oracle_api_samples_url = config.XML_API_URL_SAMPLESET_DATE_RANGE.format(
+    oracle_api_samples_url = _config.XML_API_URL_SAMPLESET_DATE_RANGE.format(
         page_no, no_per_page, from_date, until_date
     )
     return oracle_api_samples_url

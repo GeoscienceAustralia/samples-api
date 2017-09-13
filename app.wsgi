@@ -1,4 +1,4 @@
 import sys
-sys.path.insert(0, '/var/www/samples/')
+sys.path.insert(0, '/var/www/samples')
 
 from app import app as application

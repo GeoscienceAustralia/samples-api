@@ -1,11 +1,11 @@
 from .renderer import Renderer
 from flask import Response, render_template
 from rdflib import Graph, URIRef, RDF, RDFS, XSD, Namespace, Literal
-from ldapi.ldapi import LDAPI
+from _ldapi.__init__ import LDAPI
 from lxml import etree
 import requests
 from io import StringIO, BytesIO
-import config
+import _config
 
 
 class RegisterRenderer(Renderer):
@@ -85,7 +85,7 @@ class RegisterRenderer(Renderer):
         :return: None
         """
         #os.environ['NO_PROXY'] = 'ga.gov.au'
-        r = requests.get(config.XML_API_URL_SAMPLESET.format(page, per_page), timeout=3)
+        r = requests.get(_config.XML_API_URL_SAMPLESET.format(page, per_page), timeout=3)
         xml = r.content
 
         if self.validate_xml(xml):

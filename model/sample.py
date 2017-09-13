@@ -5,9 +5,9 @@ from flask import Response, render_template
 from lxml import etree
 from lxml import objectify
 from rdflib import Graph, URIRef, RDF, RDFS, XSD, OWL, Namespace, Literal, BNode
-import config
-from ldapi.ldapi import LDAPI
-from routes.datestamp import *
+import _config
+from _ldapi.__init__ import LDAPI
+from controller.datestamp import *
 
 
 class Sample:
@@ -143,7 +143,7 @@ class Sample:
         # internal URI
         # os.environ['NO_PROXY'] = 'ga.gov.au'
         # call API
-        r = requests.get(config.XML_API_URL_SAMPLE.format(self.igsn))
+        r = requests.get(_config.XML_API_URL_SAMPLE.format(self.igsn))
         if "No data" in r.content.decode('utf-8'):
             raise ParameterError('No Data')
 
@@ -830,7 +830,7 @@ class Sample:
             year_acquired = ''
 
         # add in the Pingback header links as they are valid for all HTML views
-        pingback_uri = config.BASE_URI_SAMPLE + self.igsn + "/pingback"
+        pingback_uri = _config.BASE_URI_SAMPLE + self.igsn + "/pingback"
         headers = {
             'Link': '<{}>;rel = "http://www.w3.org/ns/prov#pingback"'.format(pingback_uri)
         }

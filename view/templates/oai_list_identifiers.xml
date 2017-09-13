@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<OAI-PMH
+        xmlns="http://www.openarchives.org/OAI/2.0/"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://www.openarchives.org/OAI/2.0/
+        http://www.openarchives.org/OAI/2.0/OAI-PMH.xsd">
+    <responseDate>{{ response_date }}</responseDate>
+    <request verb="ListIdentifiers" metadataPrefix="{{ metadataPrefix }}">{{ request_uri }}</request>
+    <ListIdentifiers>{% for sample in samples %}
+        <header>
+            <identifier>{{sample['igsn']}}</identifier>
+            <datestamp>{{sample['date_acquired']}}</datestamp>
+        </header>{% endfor %}{% if resumptiontoken %}
+        <resumptionToken expirationDate="{{resumptiontoken['expiration_date']}}" completeListSize="{{resumptiontoken['complete_list_size']}}" cursor="{{resumptiontoken['cursor']}}">
+        {{resumptiontoken['from_']}},{{resumptiontoken['until']}},{{resumptiontoken['cursor_next']}},{{resumptiontoken['metadataPrefix']}}</resumptionToken>{% endif %}
+    </ListIdentifiers>
+</OAI-PMH>

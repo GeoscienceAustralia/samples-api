@@ -2,8 +2,8 @@ import unittest
 import requests
 from lxml import etree
 from io import StringIO
-from routes.oai_functions import *
-from routes.oai_errors import *
+from controller.oai_functions import *
+from controller.oai_errors import *
 import os
 
 
