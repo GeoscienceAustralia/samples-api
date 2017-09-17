@@ -1,3 +1,5 @@
+/* version 2 */
+
 body {
 	margin: 0 auto;
 	text-align: center;
@@ -39,9 +41,13 @@ p, li {
 	padding: 0.2em 0 0.9em
 }
 
-p a,
-ul li a {
-	color: #0f4a84;
+a {
+	color: #006983;
+	text-decoration: none;
+}
+
+a:hover {
+	text-decoration: underline;
 }
 
 .figure {
