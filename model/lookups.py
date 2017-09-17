@@ -25,6 +25,7 @@ def get_feature_of_interest_types():
         print(r.status_code)
         return False
 
+
 if __name__ == '__main__':
     print(get_feature_of_interest_types())
 
@@ -61,13 +62,14 @@ TERM_LOOKUP = {
         'thinSection': 'http://vocabulary.odm2.org/specimentype/thinSection',
         'unknown': 'http://vocabulary.odm2.org/specimentype/theSpecimenTypeIsUnknown'
     },
-    'method_type_uris': {
+    'method_type': {
         'Auger': 'http://pid.geoscience.gov.au/def/voc/igsn-codelists/Auger',
         'Blast': 'http://pid.geoscience.gov.au/def/voc/igsn-codelists/Blast',
         'Box': 'http://pid.geoscience.gov.au/def/voc/igsn-codelists/Box',
         'ChainBag': 'http://pid.geoscience.gov.au/def/voc/igsn-codelists/ChainBag',
         'Corer': 'http://pid.geoscience.gov.au/def/voc/igsn-codelists/Corer',
         'CoreDiamond': 'http://pid.geoscience.gov.au/def/voc/igsn-codelists/CoreDiamond',  # TODO: add this to vocab
+        'core diamond': 'http://pid.geoscience.gov.au/def/voc/igsn-codelists/CoreDiamond',
         'Dredge': 'http://pid.geoscience.gov.au/def/voc/igsn-codelists/Dredge',
         'Drill': 'http://pid.geoscience.gov.au/def/voc/igsn-codelists/Drill',
         'FreeFall': 'http://pid.geoscience.gov.au/def/voc/igsn-codelists/FreeFall',
@@ -95,7 +97,7 @@ TERM_LOOKUP = {
         'unknown': 'http://pid.geoscience.gov.au/def/voc/igsn-codelists/Unknown',
         'vibrating': 'http://pid.geoscience.gov.au/def/voc/igsn-codelists/Vibrating'
     },
-    'method_type': {
+    'method_type_old': {
         'Blast': 'Blast',
         'Corer': 'Corer',
         'Box': 'Corer:Box',
@@ -153,7 +155,8 @@ TERM_LOOKUP = {
         'SA': 'http://www.geonames.org/2061327',
         'TAS': 'http://www.geonames.org/2147291',
         'VIC': 'http://www.geonames.org/2145234',
-        'WA': 'http://www.geonames.org/2058645'
+        'WA': 'http://www.geonames.org/2058645',
+        'unknown': 'http://www.opengis.net/def/nil/OGC/0/unknown'
     },
     'country': {
         'AUS': 'http://www.geonames.org/2077456',
@@ -176,11 +179,12 @@ TERM_LOOKUP = {
         'NZL': 'http://www.geonames.org/2186224',
         'INL': 'http://pid.geoscience.gov.au/def/voc/igsn-codelists/INL',
         'LKA': 'http://www.geonames.org/1227603',
-        'IND': 'http://www.geonames.org/1269750'
+        'IND': 'http://www.geonames.org/1269750',
+        'unknown': 'http://www.opengis.net/def/nil/OGC/0/unknown'
 
     },
     # TODO: fix URI for 'unknown' in lith
-    'lith': {
+    'lithology': {
         'biogenic sediment': 'http://resource.geosciml.org/classifier/cgi/lithology/biogenic_sediment',
         'websterite': 'http://resource.geosciml.org/classifier/cgi/lithology/pyroxenite',
         'gypcrete': 'http://resource.geosciml.org/classifier/cgi/lithology/duricrust',
@@ -824,6 +828,7 @@ TERM_LOOKUP = {
         'STATE': 'http://pid.geoscience.gov.au/def/voc/featureofinteresttype/state',
         'SURVEY': 'http://pid.geoscience.gov.au/def/voc/featureofinteresttype/survey',
         'WELL': 'http://pid.geoscience.gov.au/def/voc/featureofinteresttype/well',
-        'WILDCATLOCATION': 'http://pid.geoscience.gov.au/def/voc/featureofinteresttype/wildcatlocation'
+        'WILDCATLOCATION': 'http://pid.geoscience.gov.au/def/voc/featureofinteresttype/wildcatlocation',
+        'unknown': 'http://www.opengis.net/def/nil/OGC/0/unknown'
     }
 }

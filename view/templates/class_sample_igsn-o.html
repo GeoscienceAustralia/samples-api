@@ -1,15 +1,11 @@
 <table class="pretty">
     <tr><th>Property</th><th>Value</th></tr>
     <tr><td>IGSN</td><td>{{ igsn }}</td></tr>
-    <tr><td>Sample ID</td><td>{{ sample_id }}</td></tr>
+    <tr><td>GA Sample ID</td><td>{{ sample_id }}</td></tr>
     {% if description is not none %}
     <tr><td>Description</td><td>{{ description }}</td></tr>
     {% endif %}
     <tr><td>Date Acquired</td><td>{{ date_acquired|safe }}</td></tr>
-    <tr><td>Current Location</td><td>GA Services building</td></tr>
-    <tr><td>Access Rights</td><td><a href="http://pid.geoscience.gov.au/def/voc/igsn-codelists/Public">public</a></td></tr>
-    <tr><td>Publisher</td><td><a href="http://pid.geoscience.gov.au/org/ga">Geoscience Australia</a></td></tr>
-    <tr><td>Sample Type</td><td><a href="{{ sample_type }}">{{ sample_type.split('/')[-1] }}</a></td></tr>
     <tr>
         <td>
             Sampling Location (WKT)<br />
@@ -17,9 +13,15 @@
         </td>
         <td>{{ wkt }}</td>
     </tr>
-    <tr><td>Sampling Feature</td><td><a href="{{ sampling_feature }}">{{ sampling_feature.split('/')[-1] }}</a></td></tr>
-    <tr><td>Method Type</td><td>{{ method_type.split('/')[-1] }}</td></tr>
-    <tr><td>Material Type</td><td><a href="{{ material_type }}">{{ material_type.split('/')[-1] }}</a></td></tr>
+    <tr><td>State</td><td>{{ state }}</a></td></tr>
+    <tr><td>Current Location</td><td>GA Services building</td></tr>
+    <tr><td>Access Rights</td><td><a href="http://pid.geoscience.gov.au/def/voc/igsn-codelists/Public">public</a></td></tr>
+    <tr><td>Publisher</td><td><a href="http://pid.geoscience.gov.au/org/ga">Geoscience Australia</a></td></tr>
+    <tr><td>Sample Type</td><td>{{ sample_type_alink|safe }}</a></td></tr>
+    <tr><td>Method Type</td><td>{{ method_type_alink|safe }}</a></td></tr>
+    <tr><td>Material Type</td><td>{{ material_type_alink|safe }}</a></td></tr>
+    <tr><td>Lithology</td><td>{{ lithology_alink|safe }}</a></td></tr>
+    <tr><td>Sampling Feature Type</td><td>{{ entity_type_alink|safe }}</td></tr>
     <tr><td colspan="2"></td></tr>
     <tr><th colspan="2">Functional endpoints</th></tr>
     <tr><td>Provenance</td><td><a href="{{ request.base_url }}?_view=prov">?_view=prov</a></td></tr>

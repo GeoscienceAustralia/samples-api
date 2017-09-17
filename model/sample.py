@@ -162,20 +162,14 @@ class Sample:
         """
         try:
             root = objectify.fromstring(xml)
-            from .lookups import TERM_LOOKUP
 
             self.igsn = root.ROW.IGSN
             self.sample_id = root.ROW.SAMPLEID
             self.sample_no = root.ROW.SAMPLENO
-            self.sample_type = TERM_LOOKUP['sample_type'].get(root.ROW.SAMPLE_TYPE_NEW)
-            if self.sample_type is None:
-                self.sample_type = TERM_LOOKUP['sample_type']['unknown']
-            self.method_type = TERM_LOOKUP['method_type'].get(root.ROW.SAMPLING_METHOD)
-            if self.method_type is None:
-                self.method_type = TERM_LOOKUP['method_type']['Unknown']
-            self.material_type = TERM_LOOKUP['material_type'].get(root.ROW.MATERIAL_CLASS)
-            if self.material_type is None:
-                self.material_type = TERM_LOOKUP['material_type']['unknown']
+            self.remark = str(root.ROW.REMARK).strip() if len(str(root.ROW.REMARK)) > 5 else None
+            self.sample_type = self._make_vocab_uri(root.ROW.SAMPLE_TYPE_NEW, 'sample_type')
+            self.method_type = self._make_vocab_uri(root.ROW.SAMPLING_METHOD, 'method_type')
+            self.material_type = self._make_vocab_uri(root.ROW.MATERIAL_CLASS, 'material_type')
             # self.long_min = root.ROW.SAMPLE_MIN_LONGITUDE
             # self.long_max = root.ROW.SAMPLE_MAX_LONGITUDE
             # self.lat_min = root.ROW.SAMPLE_MIN_LATITUDE
@@ -187,23 +181,18 @@ class Sample:
             self.z = root.ROW.GEOM.SDO_POINT.Z
             self.elem_info = root.ROW.GEOM.SDO_ELEM_INFO
             self.ordinates = root.ROW.GEOM.SDO_ORDINATES
-            self.state = TERM_LOOKUP['state'].get(root.ROW.STATEID)
-            if self.state is None:
-                self.state = Sample.URI_MISSSING
+            self.state = root.ROW.STATEID  # self._make_vocab_uri(root.ROW.STATEID, 'state')
             self.country = root.ROW.COUNTRY
             self.depth_top = root.ROW.TOP_DEPTH
             self.depth_base = root.ROW.BASE_DEPTH
             self.strath = root.ROW.STRATNAME
             self.age = root.ROW.AGE
-            self.remark = root.ROW.REMARK
-            self.lith = TERM_LOOKUP['lith'].get(root.ROW.LITHNAME)
-            if self.lith is None:
-                self.lith = Sample.URI_MISSSING
+            self.lith = self._make_vocab_uri(root.ROW.LITHNAME, 'lithology')
             self.date_acquired = str2datetime(root.ROW.ACQUIREDATE).date() if root.ROW.ACQUIREDATE != '' else None
             self.date_modified = str2datetime(root.ROW.MODIFIED_DATE) if root.ROW.MODIFIED_DATE != '' else None
             self.entity_uri = 'http://pid.geoscience.gov.au/site/' + str(root.ROW.ENO) if root.ROW.ENO is not None else None
             self.entity_name = root.ROW.ENTITYID
-            self.entity_type = TERM_LOOKUP['entity_type'].get(root.ROW.ENTITY_TYPE)
+            self.entity_type = self._make_vocab_uri(root.ROW.ENTITY_TYPE, 'entity_type')
             self.hole_long_min = root.ROW.HOLE_MIN_LONGITUDE if root.ROW.HOLE_MIN_LONGITUDE != '' else None
             self.hole_long_max = root.ROW.HOLE_MAX_LONGITUDE if root.ROW.HOLE_MAX_LONGITUDE != '' else None
             self.hole_lat_min = root.ROW.HOLE_MIN_LATITUDE if root.ROW.HOLE_MIN_LATITUDE != '' else None
@@ -216,6 +205,19 @@ class Sample:
             print(e)
 
         return True
+
+    def _make_vocab_uri(self, xml_value, vocab_type):
+        from .lookups import TERM_LOOKUP
+        if TERM_LOOKUP[vocab_type].get(xml_value) is not None:
+            return TERM_LOOKUP[vocab_type].get(xml_value)
+        else:
+            return TERM_LOOKUP[vocab_type].get('unknown')
+
+    def _make_vocab_alink(self, vocab_uri):
+        if vocab_uri.endswith('/'):
+            return '<a href="{}">{}</a>'.format(vocab_uri, vocab_uri.split('/')[-2])
+        else:
+            return '<a href="{}">{}</a>'.format(vocab_uri, vocab_uri.split('/')[-1])
 
     def _generate_sample_wkt(self):
         if self.z is not None:
@@ -788,18 +790,19 @@ class Sample:
         """
         if model_view == 'igsn-o':
             view_title = 'IGSN Ontology view'
-
             sample_table_html = render_template(
                 'class_sample_igsn-o.html',
                 igsn=self.igsn,
                 sample_id=self.sample_id,
-                description=self.remark if self.remark != '' else '-',
+                description=self.remark,
                 date_acquired=self.date_acquired if self.date_acquired is not None else '<a href="{}">{}</a>'.format(Sample.URI_MISSSING, Sample.URI_MISSSING.split('/')[-1]),
-                sample_type=self.sample_type,
                 wkt=self._generate_sample_wkt(),
-                sampling_feature=self.entity_type,
-                method_type=self.method_type,
-                material_type=self.material_type
+                state=self.state,
+                sample_type_alink=self._make_vocab_alink(self.sample_type),
+                method_type_alink=self._make_vocab_alink(self.method_type),
+                material_type_alink=self._make_vocab_alink(self.material_type),
+                lithology_alink=self._make_vocab_alink(self.lith),
+                entity_type_alink=self._make_vocab_alink(self.entity_type)
             )
         elif model_view == 'prov':
             view_title = 'PROV Ontology view'

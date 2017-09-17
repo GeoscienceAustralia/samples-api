@@ -144,6 +144,7 @@ table.lined td {
 table.pretty {
     border-collapse: collapse;
     border: solid 2px black;
+	width: 568px;
 }
 
 table.pretty tr:nth-child(even) {background: #efefef}
