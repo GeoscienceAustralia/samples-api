@@ -19,9 +19,18 @@ def index():
     """
     views_formats = {
         'default': 'landingpage',
-        'alternates': ['text/html'],
-        'landingpage': ['text/html'],
-        'getcapabilities': ['text/xml']
+        'alternates': {
+            "default_mimetype": "text/html",
+            "mimetypes": ["text/html"]
+        },
+        'landingpage': {
+            "default_mimetype": "text/html",
+            "mimetypes": ["text/html"]
+        },
+        'getcapabilities': {
+            "default_mimetype": "text/xml",
+            "mimetypes": ["text/xml"]
+        }
     }
 
     try:

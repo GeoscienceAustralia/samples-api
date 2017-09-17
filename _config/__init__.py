@@ -29,3 +29,6 @@ URI_SAMPLE_INSTANCE_BASE = 'http://pid.geoscience.gov.au/id/sample/'
 BASE_URI_OAI = 'http://pid.geoscience.gov.au/oai'
 
 OAI_BATCH_SIZE = 100
+
+GOOGLE_MAPS_API_KEY_EMBED = 'AIzaSyDhuFCoJynhhQT7rcgKYzk3i7K77IEwjO4'
+GOOGLE_MAPS_API_KEY = 'AIzaSyCUDcjVRsIHVHpv53r7ZnaX5xzqJbyGk58'

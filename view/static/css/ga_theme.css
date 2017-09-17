@@ -2,6 +2,8 @@ body {
 	margin: 0 auto;
 	text-align: center;
 	background-color: white;
+    font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+	font-weight:normal;
 }
 
 #container-content {
@@ -28,11 +30,6 @@ h1 {
 
 h2, h3 {
 	font-family:sans-serif;
-	font-weight:normal;
-}
-
-h4, p, li {
-	font-family:Arial,sans-serif;
 	font-weight:normal;
 }
 
@@ -142,4 +139,24 @@ table.lined th,
 table.lined td {
     border: solid 1px black;
     padding: 5px;
+}
+
+table.pretty {
+    border-collapse: collapse;
+    border: solid 2px black;
+}
+
+table.pretty tr:nth-child(even) {background: #efefef}
+table.pretty tr:nth-child(odd) {background: #ffffff}
+
+table.pretty th,
+table.pretty td {
+    border: solid 1px black;
+    padding: 5px;
+}
+
+table.pretty th {
+    color: white;
+    font-weight: bold;
+    background-color: #006983;
 }

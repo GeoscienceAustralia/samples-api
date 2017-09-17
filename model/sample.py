@@ -295,6 +295,9 @@ class Sample:
 
         return gml
 
+    def _generate_google_maps_coords(self):
+        return '{},{}'.format(self.y, self.x)
+
     def __graph_preconstruct(self, g):
         u = '''
             PREFIX prov: <http://www.w3.org/ns/prov#>
@@ -843,7 +846,10 @@ class Sample:
                 year_acquired=year_acquired,
                 view_title=view_title,
                 sample_table_html=sample_table_html,
-                date_now=datetime.datetime.now().strftime('%d %B %Y')
+                date_now=datetime.datetime.now().strftime('%d %B %Y'),
+                gm_key=_config.GOOGLE_MAPS_API_KEY,
+                lat=self.y,
+                lon=self.x
             ),
             headers=headers
         )

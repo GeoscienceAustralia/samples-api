@@ -1,27 +1,27 @@
 <table class="pretty">
     <tr><th>Property</th><th>Value</th></tr>
-    <tr><th>IGSN</th><td>{{ igsn }}</td></tr>
-    <tr><th>Sample ID</th><td>{{ sample_id }}</td></tr>
+    <tr><td>IGSN</td><td>{{ igsn }}</td></tr>
+    <tr><td>Sample ID</td><td>{{ sample_id }}</td></tr>
     {% if description is not none %}
-    <tr><th>Description</th><td>{{ description }}</td></tr>
+    <tr><td>Description</td><td>{{ description }}</td></tr>
     {% endif %}
-    <tr><th>Date Acquired</th><td>{{ date_acquired|safe }}</td></tr>
-    <tr><th>Current Location</th><td>GA Services building</td></tr>
-    <tr><th>Access Rights</th><td><a href="http://pid.geoscience.gov.au/def/voc/igsn-codelists/Public">public</a></td></tr>
-    <tr><th>Publisher</th><td><a href="http://pid.geoscience.gov.au/org/ga">Geoscience Australia</a></td></tr>
-    <tr><th>Sample Type</th><td><a href="{{ sample_type }}">{{ sample_type.split('/')[-1] }}</a></td></tr>
+    <tr><td>Date Acquired</td><td>{{ date_acquired|safe }}</td></tr>
+    <tr><td>Current Location</td><td>GA Services building</td></tr>
+    <tr><td>Access Rights</td><td><a href="http://pid.geoscience.gov.au/def/voc/igsn-codelists/Public">public</a></td></tr>
+    <tr><td>Publisher</td><td><a href="http://pid.geoscience.gov.au/org/ga">Geoscience Australia</a></td></tr>
+    <tr><td>Sample Type</td><td><a href="{{ sample_type }}">{{ sample_type.split('/')[-1] }}</a></td></tr>
     <tr>
-        <th>
+        <td>
             Sampling Location (WKT)<br />
             vertical datum: <a href="https://epsg.io/4283">4283</a>
-        </th>
+        </td>
         <td>{{ wkt }}</td>
     </tr>
-    <tr><th>Sampling Feature</th><td><a href="{{ sampling_feature }}">{{ sampling_feature.split('/')[-1] }}</a></td></tr>
-    <tr><th>Method Type</th><td>{{ method_type.split('/')[-1] }}</td></tr>
-    <tr><th>Material Type</th><td><a href="{{ material_type }}">{{ material_type.split('/')[-1] }}</a></td></tr>
-    <tr><th>Has Provenance</th><td><a href="{{ request.base_url }}?_view=prov">?_view=prov</a></td></tr>
-    <tr><th colspan="2"></th></tr>
+    <tr><td>Sampling Feature</td><td><a href="{{ sampling_feature }}">{{ sampling_feature.split('/')[-1] }}</a></td></tr>
+    <tr><td>Method Type</td><td>{{ method_type.split('/')[-1] }}</td></tr>
+    <tr><td>Material Type</td><td><a href="{{ material_type }}">{{ material_type.split('/')[-1] }}</a></td></tr>
+    <tr><td colspan="2"></td></tr>
     <tr><th colspan="2">Functional endpoints</th></tr>
-    <tr><th>Pingback endpoint</th><td><a href="{{ request.base_url }}/pingback">/pingback</a></td></tr>
+    <tr><td>Provenance</td><td><a href="{{ request.base_url }}?_view=prov">?_view=prov</a></td></tr>
+    <tr><td>Pingback endpoint</td><td><a href="{{ request.base_url }}/pingback">/pingback</a></td></tr>
 </table>
