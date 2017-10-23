@@ -358,7 +358,7 @@ class Sample:
                     label = row['label']
                 else:
                     label = 'Agent'
-                nodes += '\t\t\t\t{id: "%(node_id)s", label: "%(label)s", image: "/static/img/agent.png", shape: "image"},\n' % {
+                nodes += '\t\t\t\t{id: "%(node_id)s", label: "%(label)s", image: "/samples/static/img/agent.png", shape: "image"},\n' % {
                     'node_id': row['s'],
                     'label': label
                 }
