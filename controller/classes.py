@@ -186,9 +186,17 @@ def samples():
                 'Link': ', '.join(links)
             }
 
-            class_uri_of_register_items = 'http://pid.geoscience.gov.au/def/ont/igsn#Sample'  # 'http://def.seegrid.csiro.au/ontology/om/sam-lite#Specimen'
-            return register.RegisterRenderer(request, class_uri_of_register_items, None, page, per_page, prev_page, next_page, last_page) \
-                .render(view, mime_format, extra_headers=headers)
+            class_uri_of_register_items = 'http://pid.geoscience.gov.au/def/ont/igsn#Sample'
+            return register.RegisterRenderer(
+                request,
+                config.REGISTER_BASE_URI,
+                class_uri_of_register_items,
+                None,
+                page,
+                per_page,
+                prev_page,
+                next_page,
+                last_page).render(view, mime_format, extra_headers=headers)
 
     except LdapiParameterError as e:
         return client_error_Response(e)

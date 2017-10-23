@@ -9,10 +9,11 @@ import _config
 
 
 class RegisterRenderer(Renderer):
-    def __init__(self, request, uri, endpoints, page, per_page, prev_page, next_page, last_page):
+    def __init__(self, request, base_uri, uri, endpoints, page, per_page, prev_page, next_page, last_page):
         Renderer.__init__(self, uri, endpoints)
 
         self.request = request
+        self.base_uri = base_uri
         self.uri = uri
         self.register = []
         self.g = None
@@ -41,6 +42,7 @@ class RegisterRenderer(Renderer):
                 return Response(
                     render_template(
                         'class_register.html',
+                        base_uri=self.base_uri,
                         class_name=self.uri,
                         register=self.register,
                         page=self.page,
