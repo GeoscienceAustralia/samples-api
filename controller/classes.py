@@ -118,9 +118,9 @@ def samples():
             page = int(request.args.get('page')) if request.args.get('page') is not None else 1
             per_page = int(request.args.get('per_page')) if request.args.get('per_page') is not None else 100
 
-            if per_page > 100:
+            if per_page > config.OAI_BATCH_SIZE:
                 return Response(
-                    'You must enter either no value for per_page or an integer <= 100.',
+                    'You must enter either no value for per_page or an integer <= {}.'.format(config.OAI_BATCH_SIZE),
                     status=400,
                     mimetype='text/plain'
                 )
