@@ -9,7 +9,7 @@
                 <h3>Instances</h3>
                 <ul>
                 {% for instance in register %}
-                    <li><a href="{{ url_for('classes.sample', igsn=instance) }}">{{ instance_uri_base }}{{ instance }}</a></li>
+                    <li><a href="{{ base_uri + instance }}">{{ instance_uri_base }}{{ instance }}</a></li>
                 {% endfor %}
                 </ul>
                 {% if prev_page is not none %}

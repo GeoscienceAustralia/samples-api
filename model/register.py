@@ -9,6 +9,9 @@ import _config
 
 
 class RegisterRenderer(Renderer):
+    """
+    Version 1.0
+    """
     def __init__(self, request, base_uri, uri, endpoints, page, per_page, prev_page, next_page, last_page):
         Renderer.__init__(self, uri, endpoints)
 
