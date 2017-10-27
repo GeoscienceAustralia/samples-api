@@ -248,7 +248,7 @@ class Sample:
     def _generate_parent_wkt(self):
         if self.hole_long_min is not None and self.hole_long_max is not None:
             coordinates = {
-                'srid': self.srid,
+                'srid': 'GDA94',
                 'long_min': self.hole_long_min,
                 'long_max': self.hole_long_max,
                 'lat_min': self.hole_lat_min,

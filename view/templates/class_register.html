@@ -33,7 +33,7 @@
                 <pre>
 Link:   &lt;{{ base_uri }}?per_page=50&gt; rel="first",
         &lt;{{ base_uri }}?per_page=50&page=6&gt; rel="prev",
-        &lt;h{{ base_uri }}?per_page=50&page=8&gt; rel="next",
+        &lt;{{ base_uri }}?per_page=50&page=8&gt; rel="next",
         &lt;{{ base_uri }}?per_page=50&page=10&gt; rel="last"
                 </pre>
                 <p>If you want to page through the whole collection, you should start at <code>first</code> and follow the link headers until you reach <code>last</code> or until there is no <code>last</code> link given. You shouldn't try to calculate each <code>page</code> query string argument yourself.</p>
