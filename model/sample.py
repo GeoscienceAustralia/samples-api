@@ -175,7 +175,7 @@ class Sample:
             # self.lat_min = root.ROW.SAMPLE_MIN_LATITUDE
             # self.lat_max = root.ROW.SAMPLE_MAX_LATITUDE
             self.gtype = root.ROW.GEOM.SDO_GTYPE
-            self.srid = root.ROW.GEOM.SDO_SRID
+            self.srid = 'GDA94' if root.ROW.GEOM.SDO_SRID == '8311' else root.ROW.GEOM.SDO_SRID
             self.x = root.ROW.GEOM.SDO_POINT.X
             self.y = root.ROW.GEOM.SDO_POINT.Y
             self.z = root.ROW.GEOM.SDO_POINT.Z
