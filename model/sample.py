@@ -164,42 +164,73 @@ class Sample:
             root = objectify.fromstring(xml)
 
             self.igsn = root.ROW.IGSN
-            self.sample_id = root.ROW.SAMPLEID
+            if hasattr(root.ROW, 'SAMPLEID'):
+                self.sample_id = root.ROW.SAMPLEID
             self.sample_no = root.ROW.SAMPLENO
-            self.remark = str(root.ROW.REMARK).strip() if len(str(root.ROW.REMARK)) > 5 else None
-            self.sample_type = self._make_vocab_uri(root.ROW.SAMPLE_TYPE_NEW, 'sample_type')
-            self.method_type = self._make_vocab_uri(root.ROW.SAMPLING_METHOD, 'method_type')
-            self.material_type = self._make_vocab_uri(root.ROW.MATERIAL_CLASS, 'material_type')
+            if hasattr(root.ROW, 'REMARK'):
+                self.remark = str(root.ROW.REMARK).strip() if len(str(root.ROW.REMARK)) > 5 else None
+            if hasattr(root.ROW, 'SAMPLE_TYPE_NEW'):
+                self.sample_type = self._make_vocab_uri(root.ROW.SAMPLE_TYPE_NEW, 'sample_type')
+            if hasattr(root.ROW, 'SAMPLING_METHOD'):
+                self.method_type = self._make_vocab_uri(root.ROW.SAMPLING_METHOD, 'method_type')
+            if hasattr(root.ROW, 'MATERIAL_CLASS'):
+                self.material_type = self._make_vocab_uri(root.ROW.MATERIAL_CLASS, 'material_type')
             # self.long_min = root.ROW.SAMPLE_MIN_LONGITUDE
             # self.long_max = root.ROW.SAMPLE_MAX_LONGITUDE
             # self.lat_min = root.ROW.SAMPLE_MIN_LATITUDE
             # self.lat_max = root.ROW.SAMPLE_MAX_LATITUDE
-            self.gtype = root.ROW.GEOM.SDO_GTYPE
-            self.srid = 'GDA94' # if root.ROW.GEOM.SDO_SRID == '8311' else root.ROW.GEOM.SDO_SRID
-            self.x = root.ROW.GEOM.SDO_POINT.X
-            self.y = root.ROW.GEOM.SDO_POINT.Y
-            self.z = root.ROW.GEOM.SDO_POINT.Z
-            self.elem_info = root.ROW.GEOM.SDO_ELEM_INFO
-            self.ordinates = root.ROW.GEOM.SDO_ORDINATES
-            self.state = root.ROW.STATEID  # self._make_vocab_uri(root.ROW.STATEID, 'state')
-            self.country = root.ROW.COUNTRY
-            self.depth_top = root.ROW.TOP_DEPTH
-            self.depth_base = root.ROW.BASE_DEPTH
-            self.strath = root.ROW.STRATNAME
-            self.age = root.ROW.AGE
-            self.lith = self._make_vocab_uri(root.ROW.LITHNAME, 'lithology')
-            self.date_acquired = str2datetime(root.ROW.ACQUIREDATE).date() if root.ROW.ACQUIREDATE != '' else None
-            self.date_modified = str2datetime(root.ROW.MODIFIED_DATE) if root.ROW.MODIFIED_DATE != '' else None
-            self.entity_uri = 'http://pid.geoscience.gov.au/site/' + str(root.ROW.ENO) if root.ROW.ENO is not None else None
-            self.entity_name = root.ROW.ENTITYID
-            self.entity_type = self._make_vocab_uri(root.ROW.ENTITY_TYPE, 'entity_type')
-            self.hole_long_min = root.ROW.HOLE_MIN_LONGITUDE if root.ROW.HOLE_MIN_LONGITUDE != '' else None
-            self.hole_long_max = root.ROW.HOLE_MAX_LONGITUDE if root.ROW.HOLE_MAX_LONGITUDE != '' else None
-            self.hole_lat_min = root.ROW.HOLE_MIN_LATITUDE if root.ROW.HOLE_MIN_LATITUDE != '' else None
-            self.hole_lat_max = root.ROW.HOLE_MAX_LATITUDE if root.ROW.HOLE_MAX_LATITUDE != '' else None
+            if hasattr(root.ROW, 'SDO_GTYPE'):
+                self.gtype = root.ROW.GEOM.SDO_GTYPE
+
+            self.srid = 'GDA94'  # if root.ROW.GEOM.SDO_SRID == '8311' else root.ROW.GEOM.SDO_SRID
+
+            if hasattr(root.ROW, 'GEOM'):
+                if hasattr(root.ROW.GEOM, 'SDO_POINT'):
+                    if hasattr(root.ROW.GEOM.SDO_POINT, 'X'):
+                        self.x = root.ROW.GEOM.SDO_POINT.X
+                    if hasattr(root.ROW.GEOM.SDO_POINT, 'Y'):
+                        self.y = root.ROW.GEOM.SDO_POINT.Y
+                    if hasattr(root.ROW.GEOM.SDO_POINT, 'Z'):
+                        self.z = root.ROW.GEOM.SDO_POINT.Z
+                if hasattr(root.ROW.GEOM, 'SDO_ELEM_INFO'):
+                    self.elem_info = root.ROW.GEOM.SDO_ELEM_INFO
+                if hasattr(root.ROW, 'SDO_ORDINATES'):
+                    self.ordinates = root.ROW.GEOM.SDO_ORDINATES
+            if hasattr(root.ROW, 'STATEID'):
+                self.state = root.ROW.STATEID  # self._make_vocab_uri(root.ROW.STATEID, 'state')
+            if hasattr(root.ROW, 'COUNTRY'):
+                self.country = root.ROW.COUNTRY
+            if hasattr(root.ROW, 'TOP_DEPTH'):
+                self.depth_top = root.ROW.TOP_DEPTH
+            if hasattr(root.ROW, 'BASE_DEPTH'):
+                self.depth_base = root.ROW.BASE_DEPTH
+            if hasattr(root.ROW, 'STRATNAME'):
+                self.strath = root.ROW.STRATNAME
+            if hasattr(root.ROW, 'AGE'):
+                self.age = root.ROW.AGE
+            if hasattr(root.ROW, 'LITHNAME'):
+                self.lith = self._make_vocab_uri(root.ROW.LITHNAME, 'lithology')
+            if hasattr(root.ROW, 'ACQUIREDATE'):
+                self.date_acquired = str2datetime(root.ROW.ACQUIREDATE).date()
+            if hasattr(root.ROW, 'MODIFIED_DATE'):
+                self.date_modified = str2datetime(root.ROW.MODIFIED_DATE)
+            if hasattr(root.ROW, 'ENO'):
+                self.entity_uri = 'http://pid.geoscience.gov.au/site/' + str(root.ROW.ENO)
+            if hasattr(root.ROW, 'ENTITYID'):
+                self.entity_name = root.ROW.ENTITYID
+            if hasattr(root.ROW, 'ENTITYID'):
+                self.entity_type = self._make_vocab_uri(root.ROW.ENTITYID, 'entity_type')
+            if hasattr(root.ROW, 'HOLE_MIN_LONGITUDE'):
+                self.hole_long_min = root.ROW.HOLE_MIN_LONGITUDE
+            if hasattr(root.ROW, 'HOLE_MAX_LONGITUDE'):
+                self.hole_long_max = root.ROW.HOLE_MAX_LONGITUDE
+            if hasattr(root.ROW, 'HOLE_MIN_LATITUDE'):
+                self.hole_lat_min = root.ROW.HOLE_MIN_LATITUDE
+            if hasattr(root.ROW, 'HOLE_MAX_LATITUDE'):
+                self.hole_lat_max = root.ROW.HOLE_MAX_LATITUDE
             # self.date_modified = None
             # self.modified_datestamp = None
-            # TODO: replace all the other calles to this with a call to self.wkt instead
+            # TODO: replace all the other calls to this with a call to self.wkt instead
             # self.wkt = self._generate_sample_wkt()
         except Exception as e:
             print(e)
@@ -214,17 +245,18 @@ class Sample:
             return TERM_LOOKUP[vocab_type].get('unknown')
 
     def _make_vocab_alink(self, vocab_uri):
-        if vocab_uri.endswith('/'):
-            return '<a href="{}">{}</a>'.format(vocab_uri, vocab_uri.split('/')[-2])
-        else:
-            return '<a href="{}">{}</a>'.format(vocab_uri, vocab_uri.split('/')[-1])
+        if vocab_uri is not None:
+            if vocab_uri.endswith('/'):
+                return '<a href="{}">{}</a>'.format(vocab_uri, vocab_uri.split('/')[-2])
+            else:
+                return '<a href="{}">{}</a>'.format(vocab_uri, vocab_uri.split('/')[-1])
 
     def _generate_sample_wkt(self):
         if self.z is not None:
             wkt = 'SRID={};POINTZ({} {} {})'.format(self.srid, self.x, self.y, self.z)
         else:
             if self.srid is not None and self.x is not None and self.y is not None:
-                wkt = 'SRID={};POINT({} {} {})'.format(self.srid, self.x, self.y)
+                wkt = 'SRID={};POINT({} {})'.format(self.srid, self.x, self.y)
             else:
                 wkt = ''
 
