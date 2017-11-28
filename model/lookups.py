@@ -80,9 +80,9 @@ if __name__ == '__main__':
 
 
 TERM_LOOKUP = {
-    'access': {
-        'Public': 'http://pid.geoscience.gov.au/def/voc/igsn-codelists/Public',
-        'Private': 'http://pid.geoscience.gov.au/def/voc/igsn-codelists/Private'
+    'access_rights': {
+        'public': 'http://pid.geoscience.gov.au/def/voc/ga/igsncode/Public',
+        'private': 'http://pid.geoscience.gov.au/def/voc/igsncode/Private'
     },
     'sample_type': {
         'IsoTube': 'http://vocabulary.odm2.org/specimentype/other',
@@ -865,6 +865,7 @@ TERM_LOOKUP = {
         'museum collaction': 'http://vocabulary.odm2.org/samplingfeaturetype/site',
         'project': 'http://vocabulary.odm2.org/samplingfeaturetype/site',
         'section': 'http://vocabulary.odm2.org/samplingfeaturetype/interval',
+        'interval': 'http://vocabulary.odm2.org/samplingfeaturetype/interval',  # added while Trevor's mapping is in place, to be wound back
         'survey': 'http://vocabulary.odm2.org/samplingfeaturetype/scene'
     }
 }

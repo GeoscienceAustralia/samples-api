@@ -45,6 +45,7 @@ class Sample:
     def __init__(self, igsn, xml=None):
         self.igsn = igsn
         self.sample_id = None
+        self.access_rights = None
         self.sample_type = None
         self.method_type = None
         self.material_type = None
@@ -167,6 +168,7 @@ class Sample:
             if hasattr(root.ROW, 'SAMPLEID'):
                 self.sample_id = root.ROW.SAMPLEID
             self.sample_no = root.ROW.SAMPLENO
+            self.access_rights = self._make_vocab_uri('public', 'access_rights')  # this value is statically set to 'public' for all samples
             if hasattr(root.ROW, 'REMARK'):
                 self.remark = str(root.ROW.REMARK).strip() if len(str(root.ROW.REMARK)) > 5 else None
             if hasattr(root.ROW, 'SAMPLE_TYPE_NEW'):
@@ -827,6 +829,7 @@ class Sample:
                 igsn=self.igsn,
                 sample_id=self.sample_id,
                 description=self.remark,
+                access_rights_alink=self._make_vocab_alink(self.access_rights),
                 date_acquired=self.date_acquired if self.date_acquired is not None else '<a href="{}">{}</a>'.format(Sample.URI_MISSSING, Sample.URI_MISSSING.split('/')[-1]),
                 wkt=self._generate_sample_wkt(),
                 state=self.state,
