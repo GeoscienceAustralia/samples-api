@@ -26,8 +26,58 @@ def get_feature_of_interest_types():
         return False
 
 
+def get_collection_access():
+    q = '''
+        SELECT 
+    '''
+    pass
+
+
+def get_collection_sample_type():
+    pass
+
+
+def get_collection_method_type():
+    pass
+
+
+def get_collection_material_type():
+    pass
+
+
+def get_collection_state():
+    pass
+
+
+def get_collection_country():
+    pass
+
+
+def get_collection_lithology():
+    pass
+
+
+def get_collection_entity_type():
+    pass
+
+
+def update_lookups():
+    TERM_LOOKUP = {}
+    TERM_LOOKUP.update(get_collection_access())
+    TERM_LOOKUP.update(get_collection_sample_type())
+    TERM_LOOKUP.update(get_collection_method_type())
+    TERM_LOOKUP.update(get_collection_material_type())
+    TERM_LOOKUP.update(get_collection_state())
+    TERM_LOOKUP.update(get_collection_country())
+    TERM_LOOKUP.update(get_collection_lithology())
+    TERM_LOOKUP.update(get_collection_entity_type())
+
+    return TERM_LOOKUP
+
+
 if __name__ == '__main__':
     print(get_feature_of_interest_types())
+
 
 TERM_LOOKUP = {
     'access': {
@@ -35,117 +85,130 @@ TERM_LOOKUP = {
         'Private': 'http://pid.geoscience.gov.au/def/voc/igsn-codelists/Private'
     },
     'sample_type': {
-        'automated': 'http://vocabulary.odm2.org/specimentype/automated',
+        'IsoTube': 'http://vocabulary.odm2.org/specimentype/other',
+        'borehole specimen': 'http://vocabulary.odm2.org/specimentype/individualSample',
+        'cavings': 'http://vocabulary.odm2.org/specimentype/individualSample',
+        'coastal float specimen': 'http://vocabulary.odm2.org/specimentype/individualSample',
         'core': 'http://vocabulary.odm2.org/specimentype/core',
-        'coreHalfRound': 'http://vocabulary.odm2.org/specimentype/coreHalfRound',
-        'corePiece': 'http://vocabulary.odm2.org/specimentype/corePiece',
-        'coreQuarterRound': 'http://vocabulary.odm2.org/specimentype/coreQuarterRound',
-        'coreSection': 'http://vocabulary.odm2.org/specimentype/coreSection',
-        'coreSectionHalf': 'http://vocabulary.odm2.org/specimentype/coreSectionHalf',
-        'coreSub-Piece': 'http://vocabulary.odm2.org/specimentype/coreSub-Piece',
-        'coreWholeRound': 'http://vocabulary.odm2.org/specimentype/coreWholeRound',
-        'cuttings': 'http://vocabulary.odm2.org/specimentype/cuttings',
-        'dredge': 'http://vocabulary.odm2.org/specimentype/dredge',
-        'foliageDigestion': 'http://vocabulary.odm2.org/specimentype/foliageDigestion',
-        'foliageLeaching': 'http://vocabulary.odm2.org/specimentype/foliageLeaching',
-        'forestFloorDigestion': 'http://vocabulary.odm2.org/specimentype/forestFloorDigestion',
-        'grab': 'http://vocabulary.odm2.org/specimentype/grab',
-        'individualSample': 'http://vocabulary.odm2.org/specimentype/individualSample',
-        'litterFallDigestion': 'http://vocabulary.odm2.org/specimentype/litterFallDigestion',
-        'orientedCore': 'http://vocabulary.odm2.org/specimentype/orientedCore',
-        'other': 'http://vocabulary.odm2.org/specimentype/other',
-        'petriDishDryDeposition': 'http://vocabulary.odm2.org/specimentype/petriDishDryDeposition',
-        'precipitationBulk': 'http://vocabulary.odm2.org/specimentype/precipitationBulk',
-        'rockPowder': 'http://vocabulary.odm2.org/specimentype/rockPowder',
-        'standardReferenceSpecimen': 'http://vocabulary.odm2.org/specimentype/standardReferenceSpecimen',
-        'terrestrialSection': 'http://vocabulary.odm2.org/specimentype/terrestrialSection',
-        'thinSection': 'http://vocabulary.odm2.org/specimentype/thinSection',
-        'unknown': 'http://vocabulary.odm2.org/specimentype/theSpecimenTypeIsUnknown'
+        'drill chips/cuttings': 'http://vocabulary.odm2.org/specimentype/cutting',
+        'drilling fluid sample': 'http://vocabulary.odm2.org/specimentype/individualSample',
+        'field site observation': 'http://vocabulary.odm2.org/specimentype/other',
+        'float specimen': 'http://vocabulary.odm2.org/specimentype/individualSample',
+        'fraction': 'http://vocabulary.odm2.org/specimentype/individualSample',
+        'marine survey specimen': 'http://vocabulary.odm2.org/specimentype/individualSample',
+        'mineral grain': 'http://vocabulary.odm2.org/specimentype/individualSample',
+        'observation log': 'http://vocabulary.odm2.org/specimentype/automated',
+        'observation only': 'http://vocabulary.odm2.org/specimentype/other',
+        'outcrop specimen': 'http://vocabulary.odm2.org/specimentype/individualSample',
+        'replicate field specimen': 'http://vocabulary.odm2.org/specimentype/individualSample',
+        'replicate laboratory specimen': 'http://vocabulary.odm2.org/specimentype/individualSample',
+        'separator gas': 'http://vocabulary.odm2.org/specimentype/other',
+        'specimen blank': 'http://vocabulary.odm2.org/specimentype/other',
+        'standard reference material': 'http://vocabulary.odm2.org/specimentype/StandardReferenceSpecimen',
+        'thin section': 'http://vocabulary.odm2.org/specimentype/thinSection',
+        'unconsolidated seabed specimen': 'http://vocabulary.odm2.org/specimentype/grab',
+        'unconsolidated surficial specimen': 'http://vocabulary.odm2.org/specimentype/individualSample',
+        'unknown': 'http://vocabulary.odm2.org/specimentype/theSpecimenTypeIsUnknown',
+        'vegetation specimen': 'http://vocabulary.odm2.org/specimentype/individualSample',
+        'water column observation': 'http://vocabulary.odm2.org/specimentype/automated',
+        'water column specimen': 'http://vocabulary.odm2.org/specimentype/individualSample',
+        'water specimen': 'http://vocabulary.odm2.org/specimentype/individualSample',
     },
     'method_type': {
-        'Auger': 'http://pid.geoscience.gov.au/def/voc/igsn-codelists/Auger',
-        'Blast': 'http://pid.geoscience.gov.au/def/voc/igsn-codelists/Blast',
-        'Box': 'http://pid.geoscience.gov.au/def/voc/igsn-codelists/Box',
-        'ChainBag': 'http://pid.geoscience.gov.au/def/voc/igsn-codelists/ChainBag',
-        'Corer': 'http://pid.geoscience.gov.au/def/voc/igsn-codelists/Corer',
-        'CoreDiamond': 'http://pid.geoscience.gov.au/def/voc/igsn-codelists/CoreDiamond',  # TODO: add this to vocab
-        'core diamond': 'http://pid.geoscience.gov.au/def/voc/igsn-codelists/CoreDiamond',
-        'Dredge': 'http://pid.geoscience.gov.au/def/voc/igsn-codelists/Dredge',
-        'Drill': 'http://pid.geoscience.gov.au/def/voc/igsn-codelists/Drill',
-        'FreeFall': 'http://pid.geoscience.gov.au/def/voc/igsn-codelists/FreeFall',
-        'Grab': 'http://pid.geoscience.gov.au/def/voc/igsn-codelists/Grab',
-        'Gravity': 'http://pid.geoscience.gov.au/def/voc/igsn-codelists/Gravity',
-        'GravityGiant': 'http://pid.geoscience.gov.au/def/voc/igsn-codelists/GravityGiant',
-        'Hammer': 'http://pid.geoscience.gov.au/def/voc/igsn-codelists/Hammer',
-        'Hand': 'http://pid.geoscience.gov.au/def/voc/igsn-codelists/Hand',
-        'Kastenlot': 'http://pid.geoscience.gov.au/def/voc/igsn-codelists/Kastenlot',
-        'Knife': 'http://pid.geoscience.gov.au/def/voc/igsn-codelists/Knife',
-        'MOCNESS': 'http://pid.geoscience.gov.au/def/voc/igsn-codelists/MOCNESS',
-        'Multi': 'http://pid.geoscience.gov.au/def/voc/igsn-codelists/Multi',
-        'Net': 'http://pid.geoscience.gov.au/def/voc/igsn-codelists/Net',
-        'OtherMethod': 'http://pid.geoscience.gov.au/def/voc/igsn-codelists/OtherMethod',
-        'Piston': 'http://pid.geoscience.gov.au/def/voc/igsn-codelists/Piston',
-        'PistonGiant': 'http://pid.geoscience.gov.au/def/voc/igsn-codelists/PistonGiant',
-        'Probe': 'http://pid.geoscience.gov.au/def/voc/igsn-codelists/Probe',
-        'Rock': 'http://pid.geoscience.gov.au/def/voc/igsn-codelists/Rock',
-        'Scallop': 'http://pid.geoscience.gov.au/def/voc/igsn-codelists/Scallop',
-        'Scoop': 'http://pid.geoscience.gov.au/def/voc/igsn-codelists/Scoop',
-        'SideSaddle': 'http://pid.geoscience.gov.au/def/voc/igsn-codelists/SideSaddle',
-        'trap': 'http://pid.geoscience.gov.au/def/voc/igsn-codelists/Trap',
-        'trawl': 'http://pid.geoscience.gov.au/def/voc/igsn-codelists/Trawl',
-        'triggerweight': 'http://pid.geoscience.gov.au/def/voc/igsn-codelists/TriggerWeight',
-        'unknown': 'http://pid.geoscience.gov.au/def/voc/igsn-codelists/Unknown',
-        'vibrating': 'http://pid.geoscience.gov.au/def/voc/igsn-codelists/Vibrating'
-    },
-    'method_type_old': {
-        'Blast': 'Blast',
-        'Corer': 'Corer',
-        'Box': 'Corer:Box',
-        'Drill': 'Corer:Drill',
-        'FreeFall': 'Corer:FreeFall',
-        'Gravity': 'Corer:Gravity',
-        'GravityGiant': 'Corer:GravityGiant',
-        'Kastenlot': 'Corer:Kastenlot',
-        'Multi': 'Corer:Multi',
-        'Piston': 'Corer:Piston',
-        'PistonGiant': 'Corer:PistonGiant',
-        'Rock': 'Corer:Rock',
-        'SideSaddle': 'Corer:SideSaddle',
-        'TriggerWeight': 'Corer:TriggerWeight',
-        'Vibrating': 'Corer:Vibrating',
-        'Dredge': 'Dredge',
-        'ChainBag': 'Dredge:ChainBag',
-        'Scallop': 'Dredge:Scallop',
-        'Grab': 'Grab',
-        'Hand': 'Hand',
-        'Auger': 'Hand:Auger',
-        'Hammer': 'Hand:Hammer',
-        'Knife': 'Hand:Knife',
-        'Net': 'Net',
-        'MOCNESS': 'Net:MOCNESS',
-        'Probe': 'Probe',
-        'Scoop': 'Scoop',
-        'Trap': 'Trap',
-        'Trawl': 'Trawl',
-        'Other': 'Other',
-        'Unknown': 'Unknown',
+        'RAB drilling': 'http://pid.geoscience.gov.au/def/voc/ga/igsncode/Drill',
+        'auger': 'http://pid.geoscience.gov.au/def/voc/ga/igsncode/Auger',
+        'borehole DST test': 'http://pid.geoscience.gov.au/def/voc/ga/igsncode/Other',
+        'borehole fluid sampling': 'http://pid.geoscience.gov.au/def/voc/ga/igsncode/Hand',
+        'borehole logging tool': 'http://pid.geoscience.gov.au/def/voc/ga/igsncode/Other',
+        'bottle incubation': 'http://pid.geoscience.gov.au/def/voc/ga/igsncode/Other',
+        'bottle incubation dark': 'http://pid.geoscience.gov.au/def/voc/ga/igsncode/Other',
+        'bottle incubation light': 'http://pid.geoscience.gov.au/def/voc/ga/igsncode/Other',
+        'chamber incubation': 'http://pid.geoscience.gov.au/def/voc/ga/igsncode/Other',
+        'chamber incubation dark': 'http://pid.geoscience.gov.au/def/voc/ga/igsncode/Other',
+        'chamber incubation light': 'http://pid.geoscience.gov.au/def/voc/ga/igsncode/Other',
+        'core Kasten': 'http://pid.geoscience.gov.au/def/voc/ga/igsncode/Kastenlot',
+        'core Mackereth': 'http://pid.geoscience.gov.au/def/voc/ga/igsncode/Corer',
+        'core air': 'http://pid.geoscience.gov.au/def/voc/ga/igsncode/Corer',
+        'core box': 'http://pid.geoscience.gov.au/def/voc/ga/igsncode/Box',
+        'core catcher': 'http://pid.geoscience.gov.au/def/voc/ga/igsncode/Corer',
+        'core conventional': 'http://pid.geoscience.gov.au/def/voc/ga/igsncode/Drill',
+        'core cutter': 'http://pid.geoscience.gov.au/def/voc/ga/igsncode/Corer',
+        'core diamond': 'http://pid.geoscience.gov.au/def/voc/ga/igsncode/Rock',
+        'core drilling, unspecified': 'http://pid.geoscience.gov.au/def/voc/ga/igsncode/Drill',
+        'core geoprobe': 'http://pid.geoscience.gov.au/def/voc/ga/igsncode/Corer',
+        'core gravity': 'http://pid.geoscience.gov.au/def/voc/ga/igsncode/Gravity',
+        'core incubation dark': 'http://pid.geoscience.gov.au/def/voc/ga/igsncode/Corer',
+        'core incubation light': 'http://pid.geoscience.gov.au/def/voc/ga/igsncode/Corer',
+        'core piston': 'http://pid.geoscience.gov.au/def/voc/ga/igsncode/Piston',
+        'core push': 'http://pid.geoscience.gov.au/def/voc/ga/igsncode/Corer',
+        'core sonic': 'http://pid.geoscience.gov.au/def/voc/ga/igsncode/Corer',
+        'core spike': 'http://pid.geoscience.gov.au/def/voc/ga/igsncode/Corer',
+        'core vibro': 'http://pid.geoscience.gov.au/def/voc/ga/igsncode/Vibrating',
+        'current meter': 'http://pid.geoscience.gov.au/def/voc/ga/igsncode/Other',
+        'dredge': 'http://pid.geoscience.gov.au/def/voc/ga/igsncode/Dredge',
+        'dredge benthic': 'http://pid.geoscience.gov.au/def/voc/ga/igsncode/Dredge',
+        'dredge chain bag': 'http://pid.geoscience.gov.au/def/voc/ga/igsncode/Chainbag',
+        'dredge diamantina': 'http://pid.geoscience.gov.au/def/voc/ga/igsncode/Dredge',
+        'dredge pipe': 'http://pid.geoscience.gov.au/def/voc/ga/igsncode/Dredge',
+        'drilling': 'http://pid.geoscience.gov.au/def/voc/ga/igsncode/Drill',
+        'field mapping survey': 'http://pid.geoscience.gov.au/def/voc/ga/igsncode/Other',
+        'grab': 'http://pid.geoscience.gov.au/def/voc/ga/igsncode/Grab',
+        'grab Eckman': 'http://pid.geoscience.gov.au/def/voc/ga/igsncode/Grab',
+        'grab ROV': 'http://pid.geoscience.gov.au/def/voc/ga/igsncode/Grab',
+        'grab Shipek': 'http://pid.geoscience.gov.au/def/voc/ga/igsncode/Grab',
+        'grab Smith Mcintyre': 'http://pid.geoscience.gov.au/def/voc/ga/igsncode/Grab',
+        'grab Van Veen': 'http://pid.geoscience.gov.au/def/voc/ga/igsncode/Grab',
+        'liquid-gas separation': 'http://pid.geoscience.gov.au/def/voc/ga/igsncode/Other',
+        'marine survey': 'http://pid.geoscience.gov.au/def/voc/ga/igsncode/Hand',
+        'marine survey sampling': 'http://pid.geoscience.gov.au/def/voc/ga/igsncode/Hand',
+        'outcrop sampling': 'http://pid.geoscience.gov.au/def/voc/ga/igsncode/Hand',
+        'percussion drilling': 'http://pid.geoscience.gov.au/def/voc/ga/igsncode/Drill',
+        'pit or trench sampling': 'http://pid.geoscience.gov.au/def/voc/ga/igsncode/Hand',
+        'rotary drilling': 'http://pid.geoscience.gov.au/def/voc/ga/igsncode/Drill',
+        'sidewall core, bullet': 'http://pid.geoscience.gov.au/def/voc/ga/igsncode/Other',
+        'sidewall core, mechanical': 'http://pid.geoscience.gov.au/def/voc/ga/igsncode/Other',
+        'sonde': 'http://pid.geoscience.gov.au/def/voc/ga/igsncode/Other',
+        'surface material sampling': 'http://pid.geoscience.gov.au/def/voc/ga/igsncode/Hand',
+        'undergound mine sampling': 'http://pid.geoscience.gov.au/def/voc/ga/igsncode/Hand',
+        'underwater camera': 'http://pid.geoscience.gov.au/def/voc/ga/igsncode/Other',
+        'unknown': 'http://pid.geoscience.gov.au/def/voc/ga/igsncode/Unknown',
+        'water sampling': 'http://pid.geoscience.gov.au/def/voc/ga/igsncode/Hand',
     },
     'material_type': {
-        'AIR': 'http://vocabulary.odm2.org/medium/air/',
-        'GAS': 'http://vocabulary.odm2.org/medium/gas/',
-        'ICE': 'http://vocabulary.odm2.org/medium/ice/',
-        'liquidAqueous': 'http://vocabulary.odm2.org/medium/liquidAqueous/',
-        'liquidOrganic': 'http://vocabulary.odm2.org/medium/liquidOrganic/',
-        'mineral': 'http://vocabulary.odm2.org/medium/mineral/',
-        'organism': 'http://vocabulary.odm2.org/medium/organism/',
-        'other': 'http://vocabulary.odm2.org/medium/other/',
-        'particulate': 'http://vocabulary.odm2.org/medium/particulate/',
-        'rock': 'http://vocabulary.odm2.org/medium/rock/',
-        'sediment': 'http://vocabulary.odm2.org/medium/sediment/',
-        'snow': 'http://vocabulary.odm2.org/medium/snow/',
-        'soil': 'http://vocabulary.odm2.org/medium/soil/',
-        'tissue': 'http://vocabulary.odm2.org/medium/tissue/',
-        'unknown': 'http://vocabulary.odm2.org/medium/unknown/'
+        'adsorbed phase': 'http://vocabulary.odm2.org/medium/other',
+        'bitumen': 'http://vocabulary.odm2.org/medium/other',
+        'coal': 'http://vocabulary.odm2.org/medium/other',
+        'coke': 'http://vocabulary.odm2.org/medium/other',
+        'condensate': 'http://vocabulary.odm2.org/medium/other',
+        'crude oil': 'http://vocabulary.odm2.org/medium/other',
+        'crude oil with water': 'http://vocabulary.odm2.org/medium/other',
+        'drilling fluid': 'http://vocabulary.odm2.org/medium/other',
+        'gas': 'http://vocabulary.odm2.org/medium/gas',
+        'gas in solution': 'http://vocabulary.odm2.org/medium/gas',
+        'groundwater': 'http://vocabulary.odm2.org/medium/liquidAqueous',
+        'hydrocarbon gas': 'http://vocabulary.odm2.org/medium/gas',
+        'kerogen': 'http://vocabulary.odm2.org/medium/other',
+        'lag': 'http://vocabulary.odm2.org/medium/other',
+        'lake sediment': 'http://vocabulary.odm2.org/medium/sediment',
+        'marine sediment': 'http://vocabulary.odm2.org/medium/sediment',
+        'marine sediment and overlying seawater': 'http://vocabulary.odm2.org/medium/other',
+        'mineral': 'http://vocabulary.odm2.org/medium/mineral',
+        'mud gas': 'http://vocabulary.odm2.org/medium/gas',
+        'porewater': 'http://vocabulary.odm2.org/medium/liquidAqueous',
+        'regolith': 'http://vocabulary.odm2.org/medium/regolith',
+        'rock': 'http://vocabulary.odm2.org/medium/rock',
+        'sediment': 'http://vocabulary.odm2.org/medium/sediment',
+        'seep gas': 'http://vocabulary.odm2.org/medium/gas',
+        'seep oil': 'http://vocabulary.odm2.org/medium/other',
+        'soil': 'http://vocabulary.odm2.org/medium/regolith',
+        'solid phase': 'http://vocabulary.odm2.org/medium/other',
+        'stream sediment': 'http://vocabulary.odm2.org/medium/sediment',
+        'surface water': 'http://vocabulary.odm2.org/medium/liquidAqueous',
+        'suspended solids': 'http://vocabulary.odm2.org/medium/particulate',
+        'unknown': 'http://vocabulary.odm2.org/medium/unknown',
+        'unspecified seabed materials': 'http://vocabulary.odm2.org/medium/sediment',
+        'vegetation': 'http://vocabulary.odm2.org/medium/vegetation',
+        'water': 'http://vocabulary.odm2.org/medium/liquidAqueous'
     },
     'state': {
         'ACT': 'http://www.geonames.org/2177478',
@@ -795,40 +858,13 @@ TERM_LOOKUP = {
         'dolomite carbonatite': 'http://resource.geosciml.org/classifier/cgi/lithology/carbonatite'
     },
     'entity_type': {
-        # see vocab <http://pid.geoscience.gov.au/def/voc/featureofinteresttype>, listed above in F_O_I_TYPE list
-        'ACERAGERELEASE': 'http://pid.geoscience.gov.au/def/voc/featureofinteresttype/aceragerelease',
-        'BOREHOLE': 'http://pid.geoscience.gov.au/def/voc/featureofinteresttype/borehole',
-        'COUNTRY': 'http://pid.geoscience.gov.au/def/voc/featureofinteresttype/country',
-        'DRILLHOLE': 'http://pid.geoscience.gov.au/def/voc/featureofinteresttype/drillhole',
-        'EMITTER': 'http://pid.geoscience.gov.au/def/voc/featureofinteresttype/emitter',
-        'ESSCI': 'http://pid.geoscience.gov.au/def/voc/featureofinteresttype/essci',
-        'ESTUARY': 'http://pid.geoscience.gov.au/def/voc/featureofinteresttype/estuary',
-        'EXPLORATIONPERMIT': 'http://pid.geoscience.gov.au/def/voc/featureofinteresttype/explorationpermit',
-        'FACIES': 'http://pid.geoscience.gov.au/def/voc/featureofinteresttype/facies',
-        'FIELD SITE': 'http://pid.geoscience.gov.au/def/voc/featureofinteresttype/site',
-        'MAPSHEET': 'http://pid.geoscience.gov.au/def/voc/featureofinteresttype/mapsheet',
-        'MARSEGMENT': 'http://pid.geoscience.gov.au/def/voc/featureofinteresttype/marsegment',
-        'MINERALDEPOSIT': 'http://pid.geoscience.gov.au/def/voc/featureofinteresttype/mineraldeposit',
-        'MINERALISEDZONE': 'http://pid.geoscience.gov.au/def/voc/featureofinteresttype/mineralisedzone',
-        'MINERALPROJECT': 'http://pid.geoscience.gov.au/def/voc/featureofinteresttype/mineralproject',
-        'OBSERVATORY': 'http://pid.geoscience.gov.au/def/voc/featureofinteresttype/observatory',
-        'PIPELINE': 'http://pid.geoscience.gov.au/def/voc/featureofinteresttype/pipeline',
-        'PLACENAME': 'http://pid.geoscience.gov.au/def/voc/featureofinteresttype/placename',
-        'POLITICALREGION': 'http://pid.geoscience.gov.au/def/voc/featureofinteresttype/politicalregion',
-        'PORT': 'http://pid.geoscience.gov.au/def/voc/featureofinteresttype/port',
-        'POWERSTATION': 'http://pid.geoscience.gov.au/def/voc/featureofinteresttype/powerstation',
-        'PRODUCTIONLICENSE': 'http://pid.geoscience.gov.au/def/voc/featureofinteresttype/productionlicense',
-        'PROJECT': 'http://pid.geoscience.gov.au/def/voc/featureofinteresttype/project',
-        'PROVINCE': 'http://pid.geoscience.gov.au/def/voc/featureofinteresttype/province',
-        'RESOURCEPROCESSINGPLANT': 'http://pid.geoscience.gov.au/def/voc/featureofinteresttype/resourceprocessingplant',
-        'RESOURCEPROJECT': 'http://pid.geoscience.gov.au/def/voc/featureofinteresttype/resourceproject',
-        'RETENTIONLEASE': 'http://pid.geoscience.gov.au/def/voc/featureofinteresttype/retentionlease',
-        'SECTION': 'http://pid.geoscience.gov.au/def/voc/featureofinteresttype/section',
-        'SEISMICLINE': 'http://pid.geoscience.gov.au/def/voc/featureofinteresttype/seismicline',
-        'STATE': 'http://pid.geoscience.gov.au/def/voc/featureofinteresttype/state',
-        'SURVEY': 'http://pid.geoscience.gov.au/def/voc/featureofinteresttype/survey',
-        'WELL': 'http://pid.geoscience.gov.au/def/voc/featureofinteresttype/well',
-        'WILDCATLOCATION': 'http://pid.geoscience.gov.au/def/voc/featureofinteresttype/wildcatlocation',
-        'unknown': 'http://www.opengis.net/def/nil/OGC/0/unknown'
+        'borehole': 'http://vocabulary.odm2.org/samplingfeaturetype/borehole',
+        'estuary': 'http://vocabulary.odm2.org/samplingfeaturetype/site',
+        'field site': 'http://vocabulary.odm2.org/samplingfeaturetype/site',
+        'laboratory': 'http://vocabulary.odm2.org/samplingfeaturetype/site',
+        'museum collaction': 'http://vocabulary.odm2.org/samplingfeaturetype/site',
+        'project': 'http://vocabulary.odm2.org/samplingfeaturetype/site',
+        'section': 'http://vocabulary.odm2.org/samplingfeaturetype/interval',
+        'survey': 'http://vocabulary.odm2.org/samplingfeaturetype/scene'
     }
 }

@@ -219,7 +219,7 @@ class Sample:
             if hasattr(root.ROW, 'ENTITYID'):
                 self.entity_name = root.ROW.ENTITYID
             if hasattr(root.ROW, 'ENTITYID'):
-                self.entity_type = self._make_vocab_uri(root.ROW.ENTITYID, 'entity_type')
+                self.entity_type = self._make_vocab_uri(root.ROW.ENTITY_TYPE, 'entity_type')
             if hasattr(root.ROW, 'HOLE_MIN_LONGITUDE'):
                 self.hole_long_min = root.ROW.HOLE_MIN_LONGITUDE
             if hasattr(root.ROW, 'HOLE_MAX_LONGITUDE'):
