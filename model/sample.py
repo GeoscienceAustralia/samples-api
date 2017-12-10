@@ -527,10 +527,12 @@ class Sample:
             elevation = BNode()
             g.add((this_sample, SAMFL.samplingElevation, elevation))
             g.add((elevation, RDF.type, SAMFL.Elevation))
-            g.add((elevation, SAMFL.elevation, Literal(self.z, datatype=XSD.float)))
-            g.add((elevation, SAMFL.verticalDatum, Literal(
-                'http://spatialreference.org/ref/epsg/4283/',
-                datatype=XSD.anyUri)))
+            if self.z is None:
+                z = 'NaN'
+            else:
+                z = self.z
+            g.add((elevation, SAMFL.elevation, Literal(z, datatype=XSD.float)))
+            g.add((elevation, SAMFL.verticalDatum, URIRef('http://spatialreference.org/ref/epsg/4283/')))
 
             # properties
             g.add((this_sample, SAMFL.currentLocation, Literal('GA Services building', datatype=XSD.string)))
@@ -568,9 +570,12 @@ class Sample:
             site_elevation = BNode()
             g.add((site, SAMFL.samplingElevation, site_elevation))
             g.add((site_elevation, RDF.type, SAMFL.Elevation))
-            g.add((site_elevation, SAMFL.elevation, Literal(self.z, datatype=XSD.float)))
-            g.add((site_elevation, SAMFL.verticalDatum,
-                   Literal("http://spatialreference.org/ref/epsg/4283/", datatype=XSD.anyUri)))
+            if self.z is None:
+                z = 'NaN'
+            else:
+                z = self.z
+            g.add((site_elevation, SAMFL.elevation, Literal(z, datatype=XSD.float)))
+            g.add((site_elevation, SAMFL.verticalDatum, URIRef('http://spatialreference.org/ref/epsg/4283/')))
             g.add((site, SAMFL.sampledFeature, this_sample))
 
             # define GA as an PROV Org with an ISO19115 role of Publisher
@@ -682,7 +687,11 @@ class Sample:
             site_elevation = BNode()
             g.add((site, SAMFL.samplingElevation, site_elevation))
             g.add((site_elevation, RDF.type, SAMFL.Elevation))
-            g.add((site_elevation, SAMFL.elevation, Literal(self.z, datatype=XSD.float)))
+            if self.z is None:
+                z = 'NaN'
+            else:
+                z = self.z
+            g.add((site_elevation, SAMFL.elevation, Literal(z, datatype=XSD.float)))
             g.add((site_elevation, SAMFL.verticalDatum,
                    Literal("http://spatialreference.org/ref/epsg/4283/", datatype=XSD.anyUri)))
 
