@@ -1,7 +1,7 @@
 from flask import Blueprint, render_template, request, Response
 from controller.oai_functions import *
 from controller.oai_errors import *
-
+import _config as conf
 
 oai_ = Blueprint('oai', __name__)
 
@@ -79,7 +79,7 @@ def oai():
     elif request.values.get('verb') == 'Identify':
         values = {
             'base_url': request.base_url,
-            'admin_email': _config.ADMIN_EMAIL,
+            'admin_email': conf.ADMIN_EMAIL,
             'earliest_date': get_earliest_datestamp()
         }
 

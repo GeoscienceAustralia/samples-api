@@ -5,7 +5,7 @@ from _ldapi.__init__ import LDAPI
 from lxml import etree
 import requests
 from io import StringIO, BytesIO
-import _config
+import _config as conf
 
 
 class RegisterRenderer(Renderer):
@@ -96,7 +96,7 @@ class RegisterRenderer(Renderer):
         :return: None
         """
         #os.environ['NO_PROXY'] = 'ga.gov.au'
-        r = requests.get(_config.XML_API_URL_SAMPLESET.format(page, per_page), timeout=3)
+        r = requests.get(conf.XML_API_URL_SAMPLESET.format(page, per_page), timeout=3)
         xml = r.content
 
         if self.validate_xml(xml):

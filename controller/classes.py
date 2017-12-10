@@ -3,7 +3,7 @@ This file contains all the HTTP routes for classes from the IGSN model, such as 
 """
 from flask import Blueprint, render_template, request, Response
 from .functions import render_alternates_view, client_error_Response
-import _config as config
+import _config as conf
 from _ldapi.__init__ import LDAPI, LdapiParameterError
 from controller import classes_functions
 import urllib.parse as uparse
@@ -20,7 +20,7 @@ def sample(igsn):
     :return: HTTP Response
     """
     # lists the views and formats available for a Sample
-    c = config.URI_SAMPLE_CLASS
+    c = conf.URI_SAMPLE_CLASS
     views_formats = LDAPI.get_classes_views_formats().get(c)
 
     try:
@@ -118,9 +118,9 @@ def samples():
             page = int(request.args.get('page')) if request.args.get('page') is not None else 1
             per_page = int(request.args.get('per_page')) if request.args.get('per_page') is not None else 100
 
-            if per_page > config.OAI_BATCH_SIZE:
+            if per_page > conf.OAI_BATCH_SIZE:
                 return Response(
-                    'You must enter either no value for per_page or an integer <= {}.'.format(config.OAI_BATCH_SIZE),
+                    'You must enter either no value for per_page or an integer <= {}.'.format(conf.OAI_BATCH_SIZE),
                     status=400,
                     mimetype='text/plain'
                 )
@@ -129,12 +129,12 @@ def samples():
             links.append('<http://www.w3.org/ns/ldp#Resource>; rel="type"')
             # signalling that this is, in fact, a resource described in pages
             links.append('<http://www.w3.org/ns/ldp#Page>; rel="type"')
-            links.append('<{}?per_page={}>; rel="first"'.format(config.URI_SAMPLE_INSTANCE_BASE, per_page))
+            links.append('<{}?per_page={}>; rel="first"'.format(conf.URI_SAMPLE_INSTANCE_BASE, per_page))
 
             # if this isn't the first page, add a link to "prev"
             if page != 1:
                 links.append('<{}?per_page={}&page={}>; rel="prev"'.format(
-                    config.URI_SAMPLE_INSTANCE_BASE,
+                    conf.URI_SAMPLE_INSTANCE_BASE,
                     per_page,
                     (page - 1)
                 ))
@@ -143,7 +143,7 @@ def samples():
             if page != 1:
                 prev_page = page - 1
                 links.append('<{}?per_page={}&page={}>; rel="prev"'.format(
-                    config.URI_SAMPLE_INSTANCE_BASE,
+                    conf.URI_SAMPLE_INSTANCE_BASE,
                     per_page,
                     prev_page
                 ))
@@ -152,7 +152,7 @@ def samples():
 
             # add a link to "next" and "last"
             try:
-                r = requests.get(config.XML_API_URL_TOTAL_COUNT)
+                r = requests.get(conf.XML_API_URL_TOTAL_COUNT)
                 no_of_samples = int(r.content.decode('utf-8').split('<RECORD_COUNT>')[1].split('</RECORD_COUNT>')[0])
                 last_page = int(round(no_of_samples / per_page, 0)) + 1  # same as math.ceil()
 
@@ -169,18 +169,18 @@ def samples():
                 if page != last_page:
                     next_page = page + 1
                     links.append('<{}?per_page={}&page={}>; rel="next"'
-                                 .format(config.URI_SAMPLE_INSTANCE_BASE, per_page, (page + 1)))
+                                 .format(conf.URI_SAMPLE_INSTANCE_BASE, per_page, (page + 1)))
                 else:
                     next_page = None
 
                 # add a link to "last"
                 links.append('<{}?per_page={}&page={}>; rel="last"'
-                             .format(config.URI_SAMPLE_INSTANCE_BASE, per_page, last_page))
+                             .format(conf.URI_SAMPLE_INSTANCE_BASE, per_page, last_page))
             except:
                 # if there's some error in getting the no of samples, add the "next" link but not the "last" link
                 next_page = page + 1
                 links.append('<{}?per_page={}&page={}>; rel="next"'
-                             .format(config.URI_SAMPLE_INSTANCE_BASE, per_page, (page + 1)))
+                             .format(conf.URI_SAMPLE_INSTANCE_BASE, per_page, (page + 1)))
 
             headers = {
                 'Link': ', '.join(links)
@@ -189,7 +189,7 @@ def samples():
             class_uri_of_register_items = 'http://pid.geoscience.gov.au/def/ont/igsn#Sample'
             return register.RegisterRenderer(
                 request,
-                config.REGISTER_BASE_URI,
+                conf.REGISTER_BASE_URI,
                 class_uri_of_register_items,
                 None,
                 page,

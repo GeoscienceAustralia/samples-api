@@ -5,7 +5,7 @@ from flask import Response, render_template
 from lxml import etree
 from lxml import objectify
 from rdflib import Graph, URIRef, RDF, RDFS, XSD, OWL, Namespace, Literal, BNode
-import _config
+import _config as conf
 from _ldapi.__init__ import LDAPI
 from controller.datestamp import *
 
@@ -40,7 +40,7 @@ class Sample:
 
     URI_MISSSING = 'http://www.opengis.net/def/nil/OGC/0/missing'
     URI_INAPPLICABLE = 'http://www.opengis.net/def/nil/OGC/0/inapplicable'
-    URI_GA = 'http://pid.geoscience.gov.au/org/ga'
+    URI_GA = 'http://pid.geoscience.gov.au/org/ga/geoscienceausralia'
 
     def __init__(self, igsn, xml=None):
         self.igsn = igsn
@@ -144,7 +144,7 @@ class Sample:
         # internal URI
         # os.environ['NO_PROXY'] = 'ga.gov.au'
         # call API
-        r = requests.get(_config.XML_API_URL_SAMPLE.format(self.igsn))
+        r = requests.get(conf.XML_API_URL_SAMPLE.format(self.igsn))
         if "No data" in r.content.decode('utf-8'):
             raise ParameterError('No Data')
 
@@ -465,8 +465,7 @@ class Sample:
         g = Graph()
 
         # URI for this sample
-        base_uri = 'http://pid.geoscience.gov.au/sample/'
-        this_sample = URIRef(base_uri + self.igsn)
+        this_sample = URIRef(conf.REGISTER_BASE_URI + self.igsn)
         g.add((this_sample, RDFS.label, Literal('Sample igsn:' + self.igsn, datatype=XSD.string)))
 
         # define GA
@@ -475,7 +474,7 @@ class Sample:
         # pingback endpoint
         PROV = Namespace('http://www.w3.org/ns/prov#')
         g.bind('prov', PROV)
-        g.add((this_sample, PROV.pingback, URIRef(base_uri + '/pingback')))
+        g.add((this_sample, PROV.pingback, URIRef(conf.REGISTER_BASE_URI + self.igsn + '/pingback')))
 
         # generate things common to particular views
         if model_view == 'igsn-o' or model_view == 'dc':
@@ -544,8 +543,7 @@ class Sample:
                 g.add((this_sample, SAMFL.samplingTime, Literal(self.date_acquired.isoformat(), datatype=XSD.datetime)))
 
             from model.lookups import TERM_LOOKUP
-            # TODO: represent Public/Private (and other?) access methods in DB, add to terms in vocab?
-            g.add((this_sample, DCT.accessRights, URIRef(TERM_LOOKUP['access']['Public'])))
+            g.add((this_sample, DCT.accessRights, URIRef(TERM_LOOKUP['access_rights']['Public'])))
             # TODO: make a register of Entities
             site = URIRef(self.entity_uri)
 
@@ -871,7 +869,7 @@ class Sample:
             year_acquired = ''
 
         # add in the Pingback header links as they are valid for all HTML views
-        pingback_uri = _config.URI_SAMPLE_INSTANCE_BASE + self.igsn + "/pingback"
+        pingback_uri = conf.URI_SAMPLE_INSTANCE_BASE + self.igsn + "/pingback"
         headers = {
             'Link': '<{}>;rel = "http://www.w3.org/ns/prov#pingback"'.format(pingback_uri)
         }
@@ -885,7 +883,7 @@ class Sample:
                 view_title=view_title,
                 sample_table_html=sample_table_html,
                 date_now=datetime.datetime.now().strftime('%d %B %Y'),
-                gm_key=_config.GOOGLE_MAPS_API_KEY,
+                gm_key=conf.GOOGLE_MAPS_API_KEY,
                 lat=self.y,
                 lon=self.x
             ),
