@@ -22,7 +22,7 @@
             <cs:curator>Geoscience Australia</cs:curator>
             <cs:curationDate>2017</cs:curationDate>
             <cs:curationLocation>Geoscience Australia, Jerrabomberra Ave, Symonston, ACT, Australia</cs:curationLocation>
-            <cs:curatingInstitution institutionURI="http://pid.geoscience.gov.au/org/ga"/>
+            <cs:curatingInstitution institutionURI="http://pid.geoscience.gov.au/org/ga/geoscienceaustralia"/>
         </cs:curation>
     </cs:curationDetails>
     <cs:alternateIdentifiers>
