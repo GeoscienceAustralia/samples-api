@@ -545,7 +545,7 @@ class Sample:
                 g.add((this_sample, SAMFL.samplingTime, Literal(self.date_acquired.isoformat(), datatype=XSD.datetime)))
 
             from model.lookups import TERM_LOOKUP
-            g.add((this_sample, DCT.accessRights, URIRef(TERM_LOOKUP['access_rights']['Public'])))
+            g.add((this_sample, DCT.accessRights, URIRef(TERM_LOOKUP['access_rights']['public'])))
             # TODO: make a register of Entities
             site = URIRef(self.entity_uri)
 

@@ -244,7 +244,6 @@ TERM_LOOKUP = {
         'LKA': 'http://www.geonames.org/1227603',
         'IND': 'http://www.geonames.org/1269750',
         'unknown': 'http://www.opengis.net/def/nil/OGC/0/unknown'
-
     },
     # TODO: fix URI for 'unknown' in lith
     'lithology': {
@@ -862,7 +861,7 @@ TERM_LOOKUP = {
         'estuary': 'http://vocabulary.odm2.org/samplingfeaturetype/site',
         'field site': 'http://vocabulary.odm2.org/samplingfeaturetype/site',
         'laboratory': 'http://vocabulary.odm2.org/samplingfeaturetype/site',
-        'museum collaction': 'http://vocabulary.odm2.org/samplingfeaturetype/site',
+        'museum collection': 'http://vocabulary.odm2.org/samplingfeaturetype/site',
         'project': 'http://vocabulary.odm2.org/samplingfeaturetype/site',
         'section': 'http://vocabulary.odm2.org/samplingfeaturetype/interval',
         'interval': 'http://vocabulary.odm2.org/samplingfeaturetype/interval',  # added while Trevor's mapping is in place, to be wound back
