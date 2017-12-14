@@ -1,7 +1,7 @@
 """
 This file contains all the HTTP routes for classes from the IGSN model, such as Samples and the Sample Register
 """
-from flask import Blueprint, render_template, request, Response, g
+from flask import Blueprint, render_template, request, Response
 from .functions import render_alternates_view, client_error_Response
 import _config as conf
 from _ldapi.__init__ import LDAPI, LdapiParameterError
@@ -13,9 +13,7 @@ except:
     from urlparse import urlparse
 
 
-
 classes = Blueprint('classes', __name__)
-
 
 @classes.context_processor
 def organisation_branding():
