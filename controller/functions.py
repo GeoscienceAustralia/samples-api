@@ -5,7 +5,12 @@ from flask import Response, render_template
 from _ldapi.__init__ import LDAPI
 from rdflib import Graph, Namespace, Literal, URIRef, RDF, XSD, BNode, plugin
 import json
-import urllib.parse as uparse
+try:
+    import urllib.parse as uparse
+except:
+    from urlparse import urlparse
+
+
 
 
 def client_error_Response(error_message):

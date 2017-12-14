@@ -1,0 +1,71 @@
+ {% extends "page_layout_branding.html" %}
+
+ {% block content %}
+    <h1>Sample</h1>
+    <h2>{{ view_title }}</h2>
+
+{#    <iframe>#}
+{#        width="566"#}
+{#        height="400"#}
+{#        frameborder="0"#}
+{#        style="border:0"#}
+{#        src="https://www.google.com/maps/embed/v1/view?key={{ gm_key }}&center={{ gm_coords }}&zoom=18&maptype=satellite" allowfullscreen>#}
+{#    </iframe>#}
+    <style>
+        #map {
+            width: 568px;
+            height: 200px;
+            margin: 0;
+            padding: 0;
+            margin-bottom: 10px;
+        }
+    </style>
+
+<div id="map"></div>
+    <script>
+        function initMap() {
+            var myLatLng = {lat: -31.0380084, lng: 146.56877};
+
+            var map = new google.maps.Map(document.getElementById('map'), {
+                zoom: 6,
+                center: myLatLng
+            });
+
+            var marker = new google.maps.Marker({
+                position: myLatLng,
+                map: map,
+                title: 'Sample AU1101'
+            });
+        }
+    </script>
+    <script async defer src="https://maps.googleapis.com/maps/api/js?key=AIzaSyCUDcjVRsIHVHpv53r7ZnaX5xzqJbyGk58&callback=initMap"></script>
+
+    <table class="pretty">
+    <tr><th>Property</th><th>Value</th></tr>
+    <tr><td>IGSN</td><td>AU1101</td></tr>
+    <tr><td>GA Sample ID</td><td>CB1010(0-1)</td></tr>
+
+    <tr><td>Date Acquired</td><td><a href="http://www.opengis.net/def/nil/OGC/0/missing">missing</a></td></tr>
+    <tr>
+        <td>
+            Sampling Location (WKT)<br />
+            horizontal datum: <a href="https://epsg.io/4283">4283</a>
+        </td>
+        <td>SRID=GDA94;POINTZ(146.56877 -31.0380084 222.64)</td>
+    </tr>
+    <tr><td>State</td><td>NSW</td></tr>
+    <tr><td>Current Location</td><td>GA Services building</td></tr>
+    <tr><td>Access Rights</td><td><a href="http://pid.geoscience.gov.au/def/voc/ga/igsncode/Public">Public</a></td></tr>
+    <tr><td>Publisher</td><td><a href="http://pid.geoscience.gov.au/org/ga/geoscienceaustralia">Geoscience Australia</a></td></tr>
+    <tr><td>Sample Type</td><td><a href="http://vocabulary.odm2.org/specimentype/core">core</a></td></tr>
+    <tr><td>Method Type</td><td><a href="http://pid.geoscience.gov.au/def/voc/ga/igsncode/Unknown">Unknown</a></td></tr>
+    <tr><td>Material Type</td><td><a href="http://vocabulary.odm2.org/medium/unknown">unknown</a></td></tr>
+    <tr><td>Lithology</td><td>None</td></tr>
+    <tr><td>Sampling Feature Type</td><td><a href="http://vocabulary.odm2.org/samplingfeaturetype/borehole">borehole</a></td></tr>
+    <tr><td colspan="2"></td></tr>
+    <tr><th colspan="2">Functional endpoints</th></tr>
+    <tr><td>Provenance</td><td><a href="http://pid.geoscience.gov.au/samples/sample/AU1101?_view=prov">?_view=prov</a></td></tr>
+    <tr><td>Pingback endpoint</td><td><a href="http://pid.geoscience.gov.au/samples/sample/AU1101/pingback">/pingback</a></td></tr>
+</table>
+
+ {% endblock %}

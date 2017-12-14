@@ -1,16 +1,30 @@
 """
 This file contains all the HTTP routes for classes from the IGSN model, such as Samples and the Sample Register
 """
-from flask import Blueprint, render_template, request, Response
+from flask import Blueprint, render_template, request, Response, g
 from .functions import render_alternates_view, client_error_Response
 import _config as conf
 from _ldapi.__init__ import LDAPI, LdapiParameterError
 from controller import classes_functions
-import urllib.parse as uparse
 import requests
+try:
+    import urllib.parse as uparse
+except:
+    from urlparse import urlparse
+
+
 
 classes = Blueprint('classes', __name__)
 
+
+@classes.context_processor
+def organisation_branding():
+    return dict(organisation_branding='gsv')
+
+
+@classes.route('/sample/test')
+def test_branding():
+    return render_template('testing_branding.html')
 
 @classes.route('/sample/<string:igsn>')
 def sample(igsn):
@@ -49,7 +63,7 @@ def sample(igsn):
                 s = Sample(igsn)
                 return s.render(view, mimetype)
             except ValueError:
-                return render_template('class_sample_no_record.html')
+                return render_template('class_sample_no_record.html', organisation=ORGANISATION)
 
     except LdapiParameterError as e:
         return client_error_Response(e)
@@ -62,7 +76,7 @@ def sample_pingback(igsn):
             'This endpoint is the individual PROV "pingback" endpoint for Sample {}. It is expected to be used in '
             'accordance with the PROV-AQ Working Group Note (https://www.w3.org/TR/prov-aq/).'.format(igsn),
             mimetype='text/plain'
-        )
+            )
 
     # TODO: validate the pingback
     valid = True
