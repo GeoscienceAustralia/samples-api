@@ -48,7 +48,6 @@ class Sample:
         self.access_rights = None
         self.sample_type = None
         self.method_type = None
-        self.method_type_non_uri = None
         self.material_type = None
         self.long_min = None
         self.long_max = None
@@ -176,7 +175,7 @@ class Sample:
                 self.sample_type = self._make_vocab_uri(root.ROW.SAMPLE_TYPE_NEW, 'sample_type')
             if hasattr(root.ROW, 'SAMPLING_METHOD'):
                 self.method_type = self._make_vocab_uri(root.ROW.SAMPLING_METHOD, 'method_type')
-                self.method_type_non_uri = self._make_vocab_uri(root.ROW.SAMPLING_METHOD, 'method_type_non_uri')
+                self.method_type_non_uri = root.ROW.SAMPLING_METHOD
             if hasattr(root.ROW, 'MATERIAL_CLASS'):
                 self.material_type = self._make_vocab_uri(root.ROW.MATERIAL_CLASS, 'material_type')
             # self.long_min = root.ROW.SAMPLE_MIN_LONGITUDE
@@ -843,7 +842,8 @@ class Sample:
                 wkt=self._generate_sample_wkt(),
                 state=self.state,
                 sample_type_alink=self._make_vocab_alink(self.sample_type),
-                method_type_alink=self._make_vocab_alink(self.method_type),
+                method_type_alink=self.method_type,
+                method_type_text=self.method_type_non_uri,
                 material_type_alink=self._make_vocab_alink(self.material_type),
                 lithology_alink=self._make_vocab_alink(self.lith),
                 entity_type_alink=self._make_vocab_alink(self.entity_type)

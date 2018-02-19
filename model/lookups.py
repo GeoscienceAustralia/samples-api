@@ -1,84 +1,6 @@
 import requests
 from rdflib import Graph
 
-
-def get_feature_of_interest_types():
-    r = requests.get(
-        'http://pid.geoscience.gov.au/def/voc/featureofinteresttype/all-concepts',
-        allow_redirects=True,
-        headers={'Accept': 'text/turtle'}
-    )
-
-    if r.status_code == 200:
-        g = Graph().parse(data=r.content, format='turtle')
-        q = ''' PREFIX skos: <http://www.w3.org/2004/02/skos/core#>
-                SELECT ?o
-                WHERE {
-                    <http://pid.geoscience.gov.au/def/voc/featureofinteresttype/all-concepts> skos:member ?o .
-                }
-            '''
-        terms = []
-        for row in g.query(q):
-            terms.append(str(row['o']))
-        return sorted(terms)
-    else:
-        print(r.status_code)
-        return False
-
-
-def get_collection_access():
-    q = '''
-        SELECT 
-    '''
-    pass
-
-
-def get_collection_sample_type():
-    pass
-
-
-def get_collection_method_type():
-    pass
-
-
-def get_collection_material_type():
-    pass
-
-
-def get_collection_state():
-    pass
-
-
-def get_collection_country():
-    pass
-
-
-def get_collection_lithology():
-    pass
-
-
-def get_collection_entity_type():
-    pass
-
-
-def update_lookups():
-    TERM_LOOKUP = {}
-    TERM_LOOKUP.update(get_collection_access())
-    TERM_LOOKUP.update(get_collection_sample_type())
-    TERM_LOOKUP.update(get_collection_method_type())
-    TERM_LOOKUP.update(get_collection_material_type())
-    TERM_LOOKUP.update(get_collection_state())
-    TERM_LOOKUP.update(get_collection_country())
-    TERM_LOOKUP.update(get_collection_lithology())
-    TERM_LOOKUP.update(get_collection_entity_type())
-
-    return TERM_LOOKUP
-
-
-if __name__ == '__main__':
-    print(get_feature_of_interest_types())
-
-
 TERM_LOOKUP = {
     'access_rights': {
         'public': 'http://pid.geoscience.gov.au/def/voc/ga/igsncode/Public',
@@ -113,6 +35,7 @@ TERM_LOOKUP = {
         'water column observation': 'http://vocabulary.odm2.org/specimentype/automated',
         'water column specimen': 'http://vocabulary.odm2.org/specimentype/individualSample',
         'water specimen': 'http://vocabulary.odm2.org/specimentype/individualSample',
+        'individualSample': 'http://vocabulary.odm2.org/specimentype/individualSample'
     },
     'method_type': {
         'RAB drilling': 'http://pid.geoscience.gov.au/def/voc/ga/igsncode/Drill',
@@ -158,6 +81,7 @@ TERM_LOOKUP = {
         'grab Shipek': 'http://pid.geoscience.gov.au/def/voc/ga/igsncode/Grab',
         'grab Smith Mcintyre': 'http://pid.geoscience.gov.au/def/voc/ga/igsncode/Grab',
         'grab Van Veen': 'http://pid.geoscience.gov.au/def/voc/ga/igsncode/Grab',
+        'Hand': 'http://pid.geoscience.gov.au/def/voc/ga/igsncode/Hand',
         'liquid-gas separation': 'http://pid.geoscience.gov.au/def/voc/ga/igsncode/Other',
         'marine survey': 'http://pid.geoscience.gov.au/def/voc/ga/igsncode/Hand',
         'marine survey sampling': 'http://pid.geoscience.gov.au/def/voc/ga/igsncode/Hand',
@@ -218,6 +142,7 @@ TERM_LOOKUP = {
         'grab Shipek': 'Grab',
         'grab Smith Mcintyre': 'Grab',
         'grab Van Veen': 'Grab',
+        'hand': 'Hand',
         'liquid-gas separation': 'Other',
         'marine survey': 'Hand',
         'marine survey sampling': 'Hand',
@@ -925,6 +850,7 @@ TERM_LOOKUP = {
         'project': 'http://vocabulary.odm2.org/samplingfeaturetype/site',
         'section': 'http://vocabulary.odm2.org/samplingfeaturetype/interval',
         'interval': 'http://vocabulary.odm2.org/samplingfeaturetype/interval',  # added while Trevor's mapping is in place, to be wound back
-        'survey': 'http://vocabulary.odm2.org/samplingfeaturetype/scene'
+        'survey': 'http://vocabulary.odm2.org/samplingfeaturetype/scene',
+        'site': 'http://vocabulary.odm2.org/samplingfeaturetype/site'
     }
 }
