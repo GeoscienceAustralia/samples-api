@@ -10,7 +10,7 @@ class LDAPI:
 
     This class is issued as a Python file, rather than a Git submodule so check the version number before use!
 
-    Version 2.1
+    Version 2.2
     """
 
     # maps HTTP MIMETYPES to rdflib's RDF parsing formats
@@ -117,7 +117,7 @@ class LDAPI:
             return 'text/html'
 
     @staticmethod
-    def get_valid_view_and_format(view, format, views_formats):
+    def get_valid_view_and_format(request, views_formats):
         """
         If both the model and the format are valid, return them
 
@@ -127,15 +127,23 @@ class LDAPI:
         :param views_formats: the allowed model and their formats in this instance
         :return: valid model and format
         """
-        view = LDAPI.valid_view(view, views_formats)
-        if format is not None:
-            format = LDAPI.valid_format(format, view, views_formats)
-        else:
-            format = views_formats[view]['default_mimetype']
+        v = request.values.get('_view')
+        f = request.values.get('_format')
+        # if no given _format, check for MIME types
+        if f is None:
+            f = request.accept_mimetypes.best_match(
+                ['text/turtle', 'application/rdf+json', 'application/rdf+xml', 'text/html', 'text/xml', 'application/xml']
+            )
 
-        if view and format:
+        v = LDAPI.valid_view(v, views_formats)
+        if f is not None:
+            f = LDAPI.valid_format(f, v, views_formats)
+        else:
+            f = views_formats[v]['default_mimetype']
+
+        if v and f:
             # return valid model and format
-            return view, format
+            return v, f
 
     @staticmethod
     def client_error_Response(error_message):
@@ -199,11 +207,11 @@ class LDAPI:
         :return: a Python object parsed from the views_formats.json file
         """
         cache = SimpleCache()
-        cvf = cache.get('classes_views_formats')
+        cvf = cache.get('views_formats')
         if cvf is None:
             cvf = json.load(open(join(dirname(dirname(__file__)), 'controller', 'views_formats.json')))
             # times out never (i.e. on app startup/shutdown)
-            cache.set('classes_views_formats', cvf)
+            cache.set('views_formats', cvf)
         return cvf
 
 
@@ -212,5 +220,7 @@ class LdapiParameterError(ValueError):
 
 
 if __name__ == '__main__':
-    vfs = LDAPI.get_classes_views_formats().get('http://reference.data.gov.au/def/dataset#Dataset')
-    print(LDAPI.get_valid_view_and_format('dataset', 'text/turtle', vfs))
+    vfs = LDAPI.get_classes_views_formats().get('http://pid.geoscience.gov.au/def/ont/ga/igsn#Sample')
+    from requests.models import Request
+    r = Request(method='GET', params={'_view': 'igsn-o', '_format': 'text/turtle'})
+    print(LDAPI.get_valid_view_and_format(r, vfs))
