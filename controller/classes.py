@@ -6,7 +6,7 @@ from .functions import render_alternates_view, client_error_Response
 import _config as conf
 from _ldapi.__init__ import LDAPI, LdapiParameterError
 from controller import classes_functions
-import urllib.parse as uparse
+import urllib.parse as uriparse
 import requests
 
 classes = Blueprint('classes', __name__)
@@ -20,26 +20,20 @@ def sample(igsn):
     :return: HTTP Response
     """
     # lists the views and formats available for a Sample
-    c = conf.URI_SAMPLE_CLASS
-    views_formats = LDAPI.get_classes_views_formats().get(c)
+    views_formats = LDAPI.get_classes_views_formats().get(conf.URI_SAMPLE_CLASS)
 
     try:
-        view, mimetype = LDAPI.get_valid_view_and_format(
-            request.args.get('_view'),
-            request.args.get('_format'),
-            views_formats
-        )
+        view, mime_format = LDAPI.get_valid_view_and_format(request, views_formats)
 
         # if alternates model, return this info from file
         if view == 'alternates':
-            class_uri = 'http://pid.geoscience.gov.au/def/ont/igsn#Sample'
-            instance_uri = 'http://pid.geoscience.gov.au/sample/' + igsn
+            instance_uri = conf.URI_SAMPLE_INSTANCE_BASE + igsn
             del views_formats['renderer']
             return render_alternates_view(
-                class_uri,
-                uparse.quote_plus(class_uri),
+                conf.URI_SAMPLE_CLASS,
+                uriparse.quote_plus(conf.URI_SAMPLE_CLASS),
                 instance_uri,
-                uparse.quote_plus(instance_uri),
+                uriparse.quote_plus(instance_uri),
                 views_formats,
                 request.args.get('_format')
             )
@@ -47,7 +41,7 @@ def sample(igsn):
             from model.sample import Sample
             try:
                 s = Sample(igsn)
-                return s.render(view, mimetype)
+                return s.render(view, mime_format)
             except ValueError:
                 return render_template('class_sample_no_record.html')
 
@@ -92,20 +86,16 @@ def samples():
         .get('http://purl.org/linked-data/registry#Register')
 
     try:
-        view, mime_format = LDAPI.get_valid_view_and_format(
-            request.args.get('_view'),
-            request.args.get('_format'),
-            views_formats
-        )
+        view, mime_format = LDAPI.get_valid_view_and_format(request, views_formats)
 
         # if alternates model, return this info from file
-        class_uri = 'http://pid.geoscience.gov.au/def/ont/igsn#Sample'
+        class_uri = 'http://pid.geoscience.gov.au/def/ont/ga/igsn#Sample'
 
         if view == 'alternates':
             del views_formats['renderer']
             return render_alternates_view(
                 class_uri,
-                uparse.quote_plus(class_uri),
+                uriparse.quote_plus(class_uri),
                 None,
                 None,
                 views_formats,

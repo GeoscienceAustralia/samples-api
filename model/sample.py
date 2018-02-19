@@ -48,6 +48,7 @@ class Sample:
         self.access_rights = None
         self.sample_type = None
         self.method_type = None
+        self.method_type_non_uri = None
         self.material_type = None
         self.long_min = None
         self.long_max = None
@@ -175,6 +176,7 @@ class Sample:
                 self.sample_type = self._make_vocab_uri(root.ROW.SAMPLE_TYPE_NEW, 'sample_type')
             if hasattr(root.ROW, 'SAMPLING_METHOD'):
                 self.method_type = self._make_vocab_uri(root.ROW.SAMPLING_METHOD, 'method_type')
+                self.method_type_non_uri = self._make_vocab_uri(root.ROW.SAMPLING_METHOD, 'method_type_non_uri')
             if hasattr(root.ROW, 'MATERIAL_CLASS'):
                 self.material_type = self._make_vocab_uri(root.ROW.MATERIAL_CLASS, 'material_type')
             # self.long_min = root.ROW.SAMPLE_MIN_LONGITUDE
@@ -537,7 +539,7 @@ class Sample:
             # properties
             g.add((this_sample, SAMFL.currentLocation, Literal('GA Services building', datatype=XSD.string)))
 
-            if self.material_type != 'http://www.opengis.net/def/nil/OGC/0/missing':
+            if self.material_type is not None:
                 g.add((this_sample, SAMFL.materialClass, URIRef(self.material_type)))
             if self.method_type != 'http://www.opengis.net/def/nil/OGC/0/missing':
                 g.add((this_sample, SAMFL.samplingMethod, URIRef(self.method_type)))
@@ -795,7 +797,7 @@ class Sample:
             wkt=self._generate_sample_wkt(),
             sample_type=self.sample_type,
             material_type=self.material_type,
-            collection_method=self.method_type,
+            collection_method=self.method_type_non_uri,
             collection_time=self.date_acquired
         )
 

@@ -23,7 +23,7 @@
         </metadataFormat>
         <metadataFormat>
             <metadataPrefix>igsn-r1</metadataPrefix>
-            <schema>https://github.com/IGSN/metadata/blob/r1/description/resource.xsd</schema>
+            <schema>https://raw.githubusercontent.com/IGSN/metadata/r1/description/resource.xsd</schema>
             <metadataNamespace>http://schema.igsn.org/description/1.0</metadataNamespace>
         </metadataFormat>
         <metadataFormat>

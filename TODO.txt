@@ -9,3 +9,5 @@
     * and ListRecords & GetRecord csirov3 to print <cs:logDate eventType="registered"/> not <cs:logDate eventType="registered">1990-01-01</cs:logDate>
 
 * convert to Python 3
+
+* update SOSA RDF as per Sites Register

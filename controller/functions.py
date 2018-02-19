@@ -10,7 +10,7 @@ import urllib.parse as uparse
 
 def client_error_Response(error_message):
     return Response(
-        error_message,
+        str(error_message),
         status=400,
         mimetype='text/plain'
     )
