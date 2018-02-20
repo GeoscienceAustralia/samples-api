@@ -242,10 +242,8 @@ class Sample:
         return True
 
     def _make_vocab_uri(self, term, vocab_type):
-        # Convert term to lower case alphanumerics with hyphens
-        lookup_term = re.sub('[^\w\-]+', ' ', term).lower()
-        # Return URI for term, URI for "unknown" or None 
-        return TERM_LOOKUP[vocab_type].get(lookup_term) or TERM_LOOKUP[vocab_type].get('unknown')
+        # Convert term to lower case alphanumerics with hyphens and return URI for term, URI for "unknown" or None 
+        return TERM_LOOKUP[vocab_type].get(re.sub('[^\w\-]+', ' ', term).lower()) or TERM_LOOKUP[vocab_type].get('unknown')
 
     def _make_vocab_alink(self, vocab_uri):
         if vocab_uri is not None:
