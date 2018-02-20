@@ -6,9 +6,10 @@ from lxml import etree
 from lxml import objectify
 from rdflib import Graph, URIRef, RDF, RDFS, XSD, OWL, Namespace, Literal, BNode
 import _config as conf
+import re
 from _ldapi.__init__ import LDAPI
 from controller.datestamp import *
-
+from model.lookups import TERM_LOOKUP
 
 class Sample:
     """
@@ -240,12 +241,11 @@ class Sample:
 
         return True
 
-    def _make_vocab_uri(self, xml_value, vocab_type):
-        from .lookups import TERM_LOOKUP
-        if TERM_LOOKUP[vocab_type].get(xml_value) is not None:
-            return TERM_LOOKUP[vocab_type].get(xml_value)
-        else:
-            return TERM_LOOKUP[vocab_type].get('unknown')
+    def _make_vocab_uri(self, term, vocab_type):
+        # Convert term to lower case alphanumerics with hyphens
+        lookup_term = re.sub('[^\w\-]+', ' ', term).lower()
+        # Return URI for term, URI for "unknown" or None 
+        return TERM_LOOKUP[vocab_type].get(lookup_term) or TERM_LOOKUP[vocab_type].get('unknown')
 
     def _make_vocab_alink(self, vocab_uri):
         if vocab_uri is not None:
@@ -545,7 +545,6 @@ class Sample:
             if self.date_acquired is not None:
                 g.add((this_sample, SAMFL.samplingTime, Literal(self.date_acquired.isoformat(), datatype=XSD.datetime)))
 
-            from model.lookups import TERM_LOOKUP
             g.add((this_sample, DCT.accessRights, URIRef(TERM_LOOKUP['access_rights']['public'])))
             # TODO: make a register of Entities
             site = URIRef(self.entity_uri)
@@ -949,10 +948,8 @@ if __name__ == '__main__':
     # print s.is_xml_export_valid(open('../test/sample_eg3_IGSN_schema.xml').read())
     # print s.export_as_igsn_xml()
 
-    from model.lookups import TERM_LOOKUP
+    # print(TERM_LOOKUP['sample_type']['unknown'])
 
-    print(TERM_LOOKUP['sample_type']['unknown'])
+    # print(TERM_LOOKUP['method_type']['Unknown'])
 
-    print(TERM_LOOKUP['method_type']['Unknown'])
-
-    print(TERM_LOOKUP['material_type']['unknown'])
+    # print(TERM_LOOKUP['material_type']['unknown'])

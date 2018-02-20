@@ -1,5 +1,4 @@
-import requests
-from rdflib import Graph
+import re
 
 TERM_LOOKUP = {
     'access_rights': {
@@ -793,3 +792,10 @@ TERM_LOOKUP = {
         'site': 'http://vocabulary.odm2.org/samplingfeaturetype/site'
     }
 }
+
+# Convert all terms to lower case alphanumerics with hyphens
+TERM_LOOKUP = {term_type: {re.sub('[^\w\-]+', ' ', term).lower(): uri
+                           for term, uri in term_dict.iteritems()
+                           }
+               for term_type, term_dict in TERM_LOOKUP.iteritems()
+               }
