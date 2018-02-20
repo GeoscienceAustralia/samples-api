@@ -793,8 +793,8 @@ TERM_LOOKUP = {
     }
 }
 
-# Convert all terms to lower case alphanumerics with hyphens
-TERM_LOOKUP = {term_type: {re.sub('[^\w\-]+', ' ', term).lower(): uri
+# Convert all terms to lower case alphanumerics
+TERM_LOOKUP = {term_type: {re.sub('\W+', '', term).lower(): uri
                            for term, uri in term_dict.iteritems()
                            }
                for term_type, term_dict in TERM_LOOKUP.iteritems()
