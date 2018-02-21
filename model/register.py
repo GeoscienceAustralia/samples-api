@@ -42,9 +42,13 @@ class RegisterRenderer(Renderer):
                     headers=extra_headers
                 )
             elif mimetype == 'text/html':
+                # add branding choice
+                organisation_branding = 'ga'
+
                 return Response(
                     render_template(
                         'class_register.html',
+                        organisation_branding=organisation_branding,
                         base_uri=self.base_uri,
                         class_name=self.uri,
                         register=self.register,

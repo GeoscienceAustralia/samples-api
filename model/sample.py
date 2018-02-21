@@ -164,7 +164,7 @@ class Sample:
         try:
             root = objectify.fromstring(xml)
 
-            self.igsn = root.ROW.IGSN
+            self.igsn = str(root.ROW.IGSN)
             if hasattr(root.ROW, 'SAMPLEID'):
                 self.sample_id = root.ROW.SAMPLEID
             self.sample_no = root.ROW.SAMPLENO if hasattr(root.ROW, 'SAMPLENO') else None
@@ -200,8 +200,8 @@ class Sample:
                 if hasattr(root.ROW.GEOM, 'SDO_ORDINATES'):
                     self.ordinates = root.ROW.GEOM.SDO_ORDINATES.getchildren()
                     # calculate centroid values to centre a map
-                    self.centroid_lat = round(sum(self.ordinates[:-2:2])/len(self.ordinates[:-2:2]), 2)
-                    self.centroid_lon = round(sum(self.ordinates[1:-2:2])/len(self.ordinates[1:-2:2]), 2)
+                    self.centroid_lat = round(sum(self.ordinates[1:-2:2])/len(self.ordinates[:-2:2]), 2)
+                    self.centroid_lon = round(sum(self.ordinates[:-2:2])/len(self.ordinates[1:-2:2]), 2)
                     # self.ordinates = zip(*[iter(raw_ordinates)]*2)
             if hasattr(root.ROW, 'STATEID'):
                 self.state = root.ROW.STATEID  # self._make_vocab_uri(root.ROW.STATEID, 'state')
@@ -278,8 +278,8 @@ class Sample:
         if self.ordinates is not None:
             s = []
             for x, y in zip(*[iter(self.ordinates)] * 2):
-                s.append('{lat: ' + str(x) + ', lng: ' + str(y) + '}')
-            return ',\n'.join(s)
+                s.append('{lat: ' + str(y) + ', lng: ' + str(x) + '}')
+            return ',\n                '.join(s)
         else:
             return None
 
@@ -902,11 +902,19 @@ class Sample:
         headers = {
             'Link': '<{}>;rel = "http://www.w3.org/ns/prov#pingback"'.format(pingback_uri)
         }
-        bb = self._generate_sample_gmap_bbox()
+
+        # add branding choice
+        if self.igsn.startswith('AUVI'):
+            organisation_branding = 'gsv'
+        elif self.igsn.startswith('AUSA'):
+            organisation_branding = 'gssa'
+        else:  # default is GA
+            organisation_branding = 'ga'
 
         return Response(
             render_template(
                 'page_sample.html',
+                organisation_branding=organisation_branding,
                 view=model_view,
                 igsn=self.igsn,
                 year_acquired=year_acquired,
@@ -916,7 +924,7 @@ class Sample:
                 gm_key=conf.GOOGLE_MAPS_API_KEY,
                 lat=self.y if self.y is not None else self.centroid_lat,
                 lon=self.x if self.x is not None else self.centroid_lon,
-                gmap_bbox=bb
+                gmap_bbox=self._generate_sample_gmap_bbox()
             ),
             headers=headers
         )
