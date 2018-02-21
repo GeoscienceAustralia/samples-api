@@ -3,13 +3,17 @@
 <head lang="en">
     <meta charset="UTF-8">
     <title>Samples API</title>
-    <link rel="stylesheet" href="{{url_for('static', filename='css/ga_theme.css')}}" />
+    {% set css_stylesheet = 'css/' + organisation_branding + '_theme.css' %}
+    <link rel="stylesheet" href="{{url_for('static', filename=css_stylesheet)}}" />
 </head>
 <body>
-    {% include 'ga_header.html' %}
+    {% set header = organisation_branding + '/header.html' %}
+    {% set footer = organisation_branding + '/footer.html' %}
+    {% set nav = organisation_branding + '/nav.html' %}
+    {% include header %}
     <div id="container-content">
         {% block content %}{% endblock %}
     </div>
-    {% include 'ga_footer.html' %}
+    {% include footer %}
 </body>
 </html>
