@@ -4,7 +4,7 @@ import requests
 from lxml import etree
 import _config as conf
 from model import Sample
-from controller.datestamp import *
+from controller.oai_datestamp import *
 from controller.oai_errors import *
 import math
 

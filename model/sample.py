@@ -7,7 +7,7 @@ from lxml import objectify
 from rdflib import Graph, URIRef, RDF, RDFS, XSD, OWL, Namespace, Literal, BNode
 import _config as conf
 from _ldapi.__init__ import LDAPI
-from controller.datestamp import *
+from controller.oai_datestamp import *
 
 
 class Sample:
@@ -40,7 +40,7 @@ class Sample:
 
     URI_MISSSING = 'http://www.opengis.net/def/nil/OGC/0/missing'
     URI_INAPPLICABLE = 'http://www.opengis.net/def/nil/OGC/0/inapplicable'
-    URI_GA = 'http://pid.geoscience.gov.au/org/ga/geoscienceausralia'
+    URI_GA = 'http://pid.geoscience.gov.au/org/ga/geoscienceaustralia'
 
     def __init__(self, igsn, xml=None):
         self.igsn = igsn

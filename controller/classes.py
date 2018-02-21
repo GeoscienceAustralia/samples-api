@@ -2,10 +2,8 @@
 This file contains all the HTTP routes for classes from the IGSN model, such as Samples and the Sample Register
 """
 from flask import Blueprint, render_template, request, Response
-from .functions import render_alternates_view, client_error_Response
 import _config as conf
 from _ldapi.__init__ import LDAPI, LdapiParameterError
-from controller import classes_functions
 import urllib.parse as uriparse
 import requests
 
@@ -29,7 +27,7 @@ def sample(igsn):
         if view == 'alternates':
             instance_uri = conf.URI_SAMPLE_INSTANCE_BASE + igsn
             del views_formats['renderer']
-            return render_alternates_view(
+            return LDAPI.render_alternates_view(
                 conf.URI_SAMPLE_CLASS,
                 uriparse.quote_plus(conf.URI_SAMPLE_CLASS),
                 instance_uri,
@@ -46,7 +44,7 @@ def sample(igsn):
                 return render_template('class_sample_no_record.html')
 
     except LdapiParameterError as e:
-        return client_error_Response(e)
+        return LDAPI.client_error_Response(e)
 
 
 @classes.route('/sample/<string:igsn>/pingback', methods=['GET', 'POST'])
@@ -82,8 +80,7 @@ def samples():
     :return: HTTP Response
     """
     # lists the views and formats available for a Sample
-    views_formats = classes_functions.get_classes_views_formats() \
-        .get('http://purl.org/linked-data/registry#Register')
+    views_formats = LDAPI.get_classes_views_formats().get('http://purl.org/linked-data/registry#Register')
 
     try:
         view, mime_format = LDAPI.get_valid_view_and_format(request, views_formats)
@@ -93,7 +90,7 @@ def samples():
 
         if view == 'alternates':
             del views_formats['renderer']
-            return render_alternates_view(
+            return LDAPI.render_alternates_view(
                 class_uri,
                 uriparse.quote_plus(class_uri),
                 None,
@@ -189,4 +186,4 @@ def samples():
                 last_page).render(view, mime_format, extra_headers=headers)
 
     except LdapiParameterError as e:
-        return client_error_Response(e)
+        return LDAPI.client_error_Response(e)
