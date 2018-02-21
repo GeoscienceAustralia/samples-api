@@ -57,7 +57,7 @@ def oai():
             elif request.values.get('metadataPrefix') == 'csirov3':
                 record_xml = s.export_csirov3_xml()
             else:  # 'oai_dc':
-                record_xml = s.export_dc_xml()
+                record_xml = s.export_dct_xml()
 
             return Response(
                 render_template(

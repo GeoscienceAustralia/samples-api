@@ -39,7 +39,6 @@ class Sample:
     """
 
     URI_MISSSING = 'http://www.opengis.net/def/nil/OGC/0/missing'
-    URI_INAPPLICABLE = 'http://www.opengis.net/def/nil/OGC/0/inapplicable'
     URI_GA = 'http://pid.geoscience.gov.au/org/ga/geoscienceaustralia'
 
     def __init__(self, igsn, xml=None):
@@ -93,11 +92,11 @@ class Sample:
                 return self.export_html(model_view=view)
             else:
                 return Response(self.export_rdf(view, mimetype), mimetype=mimetype)
-        elif view == 'dc':
+        elif view == 'dct':
             if mimetype == 'text/html':
                 return self.export_html(model_view=view)
             elif mimetype == 'text/xml':
-                return Response(self.export_dc_xml(), mimetype=mimetype)
+                return Response(self.export_dct_xml(), mimetype=mimetype)
             else:
                 return Response(self.export_rdf(view, mimetype), mimetype=mimetype)
         elif view == 'igsn':  # only XML for this view
@@ -473,7 +472,7 @@ class Sample:
         Exports this instance in RDF, according to a given model from the list of supported models,
         in a given rdflib RDF format
 
-        :param model_view: string of one of the model view names available for Sample objects ['igsn', 'dc', '',
+        :param model_view: string of one of the model view names available for Sample objects ['igsn', 'dct', '',
             'default']
         :param rdf_mime: string of one of the rdflib serlialization format ['n3', 'nquads', 'nt', 'pretty-xml', 'trig',
             'trix', 'turtle', 'xml'], from http://rdflib3.readthedocs.io/en/latest/plugin_serializers.html
@@ -496,7 +495,7 @@ class Sample:
         g.add((this_sample, PROV.pingback, URIRef(conf.REGISTER_BASE_URI + self.igsn + '/pingback')))
 
         # generate things common to particular views
-        if model_view == 'igsn-o' or model_view == 'dc':
+        if model_view == 'igsn-o' or model_view == 'dct':
             # DC = Namespace('http://purl.org/dc/elements/1.1/')
             DCT = Namespace('http://purl.org/dc/terms/')
             g.bind('dct', DCT)
@@ -505,7 +504,7 @@ class Sample:
             SAMFL = Namespace('http://def.seegrid.csiro.au/ontology/om/sam-lite#')
             g.bind('samfl', SAMFL)
 
-        if model_view == 'igsn-o' or model_view == 'sosa' or model_view == 'dc':
+        if model_view == 'igsn-o' or model_view == 'sosa' or model_view == 'dct':
             GEOSP = Namespace('http://www.opengis.net/ont/geosparql#')
             g.bind('geosp', GEOSP)
 
@@ -604,7 +603,7 @@ class Sample:
             g.add((qualified_attribution, PROV.agent, ga))
             g.add((qualified_attribution, PROV.hadRole, AUROLE.Publisher))
             g.add((this_sample, PROV.qualifiedAttribution, qualified_attribution))
-        elif model_view == 'dc':
+        elif model_view == 'dct':
             # this is the cut-down IGSN --> Dublin core mapping describe at http://igsn.github.io/oai/
             g.add((this_sample, RDF.type, DCT.PhysicalResource))
             g.add((this_sample, DCT.coverage, wkt))
@@ -624,7 +623,6 @@ class Sample:
             # g.add((this_sample, DCT.title, ga)) -- no value at GA
             if self.sample_type is not None:
                 g.add((this_sample, DCT.type, URIRef(self.sample_type)))
-
         elif model_view == 'prov':
             g.add((this_sample, RDF.type, PROV.Entity))
             g.add((ga, RDF.type, PROV.Org))
@@ -678,41 +676,42 @@ class Sample:
             g.bind('sampling', SAMP)
 
             # SampleRelationship to Site
-            site = URIRef(self.entity_uri)
-            sr = BNode()
-            g.add((sr, RDF.type, SAMP.SampleRelationship))
-            g.add((sr, SAMP.relatedSample, site))
-            # TODO: replace with a real Concept URI
-            g.add((sr, SAMP.natureOfRelationship, URIRef('http://example.org/sampling/relationship/subsample')))
-            g.add((this_sample, SAMP.hasSampleRelationship, sr))  # associate
+            if self.entity_uri is not None:
+                site = URIRef(self.entity_uri)
+                sr = BNode()
+                g.add((sr, RDF.type, SAMP.SampleRelationship))
+                g.add((sr, SAMP.relatedSample, site))
+                # TODO: replace with a real Concept URI
+                g.add((sr, SAMP.natureOfRelationship, URIRef('http://example.org/sampling/relationship/subsample')))
+                g.add((this_sample, SAMP.hasSampleRelationship, sr))  # associate
 
-            # Site details
-            g.add((site, RDF.type, OWL.NamedIndividual))
-            # specific type of Site
-            if self.entity_type is not None:
-                site_type = URIRef(self.entity_type)
-            else:
-                site_type = URIRef('http://pid.geoscience.gov.au/def/voc/featureofinteresttype/borehole')
-            g.add((site, RDF.type, site_type))
-            g.add((site_type, RDFS.subClassOf, SOSA.Sample))
+                # Site details
+                g.add((site, RDF.type, OWL.NamedIndividual))
+                # specific type of Site
+                if self.entity_type is not None:
+                    site_type = URIRef(self.entity_type)
+                else:
+                    site_type = URIRef('http://pid.geoscience.gov.au/def/voc/featureofinteresttype/borehole')
+                g.add((site, RDF.type, site_type))
+                g.add((site_type, RDFS.subClassOf, SOSA.Sample))
 
-            # FOI geometry
-            site_geometry = BNode()
-            g.add((site, GEOSP.hasGeometry, site_geometry))
-            g.add((site_geometry, RDF.type, GEOSP.Geometry))
-            g.add((site_geometry, GEOSP.asWKT, Literal(self._generate_parent_wkt(), datatype=GEOSP.wktLiteral)))
-            # g.add((site_geometry, GEOSP.asGML, Literal(self._generate_parent_gml(), datatype=GEOSP.wktLiteral)))
-            # FOI elevation
-            site_elevation = BNode()
-            g.add((site, SAMFL.samplingElevation, site_elevation))
-            g.add((site_elevation, RDF.type, SAMFL.Elevation))
-            if self.z is None:
-                z = 'NaN'
-            else:
-                z = self.z
-            g.add((site_elevation, SAMFL.elevation, Literal(z, datatype=XSD.float)))
-            g.add((site_elevation, SAMFL.verticalDatum,
-                   Literal("http://spatialreference.org/ref/epsg/4283/", datatype=XSD.anyUri)))
+                # FOI geometry
+                site_geometry = BNode()
+                g.add((site, GEOSP.hasGeometry, site_geometry))
+                g.add((site_geometry, RDF.type, GEOSP.Geometry))
+                g.add((site_geometry, GEOSP.asWKT, Literal(self._generate_parent_wkt(), datatype=GEOSP.wktLiteral)))
+                # g.add((site_geometry, GEOSP.asGML, Literal(self._generate_parent_gml(), datatype=GEOSP.wktLiteral)))
+                # FOI elevation
+                site_elevation = BNode()
+                g.add((site, SAMFL.samplingElevation, site_elevation))
+                g.add((site_elevation, RDF.type, SAMFL.Elevation))
+                if self.z is None:
+                    z = 'NaN'
+                else:
+                    z = self.z
+                g.add((site_elevation, SAMFL.elevation, Literal(z, datatype=XSD.float)))
+                g.add((site_elevation, SAMFL.verticalDatum,
+                       Literal("http://spatialreference.org/ref/epsg/4283/", datatype=XSD.anyUri)))
 
             #
             #   Feature of Interest
@@ -746,7 +745,7 @@ class Sample:
 
         return xsd.validate(xml)
 
-    def export_dc_xml(self):
+    def export_dct_xml(self):
         """
         Exports this Sample instance in XML that validates against the IGSN XML Schema
 
@@ -758,7 +757,7 @@ class Sample:
         else:
             d = self.date_acquired
         template = render_template(
-            'class_sample_dc.xml',
+            'class_sample_dct.xml',
             identifier=self.igsn,
             description=self.remark,
             date=d,
@@ -783,8 +782,6 @@ class Sample:
             collection_time = datetime_to_datestamp(self.date_acquired)
         else:
             collection_time = '1900-01-01T00:00:00Z'
-
-
 
         template = render_template(
             'class_sample_igsn.xml',
@@ -844,7 +841,7 @@ class Sample:
         """
         Exports this instance in HTML, according to a given model from the list of supported models.
 
-        :param model_view: string of one of the model view names available for Sample objects ['igsn', 'dc', '',
+        :param model_view: string of one of the model view names available for Sample objects ['igsn', 'dct', '',
             'default']
         :return: HTML string
         """
@@ -876,11 +873,11 @@ class Sample:
                 visjs=self._make_vsjs(g),
                 prov_turtle=prov_turtle,
             )
-        else:  # elif model_view == 'dc':
+        else:  # elif model_view == 'dct':
             view_title = 'Dublin Core view'
 
             sample_table_html = render_template(
-                'class_sample_dc.html',
+                'class_sample_dct.html',
                 identifier=self.igsn,
                 description=self.remark if self.remark != '' else '-',
                 date=self.date_acquired if self.date_acquired is not None else '<a href="{}">{}</a>'.format(
@@ -969,7 +966,7 @@ if __name__ == '__main__':
     # print 'hole_lat_min ' + str(s.hole_lat_min)
     # print 'hole_lat_max ' + str(s.hole_lat_max)
     # print 'sample_no ' + str(s.sample_no)
-    # print s.export_dc_xml()
+    # print s.export_dct_xml()
 
     # s = Sample('http://dbforms.ga.gov.au/www_distp/a.igsn_api.get_igsnSample?pIGSN={0}', 'AU239')
     # print s.igsn

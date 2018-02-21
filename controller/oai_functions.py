@@ -150,7 +150,7 @@ def list_records_xml(metadataPrefix, resumptionToken=None, from_=None, until=Non
         elif metadataPrefix == 'csirov3':
             record_xml = sample.export_csirov3_xml()
         else:  # oai_dc
-            record_xml = sample.export_dc_xml()
+            record_xml = sample.export_dct_xml()
 
         # make the full OAI record
         oai_record_vars = {
