@@ -85,8 +85,8 @@ class Sample:
             self._populate_from_oracle_api()
 
     def render(self, view, mimetype):
-        if self.sample_no is None:
-            return Response('Sample with IGSN {} not found.'.format(self.igsn), status=404, mimetype='text/plain')
+        # if self.sample_no is None:
+        #     return Response('Sample with IGSN {} not found.'.format(self.igsn), status=404, mimetype='text/plain')
 
         if view == 'igsn-o':
             if mimetype == 'text/html':
@@ -167,7 +167,7 @@ class Sample:
             self.igsn = root.ROW.IGSN
             if hasattr(root.ROW, 'SAMPLEID'):
                 self.sample_id = root.ROW.SAMPLEID
-            self.sample_no = root.ROW.SAMPLENO
+            self.sample_no = root.ROW.SAMPLENO if hasattr(root.ROW, 'SAMPLENO') else None
             self.access_rights = self._make_vocab_uri('public', 'access_rights')  # this value is statically set to 'public' for all samples
             if hasattr(root.ROW, 'REMARK'):
                 self.remark = str(root.ROW.REMARK).strip() if len(str(root.ROW.REMARK)) > 5 else None
@@ -197,8 +197,12 @@ class Sample:
                         self.z = root.ROW.GEOM.SDO_POINT.Z
                 if hasattr(root.ROW.GEOM, 'SDO_ELEM_INFO'):
                     self.elem_info = root.ROW.GEOM.SDO_ELEM_INFO
-                if hasattr(root.ROW, 'SDO_ORDINATES'):
-                    self.ordinates = root.ROW.GEOM.SDO_ORDINATES
+                if hasattr(root.ROW.GEOM, 'SDO_ORDINATES'):
+                    self.ordinates = root.ROW.GEOM.SDO_ORDINATES.getchildren()
+                    # calculate centroid values to centre a map
+                    self.centroid_lat = round(sum(self.ordinates[:-2:2])/len(self.ordinates[:-2:2]), 2)
+                    self.centroid_lon = round(sum(self.ordinates[1:-2:2])/len(self.ordinates[1:-2:2]), 2)
+                    # self.ordinates = zip(*[iter(raw_ordinates)]*2)
             if hasattr(root.ROW, 'STATEID'):
                 self.state = root.ROW.STATEID  # self._make_vocab_uri(root.ROW.STATEID, 'state')
             if hasattr(root.ROW, 'COUNTRY'):
@@ -256,14 +260,28 @@ class Sample:
 
     def _generate_sample_wkt(self):
         if self.z is not None:
-            wkt = 'SRID={};POINTZ({} {} {})'.format(self.srid, self.x, self.y, self.z)
+            return 'SRID={};POINTZ({} {} {})'.format(self.srid, self.x, self.y, self.z)
+        elif self.srid is not None and self.x is not None and self.y is not None:
+            return 'SRID={};POINT({} {})'.format(self.srid, self.x, self.y)
+        elif self.ordinates is not None:
+            s = []
+            for x, y in zip(*[iter(self.ordinates)] * 2):
+                s.append(str(x) + ' ' + str(y))
+            return 'SRID={};POLYGON(({}))'.format(
+                self.srid,
+                ', '.join(s)
+            )
         else:
-            if self.srid is not None and self.x is not None and self.y is not None:
-                wkt = 'SRID={};POINT({} {})'.format(self.srid, self.x, self.y)
-            else:
-                wkt = ''
+            return ''
 
-        return wkt
+    def _generate_sample_gmap_bbox(self):
+        if self.ordinates is not None:
+            s = []
+            for x, y in zip(*[iter(self.ordinates)] * 2):
+                s.append('{lat: ' + str(x) + ', lng: ' + str(y) + '}')
+            return ',\n'.join(s)
+        else:
+            return None
 
     def _generate_sample_gml(self):
         if self.z is not None:
@@ -884,6 +902,7 @@ class Sample:
         headers = {
             'Link': '<{}>;rel = "http://www.w3.org/ns/prov#pingback"'.format(pingback_uri)
         }
+        bb = self._generate_sample_gmap_bbox()
 
         return Response(
             render_template(
@@ -895,8 +914,9 @@ class Sample:
                 sample_table_html=sample_table_html,
                 date_now=datetime.datetime.now().strftime('%d %B %Y'),
                 gm_key=conf.GOOGLE_MAPS_API_KEY,
-                lat=self.y,
-                lon=self.x
+                lat=self.y if self.y is not None else self.centroid_lat,
+                lon=self.x if self.x is not None else self.centroid_lon,
+                gmap_bbox=bb
             ),
             headers=headers
         )

@@ -30,11 +30,28 @@
                 center: myLatLng
             });
 
+            {% if gmap_bbox is not none %}
+            var bboxCoords = [
+                {{ gmap_bbox }}
+            ];
+            // Construct the polygon.
+            var bbox = new google.maps.Polygon({
+                paths: bboxCoords,
+                strokeColor: '#FF0000',
+                strokeOpacity: 0.8,
+                strokeWeight: 2,
+                fillColor: '#FF0000',
+                fillOpacity: 0.35,
+                title: 'Sample {{ igsn }}'
+            });
+            bbox.setMap(map);
+            {% else %}
             var marker = new google.maps.Marker({
                 position: myLatLng,
                 map: map,
                 title: 'Sample {{ igsn }}'
             });
+            {% endif %}
         }
     </script>
     <script async defer src="https://maps.googleapis.com/maps/api/js?key={{ gm_key }}&callback=initMap"></script>
