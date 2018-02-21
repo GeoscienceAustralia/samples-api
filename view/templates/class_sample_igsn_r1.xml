@@ -3,7 +3,7 @@
         xmlns:igsn="http://schema.igsn.org/description/1.0"
         xsi:schemaLocation="http://schema.igsn.org/description/1.0 https://raw.githubusercontent.com/IGSN/metadata/r1/description/resource.xsd"
         registedObjectType="http://schema.igsn.org/vocab/PhysicalSample">
-    <igsn:identifier type="IGSN">http://igsn.org/{{ igsn }}</igsn:identifier>
+    <igsn:identifier type="IGSN">{{ igsn }}</igsn:identifier>
     <igsn:title>Sample igsn:{{ igsn }}</igsn:title>
     {% if sample_id is not none %}
     <igsn:alternateIdentifiers>
@@ -14,7 +14,7 @@
     <igsn:registrant>
         <igsn:name>Geoscience Australia</igsn:name>
         <igsn:affiliation>
-            <igsn:identifier type="url">http://pid.geoscience.gov.au/org/ga/geoscienceaustralia</igsn:identifier>
+            <igsn:identifier type="URI">http://pid.geoscience.gov.au/org/ga/geoscienceaustralia</igsn:identifier>
             <igsn:name>Geoscience Australia</igsn:name>
         </igsn:affiliation>
     </igsn:registrant>
@@ -32,7 +32,7 @@
     </igsn:collectionMethods>
     <igsn:contributors>
         <igsn:contributor type="HostingInstitution">
-            <igsn:identifier type="url">http://pid.geoscience.gov.au/org/ga/geoscienceaustralia</igsn:identifier>
+            <igsn:identifier type="URI">http://pid.geoscience.gov.au/org/ga/geoscienceaustralia</igsn:identifier>
             <igsn:name>Geoscience Australia</igsn:name>
         </igsn:contributor>
     </igsn:contributors>
