@@ -13,7 +13,7 @@ class LDAPI:
 
     This class is issued as a Python file, rather than a Git submodule so check the version number before use!
 
-    Version 2.3
+    Version 2.4
     """
 
     # maps HTTP MIMETYPES to rdflib's RDF parsing formats
@@ -90,11 +90,13 @@ class LDAPI:
         """
         if view is not None:
             if view in views_formats.keys():
+                if view == 'default':
+                    view = views_formats['default']
                 return view
             else:
                 raise LdapiParameterError(
                     'The _view parameter is invalid. For this object, it must be one of {0}.'
-                    .format(', '.join(views_formats.keys()))
+                    .format(', '.join(views_formats.keys()).replace('renderer, ', ''))
                 )
         else:
             # views_formats will give us the default model
@@ -116,8 +118,8 @@ class LDAPI:
                         .format(', '.join(views_formats.get(view)['mimetypes']))
                 )
         else:
-            # HTML is default
-            return 'text/html'
+            # for format is None, return the default format
+            return views_formats[view]['default_mimetype']
 
     @staticmethod
     def get_valid_view_and_format(request, views_formats):
@@ -130,19 +132,23 @@ class LDAPI:
         :param views_formats: the allowed model and their formats in this instance
         :return: valid model and format
         """
+        # try to use given vew & format
         v = request.values.get('_view')
         f = request.values.get('_format')
+
+        # validate view
+        v = LDAPI.valid_view(v, views_formats)
+
         # if no given _format, check for MIME types
         if f is None:
             f = request.accept_mimetypes.best_match(
                 ['text/turtle', 'application/rdf+json', 'application/rdf+xml', 'text/html', 'text/xml', 'application/xml']
             )
-
-        v = LDAPI.valid_view(v, views_formats)
-        if f is not None:
-            f = LDAPI.valid_format(f, v, views_formats)
-        else:
-            f = views_formats[v]['default_mimetype']
+            # handle the case where getting the format from Accept header results in an invalid format for this view
+            if f.replace(' ', '+') not in views_formats.get(v)['mimetypes']:
+                f = views_formats[v]['default_mimetype']
+        # validate format
+        f = LDAPI.valid_format(f, v, views_formats)
 
         if v and f:
             # return valid model and format

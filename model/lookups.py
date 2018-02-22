@@ -791,5 +791,11 @@ TERM_LOOKUP = {
         'interval': 'http://vocabulary.odm2.org/samplingfeaturetype/interval',  # added while Trevor's mapping is in place, to be wound back
         'survey': 'http://vocabulary.odm2.org/samplingfeaturetype/scene',
         'site': 'http://vocabulary.odm2.org/samplingfeaturetype/site'
+    },
+    'custodian': {
+        'http://earthresources.vic.gov.au/earth-resources/geology-of-victoria/geological-survey-of-victoria': 'gsv',
+        'http://www.minerals.statedevelopment.sa.gov.au/about_us#gssa': 'gssa',
+        'http://pid.geoscience.gov.au/org/ga/geoscienceaustralia': 'ga'
     }
+
 }

@@ -15,7 +15,9 @@
         </th>
         <td>{{ wkt }}</td>
     </tr>
-    <tr><th>Creator:</th><td>{{ creator|safe }}</td></tr>
-    <tr><th>Publisher:</th><td>{{ publisher|safe }}</td></tr>
+    <tr><th>Custodian:</th><td><a href="{{ custodian_uri }}">{{ custodian_label }}</a></td></tr>
+    {% if collector is not none %}
+    <tr><th>Creator:</th><td>{{ collector }}</td></tr>
+    {% endif %}
     <tr><th>Rights:</th><td><a href="https://creativecommons.org/licenses/by/4.0/">Creative Commons 4.0</a></td></tr>
 </table>

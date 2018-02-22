@@ -32,9 +32,16 @@
     </igsn:collectionMethods>
     <igsn:contributors>
         <igsn:contributor type="HostingInstitution">
-            <igsn:identifier type="URI">http://pid.geoscience.gov.au/org/ga/geoscienceaustralia</igsn:identifier>
-            <igsn:name>Geoscience Australia</igsn:name>
+            <igsn:name>{{ custodian_label }}</igsn:name>
+            <igsn:identifier type="URI">{{ custodian_uri }}</igsn:identifier>
         </igsn:contributor>
     </igsn:contributors>
+    {% if collector is not none %}
+    <igsn:collectors>
+        <igsn:collector>
+            <igsn:name>{{ collector }}</igsn:name>
+        </igsn:collector>
+    </igsn:collectors>
+    {%  endif %}
     <igsn:isMetadataPublic>Public</igsn:isMetadataPublic>
 </igsn:resource>

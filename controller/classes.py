@@ -44,7 +44,7 @@ def sample(igsn):
                 return render_template('class_sample_no_record.html')
 
     except LdapiParameterError as e:
-        return LDAPI.client_error_Response(e)
+        return LDAPI.client_error_Response(str(e))
 
 
 @classes.route('/sample/<string:igsn>/pingback', methods=['GET', 'POST'])
@@ -186,4 +186,4 @@ def samples():
                 last_page).render(view, mime_format, extra_headers=headers)
 
     except LdapiParameterError as e:
-        return LDAPI.client_error_Response(e)
+        return LDAPI.client_error_Response(str(e))

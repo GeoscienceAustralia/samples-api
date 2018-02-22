@@ -62,7 +62,5 @@
     <p>Other views of this Sample are listed in the <a href="{{ url_for('classes.sample', igsn=igsn) }}?_view=alternates">Alternates View</a>.</p>
     <h2>Citation</h2>
     <p>If you wish to cite this sample as you would a publication, please use the following format:</p>
-    <code style="display:block; margin: 0 5em 0 5em;">
-        Geoscience Australia {{ year_acquired }} "Geo Sample {{ igsn }}". A digital catalogue record of a physical sample managed by Geoscience Australia. Accessed {{ date_now }}. <a href="http://pid.geoscience.gov.au/sample/{{ igsn }}">igsn:{{ igsn }}</a>
-    </code>
+    <code style="display:block; margin: 0 5em 0 5em;">{{ citation|safe }}</code>
 {% endblock %}

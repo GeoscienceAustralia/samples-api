@@ -8,6 +8,7 @@ from rdflib import Graph, URIRef, RDF, RDFS, XSD, OWL, Namespace, Literal, BNode
 import _config as conf
 from _ldapi.__init__ import LDAPI
 from controller.oai_datestamp import *
+from .lookups import TERM_LOOKUP
 
 
 class Sample:
@@ -77,6 +78,9 @@ class Sample:
         self.hole_lat_max = None
         self.date_modified = None
         self.sample_no = None
+        self.custodian_uri = None
+        self.custodian_label = None
+        self.collector = None
 
         if xml is not None:  # even if there are values for Oracle API URI and IGSN, load from XML file if present
             self._populate_from_xml_file(xml)
@@ -167,7 +171,7 @@ class Sample:
             if hasattr(root.ROW, 'SAMPLEID'):
                 self.sample_id = root.ROW.SAMPLEID
             self.sample_no = root.ROW.SAMPLENO if hasattr(root.ROW, 'SAMPLENO') else None
-            self.access_rights = self._make_vocab_uri('public', 'access_rights')  # this value is statically set to 'public' for all samples
+            self.access_rights = self._make_vocab_uri('public', 'access_rights')  # statically 'public' for all samples
             if hasattr(root.ROW, 'REMARK'):
                 self.remark = str(root.ROW.REMARK).strip() if len(str(root.ROW.REMARK)) > 5 else None
             if hasattr(root.ROW, 'SAMPLE_TYPE_NEW'):
@@ -234,17 +238,27 @@ class Sample:
                 self.hole_lat_min = root.ROW.HOLE_MIN_LATITUDE
             if hasattr(root.ROW, 'HOLE_MAX_LATITUDE'):
                 self.hole_lat_max = root.ROW.HOLE_MAX_LATITUDE
-            # self.date_modified = None
-            # self.modified_datestamp = None
-            # TODO: replace all the other calls to this with a call to self.wkt instead
-            # self.wkt = self._generate_sample_wkt()
+            if hasattr(root.ROW, 'ORIGINATOR'):
+                if str(root.ROW.ORIGINATOR) == 'GSSA':
+                    self.custodian_label = 'Geological Survey of South Australia'
+                    self.custodian_uri = 'http://www.minerals.statedevelopment.sa.gov.au/about_us#gssa'
+                elif str(root.ROW.ORIGINATOR) == 'GSV':
+                    self.custodian_label = 'Geological Survey of Victoria'
+                    self.custodian_uri = 'http://earthresources.vic.gov.au/earth-resources/geology-of-victoria/' \
+                                         'geological-survey-of-victoria'
+                else:
+                    self.custodian_label = 'Geoscience Australia'
+                    self.custodian_uri = self.URI_GA
+                    self.collector = str(root.ROW.ORIGINATOR)
+            else:  # if no ORIGINATOR is give, default to a custodian of GA
+                self.custodian_label = 'Geoscience Australia'
+                self.custodian_uri = self.URI_GA
         except Exception as e:
             print(e)
 
         return True
 
     def _make_vocab_uri(self, xml_value, vocab_type):
-        from .lookups import TERM_LOOKUP
         if TERM_LOOKUP[vocab_type].get(xml_value) is not None:
             return TERM_LOOKUP[vocab_type].get(xml_value)
         else:
@@ -367,6 +381,36 @@ class Sample:
         '''
         g.update(u)
 
+        # simplifying qualified relationships
+        u = '''
+            PREFIX prov: <http://www.w3.org/ns/prov#>
+            PREFIX foaf: <http://xmlns.com/foaf/0.1/>
+            INSERT {
+                ?e prov:wasAttributedTo ?a .
+                ?a rdfs:label ?n .
+            }
+            WHERE {
+                ?e prov:qualifiedAttribution/prov:agent ?a .
+                ?a foaf:name ?n .
+            }
+        '''
+        g.update(u)
+
+        # up classing all prov:Person & org:Org as prov:Agent
+        u = '''
+            PREFIX prov: <http://www.w3.org/ns/prov#>
+            PREFIX foaf: <http://xmlns.com/foaf/0.1/>
+            INSERT {
+                ?a a prov:Agent
+            }
+            WHERE {
+                {?a a foaf:Organization}
+                UNION
+                {?a a prov:Person}
+            }
+        '''
+        g.update(u)
+
         return g
 
     def __gen_visjs_nodes(self, g):
@@ -410,7 +454,7 @@ class Sample:
                     label = row['label']
                 else:
                     label = 'Agent'
-                nodes += '\t\t\t\t{id: "%(node_id)s", label: "%(label)s", image: "/samples/static/img/agent.png", shape: "image"},\n' % {
+                nodes += '\t\t\t\t{id: "%(node_id)s", label: "%(label)s", image: "/static/img/ga/agent.png", shape: "image"},\n' % {
                     'node_id': row['s'],
                     'label': label
                 }
@@ -437,6 +481,19 @@ class Sample:
             }
 
         return edges
+
+    def _make_citation(self):
+        return '{} {}"Sample {}". A digital catalogue record of ' \
+               'a physical sample managed by {}. Accessed {}. <a href="{}">igsn:{}</a>'\
+            .format(
+                self.collector if self.collector is not None else self.custodian_label,
+                '({}) '.format(datetime.datetime.strftime(self.date_acquired, '%Y')) if self.date_acquired is not None else '',
+                self.igsn,
+                self.custodian_label,
+                datetime.datetime.now().strftime('%d %B %Y'),
+                conf.URI_SAMPLE_INSTANCE_BASE + self.igsn,
+                self.igsn
+            )
 
     def _make_vsjs(self, g):
         g = self.__graph_preconstruct(g)
@@ -493,30 +550,24 @@ class Sample:
         PROV = Namespace('http://www.w3.org/ns/prov#')
         g.bind('prov', PROV)
         g.add((this_sample, PROV.pingback, URIRef(conf.REGISTER_BASE_URI + self.igsn + '/pingback')))
+        SKOS = Namespace('http://www.w3.org/2004/02/skos/core#')
+        g.bind('skos', SKOS)
+        ADMS = Namespace('http://www.w3.org/ns/adms#')
+        g.bind('adms', ADMS)
+        DCT = Namespace('http://purl.org/dc/terms/')
+        g.bind('dct', DCT)
+        SAMFL = Namespace('http://def.seegrid.csiro.au/ontology/om/sam-lite#')
+        g.bind('samfl', SAMFL)
+        GEOSP = Namespace('http://www.opengis.net/ont/geosparql#')
+        g.bind('geosp', GEOSP)
+        AUROLE = Namespace('http://communications.data.gov.au/def/role/')
+        g.bind('aurole', AUROLE)
+        FOAF = Namespace('http://xmlns.com/foaf/0.1/')
+        g.bind('foaf', FOAF)
 
-        # generate things common to particular views
-        if model_view == 'igsn-o' or model_view == 'dct':
-            # DC = Namespace('http://purl.org/dc/elements/1.1/')
-            DCT = Namespace('http://purl.org/dc/terms/')
-            g.bind('dct', DCT)
-
-        if model_view == 'igsn-o' or model_view == 'sosa':
-            SAMFL = Namespace('http://def.seegrid.csiro.au/ontology/om/sam-lite#')
-            g.bind('samfl', SAMFL)
-
-        if model_view == 'igsn-o' or model_view == 'sosa' or model_view == 'dct':
-            GEOSP = Namespace('http://www.opengis.net/ont/geosparql#')
-            g.bind('geosp', GEOSP)
-
-            # sample location in GML & WKT, formulation from GeoSPARQL
-            wkt = Literal(self._generate_sample_wkt(), datatype=GEOSP.wktLiteral)
-            gml = Literal(self._generate_sample_gml(), datatype=GEOSP.gmlLiteral)
-
-        if model_view == 'igsn-o' or model_view == 'prov':
-            PROV = Namespace('http://www.w3.org/ns/prov#')
-            g.bind('prov', PROV)
-            AUROLE = Namespace('http://communications.data.gov.au/def/role/')
-            g.bind('aurole', AUROLE)
+        # sample location in GML & WKT, formulation from GeoSPARQL
+        wkt = Literal(self._generate_sample_wkt(), datatype=GEOSP.wktLiteral)
+        gml = Literal(self._generate_sample_gml(), datatype=GEOSP.gmlLiteral)
 
         # select model view
         if model_view == 'igsn-o':
@@ -530,9 +581,11 @@ class Sample:
 
             # AlternateIdentifier
             alternate_identifier = BNode()
-            g.add((this_sample, IGSN.alternateIdentifier, Literal(self.igsn, datatype=IGSN.IGSN)))
-            # g.add((alternate_identifier, RDF.type, URIRef('http://pid.geoscience.gov.au/def/voc/igsn-codelists/IGSN')))
-            # g.add((alternate_identifier, PROV.value, Literal(self.igsn, datatype=XSD.string)))
+            g.add((alternate_identifier, RDF.type, ADMS.Identifier))
+            g.add((alternate_identifier, SKOS.notation, Literal(self.igsn, datatype=XSD.string)))
+            g.add((alternate_identifier, ADMS.schemeAgency, URIRef('http://igsn.org')))
+            # TODO: add in a schema identifier, as per ADMS documentation
+            g.add((this_sample, DCT.identifier, alternate_identifier))
 
             # Geometry
             geometry = BNode()
@@ -562,47 +615,61 @@ class Sample:
             if self.date_acquired is not None:
                 g.add((this_sample, SAMFL.samplingTime, Literal(self.date_acquired.isoformat(), datatype=XSD.datetime)))
 
-            from model.lookups import TERM_LOOKUP
             g.add((this_sample, DCT.accessRights, URIRef(TERM_LOOKUP['access_rights']['public'])))
             # TODO: make a register of Entities
-            site = URIRef(self.entity_uri)
+            if self.entity_uri is not None:
+                site = URIRef(self.entity_uri)
 
-            g.add((this_sample, SAMFL.relatedSamplingFeature, site))  # could be OM.featureOfInterest
+                g.add((this_sample, SAMFL.relatedSamplingFeature, site))  # could be OM.featureOfInterest
 
-            # parent
-            if self.entity_type is not None:
-                g.add((site, RDF.type, URIRef(self.entity_type)))
-            else:
-                g.add((
-                    site,
-                    RDF.type,
-                    URIRef('http://pid.geoscience.gov.au/def/voc/featureofinteresttype/borehole')
-                ))
+                # parent
+                if self.entity_type is not None:
+                    g.add((site, RDF.type, URIRef(self.entity_type)))
+                else:
+                    g.add((
+                        site,
+                        RDF.type,
+                        URIRef('http://pid.geoscience.gov.au/def/voc/featureofinteresttype/borehole')
+                    ))
 
-            site_geometry = BNode()
-            g.add((site, GEOSP.hasGeometry, site_geometry))
-            g.add((site_geometry, RDF.type, SAMFL.Point))  # TODO: extend this for other geometry types
-            g.add((site_geometry, GEOSP.asWKT, Literal(self._generate_parent_wkt(), datatype=GEOSP.wktLiteral)))
-            g.add((site_geometry, GEOSP.asGML, Literal(self._generate_parent_gml(), datatype=GEOSP.wktLiteral)))
+                site_geometry = BNode()
+                g.add((site, GEOSP.hasGeometry, site_geometry))
+                g.add((site_geometry, RDF.type, SAMFL.Point))  # TODO: extend this for other geometry types
+                g.add((site_geometry, GEOSP.asWKT, Literal(self._generate_parent_wkt(), datatype=GEOSP.wktLiteral)))
+                g.add((site_geometry, GEOSP.asGML, Literal(self._generate_parent_gml(), datatype=GEOSP.wktLiteral)))
 
-            site_elevation = BNode()
-            g.add((site, SAMFL.samplingElevation, site_elevation))
-            g.add((site_elevation, RDF.type, SAMFL.Elevation))
-            if self.z is None:
-                z = 'NaN'
-            else:
-                z = self.z
-            g.add((site_elevation, SAMFL.elevation, Literal(z, datatype=XSD.float)))
-            g.add((site_elevation, SAMFL.verticalDatum, URIRef('http://spatialreference.org/ref/epsg/4283/')))
-            g.add((site, SAMFL.sampledFeature, this_sample))
+                site_elevation = BNode()
+                g.add((site, SAMFL.samplingElevation, site_elevation))
+                g.add((site_elevation, RDF.type, SAMFL.Elevation))
+                if self.z is None:
+                    z = 'NaN'
+                else:
+                    z = self.z
+                g.add((site_elevation, SAMFL.elevation, Literal(z, datatype=XSD.float)))
+                g.add((site_elevation, SAMFL.verticalDatum, URIRef('http://spatialreference.org/ref/epsg/4283/')))
+                g.add((site, SAMFL.sampledFeature, this_sample))
 
-            # define GA as an PROV Org with an ISO19115 role of Publisher
-            g.add((ga, RDF.type, PROV.Org))
+            # Agents
+            # define custodian as an PROV Org with an ISO19115 role of custodian
+            custodian_uri = URIRef(self.custodian_uri)
+            g.add((custodian_uri, RDF.type, ORG.Organization))
+            g.add((custodian_uri, FOAF.name, Literal(self.custodian_label, datatype=XSD.string)))
             qualified_attribution = BNode()
             g.add((qualified_attribution, RDF.type, PROV.Attribution))
-            g.add((qualified_attribution, PROV.agent, ga))
-            g.add((qualified_attribution, PROV.hadRole, AUROLE.Publisher))
+            g.add((qualified_attribution, PROV.agent, custodian_uri))
+            g.add((qualified_attribution, PROV.hadRole, AUROLE.custodian))
             g.add((this_sample, PROV.qualifiedAttribution, qualified_attribution))
+
+            # if a collector is known, term then a principalInvestigator
+            if self.collector is not None:
+                collector = BNode()
+                g.add((collector, RDF.type, PROV.Person))
+                g.add((collector, FOAF.name, Literal(self.collector, datatype=XSD.string)))
+                qualified_attribution2 = BNode()
+                g.add((qualified_attribution2, RDF.type, PROV.Attribution))
+                g.add((qualified_attribution2, PROV.agent, collector))
+                g.add((qualified_attribution2, PROV.hadRole, AUROLE.principalInvestigator))
+                g.add((this_sample, PROV.qualifiedAttribution, qualified_attribution2))
         elif model_view == 'dct':
             # this is the cut-down IGSN --> Dublin core mapping describe at http://igsn.github.io/oai/
             g.add((this_sample, RDF.type, DCT.PhysicalResource))
@@ -625,17 +692,27 @@ class Sample:
                 g.add((this_sample, DCT.type, URIRef(self.sample_type)))
         elif model_view == 'prov':
             g.add((this_sample, RDF.type, PROV.Entity))
-            g.add((ga, RDF.type, PROV.Org))
+            # Agents
+            # define custodian as an PROV Org with an ISO19115 role of custodian
+            custodian_uri = URIRef(self.custodian_uri)
+            g.add((custodian_uri, RDF.type, FOAF.Organization))
+            g.add((custodian_uri, FOAF.name, Literal(self.custodian_label, datatype=XSD.string)))
             qualified_attribution = BNode()
             g.add((qualified_attribution, RDF.type, PROV.Attribution))
-            g.add((qualified_attribution, PROV.agent, ga))
-            g.add((qualified_attribution, PROV.hadRole, AUROLE.Publisher))
+            g.add((qualified_attribution, PROV.agent, custodian_uri))
+            g.add((qualified_attribution, PROV.hadRole, AUROLE.custodian))
             g.add((this_sample, PROV.qualifiedAttribution, qualified_attribution))
 
-            # just for visjs
-            g.add((ga, RDF.type, PROV.Agent))
-            g.add((this_sample, PROV.wasAttributedTo, ga))
-            g.add((ga, RDFS.label, Literal('Geoscience Australia', datatype=XSD.string)))
+            # if a collector is known, term then a principalInvestigator
+            if self.collector is not None:
+                collector = BNode()
+                g.add((collector, RDF.type, PROV.Person))
+                g.add((collector, FOAF.name, Literal(self.collector, datatype=XSD.string)))
+                qualified_attribution2 = BNode()
+                g.add((qualified_attribution2, RDF.type, PROV.Attribution))
+                g.add((qualified_attribution2, PROV.agent, collector))
+                g.add((qualified_attribution2, PROV.hadRole, AUROLE.principalInvestigator))
+                g.add((this_sample, PROV.qualifiedAttribution, qualified_attribution2))
         elif model_view == 'sosa':
             SOSA = Namespace('http://www.w3.org/ns/sosa/')
             g.bind('sosa', SOSA)
@@ -719,10 +796,32 @@ class Sample:
             # domain feature, same for all Samples
             domain_feature = URIRef('http://registry.it.csiro.au/sandbox/csiro/oznome/feature/earth-realm/lithosphere')
             g.add((domain_feature, RDF.type, SOSA.FeatureOfInterest))
-            SKOS = Namespace('http://www.w3.org/2004/02/skos/core#')
-            g.bind('skos', SKOS)
             g.add((domain_feature, SKOS.exactMatch, URIRef('http://sweet.jpl.nasa.gov/2.3/realmGeol.owl#Lithosphere')))
             g.add((this_sample, SOSA.isSampleOf, domain_feature))  # associate
+
+            g.add((this_sample, RDF.type, PROV.Entity))
+
+            # Provenance Agents
+            # define custodian as an PROV Org with an ISO19115 role of custodian
+            custodian_uri = URIRef(self.custodian_uri)
+            g.add((custodian_uri, RDF.type, FOAF.Organization))
+            g.add((custodian_uri, FOAF.name, Literal(self.custodian_label, datatype=XSD.string)))
+            qualified_attribution = BNode()
+            g.add((qualified_attribution, RDF.type, PROV.Attribution))
+            g.add((qualified_attribution, PROV.agent, custodian_uri))
+            g.add((qualified_attribution, PROV.hadRole, AUROLE.custodian))
+            g.add((this_sample, PROV.qualifiedAttribution, qualified_attribution))
+
+            # if a collector is known, term then a principalInvestigator
+            if self.collector is not None:
+                collector = BNode()
+                g.add((collector, RDF.type, PROV.Person))
+                g.add((collector, FOAF.name, Literal(self.collector, datatype=XSD.string)))
+                qualified_attribution2 = BNode()
+                g.add((qualified_attribution2, RDF.type, PROV.Attribution))
+                g.add((qualified_attribution2, PROV.agent, collector))
+                g.add((qualified_attribution2, PROV.hadRole, AUROLE.principalInvestigator))
+                g.add((this_sample, PROV.qualifiedAttribution, qualified_attribution2))
 
         return g.serialize(format=LDAPI.get_rdf_parser_for_mimetype(rdf_mime))
 
@@ -764,8 +863,9 @@ class Sample:
             type=self.sample_type,
             format=self.material_type,
             wkt=self._generate_sample_wkt(),
-            creator='Geoscience Australia ({})'.format(Sample.URI_GA),
-            publisher='Geoscience Australia ({})'.format(Sample.URI_GA),
+            creator=self.collector,
+            publisher_uri=self.custodian_uri,
+            publisher_label=self.custodian_label
         )
 
         return template
@@ -792,7 +892,10 @@ class Sample:
             sample_type=self.sample_type,
             material_type=self.material_type,
             collection_method=self.method_type,
-            collection_time=collection_time
+            collection_time=collection_time,
+            collector=self.collector,
+            publisher_uri=self.custodian_uri,
+            publisher_label=self.custodian_label
         )
 
         return template
@@ -812,7 +915,10 @@ class Sample:
             sample_type=self.sample_type,
             material_type=self.material_type,
             collection_method=self.method_type_non_uri,
-            collection_time=self.date_acquired
+            collection_time=self.date_acquired,
+            collector=self.collector,
+            custodian_uri=self.custodian_uri,
+            custodian_label=self.custodian_label
         )
 
         return template
@@ -832,7 +938,10 @@ class Sample:
             method_type=self.method_type,
             wkt=self._generate_sample_wkt(),
             sample_id=self.sample_id,
-            collection_time=self.date_acquired
+            collection_time=self.date_acquired,
+            collector=self.collector,
+            publisher_uri=self.custodian_uri,
+            publisher_label=self.custodian_label
         )
 
         return template
@@ -861,7 +970,10 @@ class Sample:
                 method_type_text=self.method_type_non_uri,
                 material_type_alink=self._make_vocab_alink(self.material_type),
                 lithology_alink=self._make_vocab_alink(self.lith),
-                entity_type_alink=self._make_vocab_alink(self.entity_type)
+                entity_type_alink=self._make_vocab_alink(self.entity_type),
+                custodian_uri=self.custodian_uri,
+                custodian_label=self.custodian_label,
+                collector=self.collector
             )
         elif model_view == 'prov':
             view_title = 'PROV Ontology view'
@@ -871,7 +983,7 @@ class Sample:
             sample_table_html = render_template(
                 'class_sample_prov.html',
                 visjs=self._make_vsjs(g),
-                prov_turtle=prov_turtle,
+                prov_turtle=prov_turtle.decode('utf-8'),
             )
         else:  # elif model_view == 'dct':
             view_title = 'Dublin Core view'
@@ -885,8 +997,9 @@ class Sample:
                 type=self.sample_type,
                 format=self.material_type,
                 wkt=self._generate_sample_wkt(),
-                creator='<a href="{}">Geoscience Australia</a>'.format(Sample.URI_GA),
-                publisher='<a href="{}">Geoscience Australia</a>'.format(Sample.URI_GA),
+                custodian_uri=self.custodian_uri,
+                custodian_label=self.custodian_label,
+                collector=self.collector
             )
 
         if self.date_acquired is not None:
@@ -900,28 +1013,20 @@ class Sample:
             'Link': '<{}>;rel = "http://www.w3.org/ns/prov#pingback"'.format(pingback_uri)
         }
 
-        # add branding choice
-        if self.igsn.startswith('AUVI'):
-            organisation_branding = 'gsv'
-        elif self.igsn.startswith('AUSA'):
-            organisation_branding = 'gssa'
-        else:  # default is GA
-            organisation_branding = 'ga'
-
         return Response(
             render_template(
                 'page_sample.html',
-                organisation_branding=organisation_branding,
+                organisation_branding=TERM_LOOKUP['custodian'].get(self.custodian_uri),
                 view=model_view,
                 igsn=self.igsn,
                 year_acquired=year_acquired,
                 view_title=view_title,
                 sample_table_html=sample_table_html,
-                date_now=datetime.datetime.now().strftime('%d %B %Y'),
                 gm_key=conf.GOOGLE_MAPS_API_KEY,
                 lat=self.y if self.y is not None else self.centroid_lat,
                 lon=self.x if self.x is not None else self.centroid_lon,
-                gmap_bbox=self._generate_sample_gmap_bbox()
+                gmap_bbox=self._generate_sample_gmap_bbox(),
+                citation=self._make_citation()
             ),
             headers=headers
         )
@@ -932,52 +1037,13 @@ class ParameterError(ValueError):
 
 
 if __name__ == '__main__':
-    s = Sample(None, xml='c:/work/samples-api/test/static_data/AU239.xml')
-    # print s.igsn
-    # print s.sample_id
-    # print 'sample_type ' + s.sample_type
-    # print 'method_type ' + s.method_type
-    # print 'material_type ' + s.material_type
-    # # print 'long_min ' + s.long_min
-    # # print 'long_max ' + s.long_max
-    # # print 'lat_min ' + s.lat_min
-    # # print 'lat_max ' + s.lat_max
-    # print 'gtype ' + str(s.gtype)
-    # print 'srid ' + str(s.srid)
-    # print 'x ' + str(s.x)
-    # print 'y ' + str(s.y)
-    # print 'z ' + str(s.z)
-    # print 'elem_info ' + s.elem_info
-    # print 'ordinates ' + s.ordinates
-    # print 'state ' + s.state
-    # print 'country ' + s.country
-    # print 'depth_top ' + str(s.depth_top)
-    # print 'depth_base ' + str(s.depth_base)
-    # print 'strath ' + s.strath
-    # print 'age ' + s.age
-    # print 'remark ' + s.remark
-    # print 'lith ' + s.lith
-    # print 'date_acquired ' + s.date_acquired.isoformat()
-    # print 'entity_uri ' + s.entity_uri
-    # print 'entity_name ' + s.entity_name
-    # print 'entity_type ' + s.entity_type
-    # print 'hole_long_min ' + str(s.hole_long_min)
-    # print 'hole_long_max ' + str(s.hole_long_max)
-    # print 'hole_lat_min ' + str(s.hole_lat_min)
-    # print 'hole_lat_max ' + str(s.hole_lat_max)
-    # print 'sample_no ' + str(s.sample_no)
-    # print s.export_dct_xml()
-
-    # s = Sample('http://dbforms.ga.gov.au/www_distp/a.igsn_api.get_igsnSample?pIGSN={0}', 'AU239')
-    # print s.igsn
-
-    # print s.is_xml_export_valid(open('../test/sample_eg3_IGSN_schema.xml').read())
-    # print s.export_as_igsn_xml()
-
-    from model.lookups import TERM_LOOKUP
-
-    print(TERM_LOOKUP['sample_type']['unknown'])
-
-    print(TERM_LOOKUP['method_type']['Unknown'])
-
-    print(TERM_LOOKUP['material_type']['unknown'])
+    # s = Sample(None, xml='c:/work/samples-api/test/static_data/AU239.xml')
+    #
+    # from model.lookups import TERM_LOOKUP
+    #
+    # print(TERM_LOOKUP['sample_type']['unknown'])
+    #
+    # print(TERM_LOOKUP['method_type']['Unknown'])
+    #
+    # print(TERM_LOOKUP['material_type']['unknown'])
+    pass

@@ -22,6 +22,10 @@
     <tr><td>Material Type</td><td>{{ material_type_alink|safe }}</td></tr>
     <tr><td>Lithology</td><td>{{ lithology_alink|safe }}</td></tr>
     <tr><td>Sampling Feature Type</td><td>{{ entity_type_alink|safe }}</td></tr>
+    <tr><th>Custodian:</th><td><a href="{{ custodian_uri }}">{{ custodian_label }}</a></td></tr>
+    {% if collector is not none %}
+    <tr><td>Collector</td><td>{{ collector }}</td></tr>
+    {% endif %}
     <tr><td colspan="2"></td></tr>
     <tr><th colspan="2">Functional endpoints</th></tr>
     <tr><td>Provenance</td><td><a href="{{ request.base_url }}?_view=prov">?_view=prov</a></td></tr>
