@@ -273,15 +273,14 @@ class Sample:
 
     def _generate_sample_wkt(self):
         if self.z is not None:
-            return 'SRID={};POINTZ({} {} {})'.format(self.srid, self.x, self.y, self.z)
+            return '<http://www.opengis.net/def/crs/EPSG/0/4283> POINTZ({} {} {})'.format(self.x, self.y, self.z)
         elif self.srid is not None and self.x is not None and self.y is not None:
-            return 'SRID={};POINT({} {})'.format(self.srid, self.x, self.y)
+            return '<http://www.opengis.net/def/crs/EPSG/0/4283> POINT({} {})'.format(self.x, self.y)
         elif self.ordinates is not None:
             s = []
             for x, y in zip(*[iter(self.ordinates)] * 2):
                 s.append(str(x) + ' ' + str(y))
-            return 'SRID={};POLYGON(({}))'.format(
-                self.srid,
+            return '<http://www.opengis.net/def/crs/EPSG/0/4283> POLYGON(({}))'.format(
                 ', '.join(s)
             )
         else:
@@ -314,20 +313,19 @@ class Sample:
     def _generate_parent_wkt(self):
         if self.hole_long_min is not None and self.hole_long_max is not None:
             coordinates = {
-                'srid': 'GDA94',
                 'long_min': self.hole_long_min,
                 'long_max': self.hole_long_max,
                 'lat_min': self.hole_lat_min,
                 'lat_max': self.hole_lat_max
             }
-            wkt = 'SRID={srid};POLYGON(({long_min} {lat_max}, {long_max} {lat_max}, {long_max} {lat_min}, {long_max} {lat_min}, {long_min} {lat_max}))'.format(**coordinates)
+            wkt = '<http://www.opengis.net/def/crs/EPSG/0/4283> POLYGON(({long_min} {lat_max}, {long_max} {lat_max}, ' \
+                  '{long_max} {lat_min}, {long_max} {lat_min}, {long_min} {lat_max}))'.format(**coordinates)
         elif self.hole_long_min is not None:
             coordinates = {
-                'srid': self.srid,
                 'long_min': self.hole_long_min,
                 'lat_min': self.hole_lat_min
             }
-            wkt = 'SRID={srid};POINT({long_min} {lat_min})'.format(**coordinates)
+            wkt = '<http://www.opengis.net/def/crs/EPSG/0/4283> POINT({long_min} {lat_min})'.format(**coordinates)
         else:
             wkt = ''
 
