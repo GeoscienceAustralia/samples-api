@@ -562,6 +562,8 @@ class Sample:
         g.bind('aurole', AUROLE)
         FOAF = Namespace('http://xmlns.com/foaf/0.1/')
         g.bind('foaf', FOAF)
+        ORG = Namespace('http://www.w3.org/ns/org#')
+        g.bind('org', ORG)
 
         # sample location in GML & WKT, formulation from GeoSPARQL
         wkt = Literal(self._generate_sample_wkt(), datatype=GEOSP.wktLiteral)
