@@ -22,7 +22,7 @@
     <tr><td>Material Type</td><td>{{ material_type_alink|safe }}</td></tr>
     <tr><td>Lithology</td><td>{{ lithology_alink|safe }}</td></tr>
     <tr><td>Sampling Feature Type</td><td>{{ entity_type_alink|safe }}</td></tr>
-    <tr><th>Custodian:</th><td><a href="{{ custodian_uri }}">{{ custodian_label }}</a></td></tr>
+    <tr><td>Custodian:</td><td><a href="{{ custodian_uri }}">{{ custodian_label }}</a></td></tr>
     {% if collector is not none %}
     <tr><td>Collector</td><td>{{ collector }}</td></tr>
     {% endif %}
