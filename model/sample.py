@@ -1016,7 +1016,7 @@ class Sample:
         return Response(
             render_template(
                 'page_sample.html',
-                organisation_branding=TERM_LOOKUP['custodian'].get(self.custodian_uri),
+                organisation_branding=TERM_LOOKUP['custodian'].get(self.custodian_uri) if TERM_LOOKUP['custodian'].get(self.custodian_uri) is not None else 'ga',
                 view=model_view,
                 igsn=self.igsn,
                 year_acquired=year_acquired,
