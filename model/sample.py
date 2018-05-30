@@ -78,8 +78,8 @@ class Sample:
         self.hole_lat_max = None
         self.date_modified = None
         self.sample_no = None
-        self.custodian_uri = None
-        self.custodian_label = None
+        self.custodian_uri = self.URI_GA  # default
+        self.custodian_label = 'Geoscience Australia'  # default
         self.collector = None
 
         if xml is not None:  # even if there are values for Oracle API URI and IGSN, load from XML file if present
@@ -247,12 +247,8 @@ class Sample:
                     self.custodian_uri = 'http://earthresources.vic.gov.au/earth-resources/geology-of-victoria/' \
                                          'geological-survey-of-victoria'
                 else:
-                    self.custodian_label = 'Geoscience Australia'
-                    self.custodian_uri = self.URI_GA
+                    # custodian_uri & custodian_label set to GA by default
                     self.collector = str(root.ROW.ORIGINATOR)
-            else:  # if no ORIGINATOR is give, default to a custodian of GA
-                self.custodian_label = 'Geoscience Australia'
-                self.custodian_uri = self.URI_GA
         except Exception as e:
             print(e)
 
